@@ -1,0 +1,235 @@
+/* === ROOT & TYPOGRAPHY === */
+:root {
+    --primary-blue: #3498db;
+    --primary-blue-dark: #2980b9;
+    --text-dark: #2c3e50;
+    --text-light: #34495e;
+    --bg-start: #f8fafc;
+    --bg-end: #e8f4f8;        /* Soft blue-tinted white */
+    --accent-shadow: rgba(52, 152, 219, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-start);
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    overflow: hidden;
+    transition: background 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Background transition when splash finishes */
+body.splash-done {
+    background: linear-gradient(135deg, #e8f4fc 0%, #d6edff 100%);
+}
+
+/* === SPLASH CONTAINER === */
+#splash {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+/* === CAPSULE CURTAIN REVEAL — BUTTERY SMOOTH === */
+.capsule {
+    width: 190px;
+    height: 56px;
+    position: relative;
+    margin: 0 auto 50px;
+    filter: drop-shadow(0 12px 30px rgba(52, 152, 219, 0.3));
+    overflow: hidden;
+    border-radius: 32px;
+}
+
+.half {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6), 
+                inset 0 0 40px rgba(52, 152, 219, 0.15);
+}
+
+/* LEFT HALF — comes from TOP-LEFT corner */
+.left {
+    left: 0;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border-radius: 32px 0 0 32px;
+    transform: translate(-100vw, -100vh);
+    animation: curtainLeft 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* RIGHT HALF — comes from BOTTOM-RIGHT corner */
+.right {
+    right: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fdff 100%);
+    border-radius: 0 32px 32px 0;
+    border-left: 3px solid #e3f2fd;
+    box-shadow: inset 8px 0 25px rgba(52, 152, 219, 0.12),
+                0 8px 25px rgba(0, 0, 0, 0.08);
+    transform: translate(100vw, 100vh);
+    animation: curtainRight 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* Ultra-smooth curtain pull from diagonal corners */
+@keyframes curtainLeft {
+    0% {
+        transform: translate(-100vw, -100vh) scale(0.8);
+        opacity: 0.9;
+    }
+    70% {
+        transform: translate(-8%, -8%) scale(1.02);
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes curtainRight {
+    0% {
+        transform: translate(100vw, 100vh) scale(0.8);
+        opacity: 0.9;
+    }
+    70% {
+        transform: translate(8%, 8%) scale(1.02);
+    }
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Soft pulse when they perfectly meet */
+.capsule::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 36px;
+    background: transparent;
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.5);
+    animation: curtainPulse 1s ease-out 1.4s forwards;
+    pointer-events: none;
+}
+
+@keyframes curtainPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+    70%  { box-shadow: 0 0 0 30px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+/* === TEXT ANIMATIONS === */
+#splash h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 12px 0;
+    opacity: 0;
+    letter-spacing: -0.5px;
+    animation: fadeUp 0.9s ease-out 1.2s forwards;
+}
+
+#splash p {
+    font-size: 19px;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto 30px;
+    opacity: 0;
+    line-height: 1.6;
+    animation: fadeUp 0.9s ease-out 1.4s forwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === BUTTONS === */
+.buttons {
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease-out 1.6s forwards;
+}
+
+.buttons a {
+    display: inline-block;
+    padding: 14px 32px;
+    margin: 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    color: white;
+    background: var(--primary-blue);
+    border-radius: 50px;
+    transition: all 0.35s ease;
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.buttons a::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.buttons a:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(52, 152, 219, 0.4);
+}
+
+.buttons a:hover::before {
+    opacity: 1;
+}
+
+.buttons a:active {
+    transform: translateY(-1px);
+}
+
+/* Secondary button variant (optional) */
+.buttons a.secondary {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+}
+
+.buttons a.secondary:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-blue-dark);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+    .capsule { 
+        width: 140px; 
+        height: 42px; 
+        margin-bottom: 30px;
+    }
+    #splash h1 { font-size: 36px; }
+    #splash p { font-size: 17px; padding: 0 20px; }
+    .buttons a { 
+        display: block; 
+        width: 80%;
+        max-width: 300px;
+        margin: 12px auto;
+    }
+}
