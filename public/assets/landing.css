@@ -11,7 +11,10 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 25px 60px;
+    position: relative;
+    z-index: 10; 
 }
+
 
 .logo {
     font-size: 1.8rem;
@@ -38,21 +41,29 @@ nav .btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 70px 60px;
+    padding: 90px 80px;
+    min-height: 80vh;
+    position: relative;
+    overflow: hidden;
 }
 
+
+
 .hero-text {
-    max-width: 550px;
+    max-width: 600px;
+    margin-top: -200px;
+    margin-left :-40px;
 }
 
 .hero-text h1 {
-    font-size: 3rem;
+    font-size: 3.2rem;
     font-weight: 600;
+    line-height: 1.25;
     color: #1a1a1a;
 }
 
 .hero-text p {
-    margin: 15px 0 25px;
+    margin: 18px 0 28px;
     font-size: 1.1rem;
     color: #555;
 }
@@ -66,15 +77,36 @@ nav .btn {
     font-weight: 600;
 }
 
-.hero-img img {
-    width: 360px;
-    animation: float 4s ease-in-out infinite;
+.hero-img {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
+.hero-img::before {
+    content: "";
+    position: absolute;
+    width: 750px;
+    height: 750px;
+    background: #f7f8fa;
+    border-radius: 50%;
+    top: -500px;
+    right: -150px;
+    z-index: 0;
 }
+
+.hero-img img {
+    position: absolute;
+    top: -500px;        /* same as circle */
+    right: -150px;      /* same as circle */
+    width: 750px;       /* match the circle */
+    height: 750px;      /* match the circle */
+    object-fit: cover;  /* fill the circle perfectly */
+    z-index: 1;
+}
+
 
 /* FEATURES */
 .features {

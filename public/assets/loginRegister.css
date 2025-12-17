@@ -93,20 +93,20 @@ body {
 }
 
 /* ------------------ LIVE VALIDATION ---------------------- */
-/* Invalid state */
+/* Invalid state overrides focus */
 .auth-card input.invalid,
-input.invalid {
+.auth-card input.invalid:focus {
     border-color: #e74c3c !important;
     background-color: #ffe6e6;
-    box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 0 8px rgba(231,76,60,0.5) !important;
 }
 
-/* Valid state */
+/* Valid state overrides focus */
 .auth-card input.valid,
-input.valid {
+.auth-card input.valid:focus {
     border-color: #2ecc71 !important;
     background-color: #e8ffe8;
-    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 0 8px rgba(46,204,113,0.5) !important;
 }
 
 /* -------------------- BUTTON & LINKS --------------------- */
