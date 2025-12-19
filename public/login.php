@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../src/config/db.php'; // UPDATE IF NEEDED
+require '../src/config/db.php';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -42,41 +42,42 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSHRUSHA – Login</title>
+
     <link rel="stylesheet" href="assets/loginRegister.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
-<div class="auth-wrapper">
-
-    <div class="auth-image">
-        <img src="assets/images/loginimage.jpg" alt="Illustration">
-    </div>
-
-    <div class="auth-form">
+    <div class="auth-wrapper">
+        <!-- LOGIN FORM CARD -->
         <div class="auth-card">
-
             <h2>Welcome Back!</h2>
-            <p>Login to access your medicine reminders and care dashboard</p>
+            <p class="subtitle">
+                Login to access your medicine reminders and care dashboard
+            </p>
 
-            <!-- Show errors -->
+            <!-- Error Message -->
             <?php if(isset($_SESSION['error'])): ?>
-                <p style="color:red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+                <p class="message error-message">
+                    <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                </p>
             <?php endif; ?>
 
             <form action="login.php" method="POST">
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="email" name="email" placeholder="Enter your email..." required>
+                <input type="password" name="password" placeholder="Enter your password" required>
+                <a href="#" class="forgot">Forgot your password?</a>
                 <button type="submit" class="btn-primary">Login</button>
             </form>
 
-            <p class="switch">Don't have an account?
-                <a href="/Sushrusha/public/register.php">Register</a>
-            </p>
+            <button class="google-btn">
+                <img src="assets/images/google.png" alt="Google">
+                Continue with Google
+            </button>
 
+            <p class="switch">
+                Don’t have an account?
+                <a href="/Sushrusha/public/register.php">Create Account</a>
+            </p>
         </div>
     </div>
-
-</div>
 </body>
-</html>

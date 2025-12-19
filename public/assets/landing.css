@@ -134,3 +134,461 @@ nav .btn {
     color: #555;
     font-size: 0.95rem;
 }
+/* ABOUT SECTION */
+.about {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 60px;
+    background: #f7f8fa;
+}
+
+.about-content {
+    flex: 1;
+    padding-right: 40px;
+}
+
+.about-content h2 {
+    font-size: 2.5rem;
+    color: #2a79ff;
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.about-img {
+    flex: 1;
+}
+
+.about-img img {
+    width: 100%;
+    border-radius: 15px;
+}
+/* HOW IT WORKS */
+.how-it-works {
+  padding: 60px 20px;
+  background: #f4fbff;
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.how-it-works h2 {
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: #1f2d3d;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.step {
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.step:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Active Card (blue one like image) */
+.step-active {
+  background: linear-gradient(135deg, #1aa6d9, #4fc3f7);
+  color: #ffffff;
+}
+
+.step-active h3,
+.step-active p {
+  color: #ffffff;
+}
+
+.step-icon {
+  width: 70px;
+  height: 70px;
+  background: #eaf7fd;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.step-active .step-icon {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.step-icon img {
+  width: 40px;
+  height: 40px;
+}
+
+.step h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #1f2d3d;
+}
+
+.step p {
+  font-size: 14px;
+  color: #6b7c93;
+  line-height: 1.6;
+}
+
+/* BENEFITS SECTION */
+.benefits {
+  padding: 80px 20px;
+  background: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.benefits h2 {
+  text-align: center;
+  font-size: 34px;
+  margin-bottom: 60px;
+  color: #1f2d3d;
+}
+
+/* Layout */
+.benefit-cards {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 60px;
+}
+.benefit-content {
+  margin-left: 50px; 
+}
+
+/* LEFT – Illustration */
+.benefit-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.illustration-wrapper {
+  max-width: 100%;
+  height: auto;
+}
+
+.illustration-wrapper img {
+  width: 100%;
+  max-width: 600px;  /* limit size */
+  height: auto;
+  border-radius: 20px;
+  object-fit: contain;
+}
+
+/* Floating pills / benefit cards */
+.benefit-card {
+  background: #ffffff;
+  padding: 30px 26px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  margin-bottom: 22px;
+  max-width: 420px;
+  transition: transform 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateX(8px);
+}
+
+.benefit-card h3 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  color: #1f2d3d;
+}
+
+.benefit-card p {
+  font-size: 14px;
+  color: #6b7c93;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .benefit-cards {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .illustration-wrapper img {
+    max-width: 100%;
+  }
+}
+
+
+/* TESTIMONIALS */
+.testimonials {
+    padding: 80px 60px;
+    background: #f7f8fa;
+    text-align: center;
+}
+
+.testimonials h2 {
+    font-size: 2.5rem;
+    color: #2a79ff;
+    margin-bottom: 50px;
+}
+
+.testimonial-cards {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.testimonial-card {
+    flex: 1;
+    min-width: 220px;
+    background: white;
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.testimonial-card p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.testimonial-card h4 {
+    color: #2a79ff;
+    font-weight: 500;
+}
+
+/* DASHBOARD PREVIEW */
+.dashboard-preview {
+    padding: 80px 60px;
+    text-align: center;
+}
+
+.dashboard-preview h2 {
+    font-size: 2.5rem;
+    color: #2a79ff;
+    margin-bottom: 50px;
+}
+
+.dashboard-images {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.dashboard-images img {
+    width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+/* CTA */
+.cta {
+    padding: 80px 60px;
+    background: #2a79ff;
+    color: white;
+    text-align: center;
+}
+
+.cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+}
+
+.cta .get-started {
+    background: white;
+    color: #2a79ff;
+    padding: 16px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* MEDICINE BOX SECTION */
+.medicine-box {
+    padding: 80px 60px;
+    background: #f7f8fa;
+}
+
+.medicine-box-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.medicine-box-img {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    justify-content: center;
+}
+
+.medicine-box-img img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+}
+
+.medicine-box-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.medicine-box-text h2 {
+    font-size: 2.5rem;
+    color: #2a79ff;
+    margin-bottom: 20px;
+}
+
+.medicine-box-text p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.medicine-box-text .get-started {
+    padding: 14px 28px;
+    background: #2a79ff;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.medicine-box-text .get-started:hover {
+    background: #1a5fd4;
+}
+
+/* FOOTER */
+footer {
+    padding: 40px 60px;
+    background: #2a79ff;
+    color: white;
+    text-align: center;
+}
+
+footer a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+    font-weight: 500;
+}
+/* SPECIALITY SECTION */
+.speciality {
+  padding: 80px 20px;
+  background: #f2fbff;
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.section-tag {
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #6b7c93;
+  margin-bottom: 8px;
+}
+
+.speciality h2 {
+  font-size: 32px;
+  color: #1f2d3d;
+  margin-bottom: 40px;
+}
+
+/* Card */
+.speciality-card {
+  max-width: 1000px;
+  margin: auto;
+  background: linear-gradient(135deg, #1aa6d9, #4fc3f7);
+  border-radius: 28px;
+  padding: 50px 60px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 40px;
+  color: #ffffff;
+}
+
+/* Left content */
+.speciality-content {
+  text-align: left;
+}
+
+.icon-box {
+  width: 55px;
+  height: 55px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.icon-box img {
+  width: 28px;
+}
+
+.speciality-content h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.speciality-content p {
+  font-size: 14px;
+  line-height: 1.7;
+  opacity: 0.95;
+  margin-bottom: 22px;
+}
+
+/* Button */
+.speciality-btn {
+  display: inline-block;
+  padding: 10px 22px;
+  background: #ffffff;
+  color: #1aa6d9;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Right image */
+.speciality-image img {
+  width: 100%;
+  max-width: 260px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .speciality-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .speciality-content {
+    text-align: center;
+  }
+}
+

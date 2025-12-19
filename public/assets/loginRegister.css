@@ -1,189 +1,169 @@
-/* ---------------------- GENERAL BODY ---------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: url('images/background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
+
+    background: url('images/loginui .png') no-repeat;
+    background-size: contain;
+    background-position: left center;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    padding-right: 8vw;   /* pull card slightly left */
 }
 
-/* ------------------- OUTER WRAPPER ----------------------- */
+
+/* Wrapper for login card only */
 .auth-wrapper {
-    display: flex;
-    background: #ffffff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-    max-width: 900px;
-    width: 90%;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    width: 500px;
+    max-width: 500px; /* card max width */
+      margin-top: -30px;
 }
 
-/* -------------------- LEFT IMAGE ------------------------- */
-.auth-image {
-    flex: 1.1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Login card */
+.auth-card {
+   
     background: #ffffff;
-    border-radius: 20px 0 0 20px;
-    overflow: hidden;
-    padding: 20px;
-    min-height: 500px;
+    padding: 40px 32px;
+    border-radius: 24px;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.12);
+
+    display: flex;
+    flex-direction: column;
+     overflow: hidden;
+}
+
+
+
+
+/* Responsive */
+@media (max-width: 900px) {
+    body {
+        justify-content: center; /* center card on mobile */
+        padding: 20px;
+        background-position: top center;
+    }
+
+    .auth-card {
+        width: 90%;
+        padding: 30px 20px;
+    }
+}
+
+/* Left image */
+.auth-image {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .auth-image img {
     width: auto;
     height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    display: block;
+    max-width: 550px;  /* smaller to reduce white space */
     border-radius: 20px;
+    display: block;
 }
 
-/* -------------------- FORM SECTION ----------------------- */
-.auth-form {
-    flex: 0.9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-.auth-card {
-    width: 80%;
-    max-width: 350px;
-    min-height: 420px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+/* Login card */
 
 .auth-card h2 {
-    color: #2a79ff;
-    margin-bottom: 10px;
+    color: #000;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-align: center;
 }
-.auth-card p {
-    margin-bottom: 30px;
+
+.auth-card p.subtitle {
     color: #555;
     font-size: 0.95rem;
+    margin-bottom: 20px;    /* smaller bottom margin */
+    text-align: center;
 }
 
-/* -------------------- INPUT FIELDS ----------------------- */
+/* Input fields */
 .auth-card input {
-    width: 100%;
-    padding: 14px 18px;
-    margin: 10px 0;
-    border-radius: 12px;
-    border: 2px solid #ccc;
-    outline: none;
-    transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s;
+    width: 100%;             /* fill card width */
+    border: none;
+    margin-bottom: 14px;     /* reduce spacing between inputs */
+  background: #f3f5f7;
+    border-radius: 14px;
+    padding: 15px 18px;
+    font-size: 14px;
 }
 
-/* Focused input (still valid/invalid will override) */
-.auth-card input:focus {
-    border-color: #2a79ff;
-    box-shadow: 0 0 8px rgba(42,121,255,0.2);
-}
-
-/* ------------------ LIVE VALIDATION ---------------------- */
-/* Invalid state overrides focus */
-.auth-card input.invalid,
-.auth-card input.invalid:focus {
-    border-color: #e74c3c !important;
-    background-color: #ffe6e6;
-    box-shadow: 0 0 8px rgba(231,76,60,0.5) !important;
-}
-
-/* Valid state overrides focus */
-.auth-card input.valid,
-.auth-card input.valid:focus {
-    border-color: #2ecc71 !important;
-    background-color: #e8ffe8;
-    box-shadow: 0 0 8px rgba(46,204,113,0.5) !important;
-}
-
-/* -------------------- BUTTON & LINKS --------------------- */
+/* Primary button */
 .btn-primary {
     width: 100%;
     padding: 14px 0;
-    margin-top: 20px;
-    background: #2a79ff;
+    margin-top: 15px;
+    
     color: white;
-    border-radius: 14px;
+   background: linear-gradient(90deg, #8fb3e8, #4a78c2);
+    border-radius: 20px;
+    font-size: 15px;
+
     cursor: pointer;
     border: none;
     font-weight: 600;
     transition: background 0.3s;
 }
+
 .btn-primary:hover {
     background: #265fba;
 }
 
+/* Google button */
+.google-btn {
+    width: 100%;
+    margin-top: 12px;
+   border-radius: 20px;
+    padding: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid #ddd;
+   
+    background: #fff;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Switch text */
 .switch {
-    margin-top: 20px;
+    margin-top: 15px;
     font-size: 0.9rem;
     color: #555;
+    text-align: center;
 }
+
 .switch a {
     color: #2a79ff;
     text-decoration: none;
     font-weight: 500;
 }
+
 .switch a:hover {
     text-decoration: underline;
 }
 
-/* ------------------- MESSAGES --------------------------- */
-.message {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.error-message {
-    color: #e74c3c;
-    background-color: #fceae9;
-    border: 1px solid #f8c9c7;
-}
-
-.success-message {
-    color: #2ecc71;
-    background-color: #e8f9ee;
-    border: 1px solid #c2e6d1;
-}
-
-/* ------------------- RESPONSIVE ------------------------- */
+/* Responsive adjustments */
 @media (max-width: 900px) {
-    .auth-wrapper {
-        flex-direction: column;
-        min-height: auto;
-        width: 90%;
-        padding: 0;
-    }
-    .auth-image {
-        border-radius: 20px 20px 0 0;
-        padding: 20px;
-        min-height: 250px;
-    }
-    .auth-image img {
-        height: auto;
-        width: 100%;
-    }
-    .auth-form {
-        border-radius: 0 0 20px 20px;
-        padding: 30px 20px;
-    }
     .auth-card {
-        width: 100%;
-        min-height: auto;
+        width: 90%;
+        padding: 30px 20px;
     }
 }
