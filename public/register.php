@@ -80,49 +80,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSHRUSHA – Register</title>
 
-    <link rel="stylesheet" href="assets/loginRegister.css">
+    <link rel="stylesheet" href="assets/register.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+
+
+<body class="register-page">
 
 <div class="auth-wrapper">
 
-    <div class="auth-form">
-        <div class="auth-card">
+    <div class="auth-card">
 
-            <h2>Create Account</h2>
-            <p>Start managing your medicine schedule today</p>
+        <h2>Create Account</h2>
+        <p class="subtitle">Start managing your medicine schedule today</p>
 
-            <?php if(isset($_SESSION['error'])): ?>
-                <p class="message error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
-            <?php endif; ?>
+        <?php if(isset($_SESSION['error'])): ?>
+            <p class="message error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <?php endif; ?>
 
-            <?php if(isset($_SESSION['success'])): ?>
-                <p class="message success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
-            <?php endif; ?>
+        <?php if(isset($_SESSION['success'])): ?>
+            <p class="message success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
+        <?php endif; ?>
 
-           <form id="registerForm" action="register.php" method="POST" novalidate>
-                <input type="text" id="name" name="name" placeholder="Full Name" required>
-                <input type="email" id="email" name="email" placeholder="Email" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <button type="submit" class="btn-primary">Register</button>
-            </form>
+        <form id="registerForm" action="register.php" method="POST" novalidate>
+            <input type="text" id="name" name="name" placeholder="Full Name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
 
-            <p class="switch">Already have an account? 
-                <a href="login.php">Login</a>
-            </p>
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
 
-        </div>
-    </div>
+        <p class="switch">
+            Already have an account?
+            <a href="login.php">Login</a>
+        </p>
 
-    <div class="auth-image">
-        <img src="assets/images/loginimage.jpg" alt="Medical illustration">
     </div>
 
 </div>
 
-<script>
+
+
+
+
+<!-- <script>
     console.log("Validation script loaded!");
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -188,6 +190,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     });
 });
 
-    </script>
+    </script> -->
 </body>
 </html>
