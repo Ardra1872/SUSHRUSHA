@@ -8,6 +8,8 @@ CREATE TABLE users (
     contact_number VARCHAR(15),
     emergency_contact VARCHAR(15),
     patient_id INT,
+    reset_code VARCHAR(10),
+    reset_expiry DATETIME,
     FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE SET NULL
 );
 

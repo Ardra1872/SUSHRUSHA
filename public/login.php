@@ -35,7 +35,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 }
-?>
+ if(isset($_SESSION['success'])): ?>
+    <p class="message success-message">
+        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+    </p>
+<?php endif; ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,14 +71,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form action="login.php" method="POST">
                 <input type="email" name="email" placeholder="Enter your email..." required>
                 <input type="password" name="password" placeholder="Enter your password" required>
-                <a href="#" class="forgot">Forgot your password?</a>
+                <a href="forgot-password.php" class="forgot">Forgot your password?</a>
                 <button type="submit" class="btn-primary">Login</button>
             </form>
 
-            <button class="google-btn">
-                <img src="assets/images/google.png" alt="Google">
-                Continue with Google
-            </button>
+          <button class="google-btn" onclick="window.location.href='google-login.php'">
+    <img src="assets/images/google.png" alt="Google">
+    Continue with Google
+</button>
 
             <p class="switch">
                 Don’t have an account?

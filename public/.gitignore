@@ -1,0 +1,15 @@
+# Ignore .env with credentials
+.env
+
+# Ignore PHPMailer library if you don’t want to push vendor
+src/helpers/PHPMailer/
+
+# Ignore XAMPP/IDE or OS files
+*.log
+*.DS_Store
+*.idea/
+*.vscode/
+
+# Also ignore any credential files used for SMTP locally
+credential.env
+.env.*

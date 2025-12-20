@@ -1,0 +1,15 @@
+# Ignore environment files and local secrets
+.env
+**/.env
+*.env.local
+*.env.*
+
+# Ignore any credential files in public
+public/credential.env
+public/credential.env.example
+
+# Ignore IDE / OS files
+*.log
+*.DS_Store
+*.idea/
+*.vscode/
