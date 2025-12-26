@@ -3,8 +3,11 @@ session_start();
 require_once '../src/config/env.php'; // 👈 load env
 
 
+
 $client_id    = $_ENV['GOOGLE_CLIENT_ID'];
 $redirect_uri = $_ENV['GOOGLE_REDIRECT_URI'];
+
+
 
 
 $scope = urlencode(
