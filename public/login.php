@@ -7,11 +7,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, name, password FROM users WHERE email=?");
+    $stmt = $conn->prepare("SELECT id, name, password, role FROM users WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($id, $name, $hashed_password);
+    $stmt->bind_result($id, $name, $hashed_password, $role);
     $stmt->fetch();
 
     if($stmt->num_rows > 0){
@@ -19,6 +19,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             $_SESSION['user_id'] = $id;
             $_SESSION['user_name'] = $name;
+            $_SESSION['user_role'] = $role;
 
             header("Location:../src/views/dashboard.php");
             exit;
@@ -76,7 +77,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
 
           <button class="google-btn" onclick="window.location.href='google-login.php'">
-    <img src="assets/images/google.png" alt="Google">
+    <img src="assets/images/google-icon.svg" alt="Google">
     Continue with Google
 </button>
 

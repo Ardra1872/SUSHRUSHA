@@ -128,7 +128,7 @@ if (empty($name)) {
 }
 
 /* STEP 3: Check user in DB */
-$stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
+$stmt = $conn->prepare("SELECT id, role FROM users WHERE email=?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -145,10 +145,15 @@ if ($result->num_rows == 0) {
         header('Location: login.php');
         exit();
     }
+} else {
+    $row = $result->fetch_assoc();
+    $role = $row['role'];
 }
 
 /* STEP 4: Login */
 $_SESSION['user_email'] = $email;
+$_SESSION['user_name'] = $name;
+$_SESSION['user_role'] = $role;
 header("Location: /Sushrusha/src/views/dashboard.php");
 exit();
 ?>

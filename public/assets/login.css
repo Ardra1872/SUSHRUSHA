@@ -99,6 +99,22 @@ body {
     font-size: 14px;
 }
 
+
+/* Forgot Password link */
+.forgot {
+    text-decoration: none;
+    color: #2a79ff;
+    font-size: 0.9rem;
+    display: block;
+    text-align: right;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.forgot:hover {
+    text-decoration: underline;
+}
+
 /* Primary button */
 .btn-primary {
     width: 100%;
@@ -131,15 +147,17 @@ body {
     justify-content: center;
     gap: 10px;
     border: 1px solid #ddd;
-   
+
     background: #fff;
     cursor: pointer;
     font-weight: 500;
+    font-size: 15px;
 }
 
 .google-btn img {
     width: 20px;
     height: 20px;
+    vertical-align: middle;
 }
 
 /* Switch text */

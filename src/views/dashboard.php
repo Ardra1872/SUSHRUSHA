@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<?php
+session_start();
+// Redirect to login if user is not logged in
+if (!isset($_SESSION['user_name'])) {
+    header('Location: ../../public/login.php');
+    exit();
+}
+$userName = $_SESSION['user_name'];
+$userRole = isset($_SESSION['user_role']) ? ucfirst($_SESSION['user_role']) : 'User';
+?>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SUSHRUSHA – Dashboard</title>
@@ -75,8 +85,11 @@ body{
   border-radius:20px;
   border:none;
 }
-.profile{display:flex;align-items:center;gap:10px;font-size:13px}
-.avatar{width:36px;height:36px;border-radius:50%;background:#ddd}
+.profile{display:flex;align-items:center;gap:15px;font-size:13px}
+.time-section{display:flex;flex-direction:column;gap:4px}
+.time{font-weight:600;color:#2a79ff;font-size:14px}
+.name{color:#5b6b7a;font-size:12px}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;cursor:pointer}
 
 /* Pages */
 .page{
@@ -178,8 +191,11 @@ body{
     <div class="topbar">
       <input class="search" placeholder="Search..." />
       <div class="profile">
-        <div>Tuesday, Dec 2025 · 11:14 AM</div>
-        <div class="avatar"></div>
+        <div class="time-section">
+          <div class="time" id="current-time">12:00 PM</div>
+          <div class="name" id="profile-name">John Doe</div>
+        </div>
+        <div class="avatar" id="avatar-circle" title="Profile">👤</div>
       </div>
     </div>
 
@@ -265,11 +281,42 @@ navItems.forEach(item=>{
   });
 });
 
+// Real-time clock
+function updateTime() {
+  const now = new Date();
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  
+  const month = monthNames[now.getMonth()];
+  const date = now.getDate();
+  const day = dayNames[now.getDay()];
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = now.getHours() >= 12 ? 'AM' : 'PM';
+  const displayHours = now.getHours() % 12 || 12;
+  
+  document.getElementById('current-time').textContent = `${month} ${date} ${day} ${year} | ${displayHours}:${minutes} ${ampm}`;
+}
 
-  function logout() {
-   
-    window.location.href = '../../public/landing.html';
-  }
+// Update time every second
+setInterval(updateTime, 1000);
+updateTime();
+
+// Load profile name from session
+function loadProfileName() {
+  const profileName = '<?php echo htmlspecialchars($userName); ?>';
+  const userRole = '<?php echo htmlspecialchars($userRole); ?>';
+  const firstLetter = profileName.charAt(0).toUpperCase();
+  document.getElementById('profile-name').textContent = profileName + ' | ' + userRole;
+  document.getElementById('avatar-circle').textContent = firstLetter;
+}
+
+loadProfileName();
+
+function logout() {
+  window.location.href = '../../public/landing.html';
+}
 
 </script>
 
