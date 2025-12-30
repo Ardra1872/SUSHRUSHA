@@ -43,3 +43,33 @@ CREATE TABLE dose_logs (
     FOREIGN KEY (medicine_id) REFERENCES medicines(id) ON DELETE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE patient_profile (
+    patient_id INT PRIMARY KEY,
+    dob DATE,
+    gender ENUM('Male','Female','Other'),
+    blood_group VARCHAR(5),
+    height_cm INT,
+    weight_kg INT,
+    profile_photo VARCHAR(255),
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE medical_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    conditions TEXT,
+    allergies TEXT,
+    current_medications TEXT,
+    doctor_name VARCHAR(100),
+    hospital_name VARCHAR(100),
+    prescription_file VARCHAR(255),
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE caregivers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    caregiver_id INT NOT NULL,
+    relation VARCHAR(50),
+    notifications_enabled BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (caregiver_id) REFERENCES users(id) ON DELETE CASCADE
+);

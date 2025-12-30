@@ -3,6 +3,24 @@
 <head>
 <?php
 session_start();
+include '../config/db.php'; 
+
+$user_id = $_SESSION['user_id'] ?? null;
+
+/* Patient Profile */
+$profile = [];
+if ($user_id) {
+  $stmt = $conn->prepare("
+    SELECT u.name, u.contact_number, u.emergency_contact,
+           p.dob, p.gender, p.blood_group, p.height_cm, p.weight_kg
+    FROM users u
+    LEFT JOIN patient_profile p ON u.id = p.patient_id
+    WHERE u.id = ?
+  ");
+  $stmt->bind_param("i", $user_id);
+  $stmt->execute();
+  $profile = $stmt->get_result()->fetch_assoc();
+}
 // Redirect to login if user is not logged in
 if (!isset($_SESSION['user_name'])) {
     header('Location: ../../public/login.php');
@@ -158,6 +176,107 @@ body{
   .app{grid-template-columns:1fr}
   .grid{grid-template-columns:1fr 1fr}
 }
+/* Patient Profile */
+.profile-grid{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:18px;
+}
+
+.profile-header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.profile-avatar{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;
+  font-size:26px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.profile-info h4{
+  margin:0;
+  font-size:16px;
+  color:#2a79ff;
+}
+
+.profile-info p{
+  margin:2px 0;
+  font-size:12px;
+  color:#5b6b7a;
+}
+
+.profile-list p{
+  font-size:13px;
+  margin:6px 0;
+}
+
+.edit-btn{
+  margin-top:12px;
+  padding:8px 14px;
+  border:none;
+  border-radius:14px;
+  background:#2a79ff;
+  color:#fff;
+  font-size:12px;
+  cursor:pointer;
+}
+/* Edit Profile Form Styling */
+#profile-form .card {
+  background: #f5fbff;
+}
+
+#profile-form form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 18px;
+}
+
+#profile-form label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5d6b;
+}
+
+#profile-form input,
+#profile-form select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid #dbe7f1;
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+
+#profile-form input:focus,
+#profile-form select:focus {
+  border-color: #2a79ff;
+  box-shadow: 0 0 0 2px rgba(42,121,255,0.12);
+}
+
+/* Full-width fields */
+#profile-form .full {
+  grid-column: span 2;
+}
+
+/* Save button alignment */
+#profile-form button {
+  grid-column: span 2;
+  justify-self: flex-end;
+  padding: 10px 20px;
+  border-radius: 16px;
+}
+
 </style>
 </head>
 
@@ -256,12 +375,90 @@ body{
     </section>
 
     <!-- Profile -->
-    <section id="profile" class="page">
-      <div class="card">
-        <h3>Patient Profile</h3>
-        <!-- <p>Name, age, conditions & preferences.</p> -->
+   <section id="profile" class="page">
+  <div class="profile-grid">
+
+    <!-- BASIC PROFILE -->
+    <div class="card">
+      <h3>Patient Profile</h3>
+
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <?= strtoupper(substr($profile['name'] ?? 'U', 0, 1)) ?>
+        </div>
+
+        <div class="profile-info">
+          <h4><?= $profile['name'] ?? 'Not Updated' ?></h4>
+          <p><?= $profile['gender'] ?? '—' ?> | Blood: <?= $profile['blood_group'] ?? '—' ?></p>
+          <p>📞 <?= $profile['contact_number'] ?? '—' ?></p>
+        </div>
       </div>
-    </section>
+
+      <button class="edit-btn" onclick="openProfileForm()">Edit Profile</button>
+       <div id="profile-form" style="display:none;margin-top:20px;">
+  <div class="card">
+    <h3>Edit Patient Profile</h3>
+
+   <form method="POST" action="update_profile.php" class="profile-grid">
+
+  <input type="hidden" name="patient_id" value="<?= $_SESSION['user_id'] ?>">
+
+  <div class="form-group">
+    <label>Date of Birth</label>
+    <input type="date" name="dob">
+  </div>
+
+  <div class="form-group">
+    <label>Gender</label>
+    <select name="gender" required>
+      <option value="">Select</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Blood Group</label>
+    <input type="text" name="blood_group" placeholder="O+, A-" required>
+  </div>
+
+  <div class="form-group">
+    <label>Height (cm)</label>
+    <input type="number" name="height_cm">
+  </div>
+
+  <div class="form-group">
+    <label>Weight (kg)</label>
+    <input type="number" name="weight_kg">
+  </div>
+
+  <div class="form-group full">
+    <label>Emergency Contact</label>
+    <input type="text" name="emergency_contact">
+  </div>
+
+  <button type="submit" class="edit-btn full">Save Profile</button>
+
+</form>
+
+  </div>
+</div>
+
+    </div>
+
+    <!-- MEDICAL & PERSONAL INFO -->
+    <div class="card profile-list">
+      <h3>Personal & Medical Info</h3>
+      <p><b>Date of Birth:</b> <?= $profile['dob'] ?? '—' ?></p>
+      <p><b>Height:</b> <?= $profile['height_cm'] ?? '—' ?> cm</p>
+      <p><b>Weight:</b> <?= $profile['weight_kg'] ?? '—' ?> kg</p>
+      <p><b>Emergency Contact:</b> <?= $profile['emergency_contact'] ?? '—' ?></p>
+    </div>
+
+  </div>
+</section>
+
 
   </main>
 </div>
@@ -316,6 +513,10 @@ loadProfileName();
 
 function logout() {
   window.location.href = '../../public/landing.html';
+}
+function openProfileForm() {
+  const form = document.getElementById('profile-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
 </script>
