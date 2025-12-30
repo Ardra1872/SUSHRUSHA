@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../src/config/env.php'; // 👈 load env
+require_once '../src/config/env.php'; //load env
 
 
 

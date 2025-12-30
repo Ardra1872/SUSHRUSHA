@@ -2,14 +2,14 @@
 session_start();
 
 require_once '../src/config/db.php';
-require_once '../src/config/env.php'; // 👈 load env
+require_once '../src/config/env.php'; // load env
 
 $client_id     = $_ENV['GOOGLE_CLIENT_ID'];
 $client_secret = $_ENV['GOOGLE_CLIENT_SECRET'];
 $redirect_uri  = $_ENV['GOOGLE_REDIRECT_URI'];
 
 if (empty($client_id) || empty($client_secret)) {
-    // search common .env locations used by this project
+    
     $candidates = [
         __DIR__ . '/credential.env',
         __DIR__ . '/../public/credential.env',
@@ -27,7 +27,6 @@ if (empty($client_id) || empty($client_secret)) {
                 if (empty($client_secret) && isset($env['GOOGLE_CLIENT_SECRET'])) {
                     $client_secret = $env['GOOGLE_CLIENT_SECRET'];
                 }
-                // Stop searching if we found both
                 if (!empty($client_id) && !empty($client_secret)) {
                     break;
                 }
@@ -36,7 +35,6 @@ if (empty($client_id) || empty($client_secret)) {
     }
 }
 
-// If still empty, stop with a friendly message
 if (empty($client_id) || empty($client_secret)) {
     $_SESSION['error'] = 'Google OAuth credentials are not configured. Contact the administrator.';
     header('Location: login.php');
