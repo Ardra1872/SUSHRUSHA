@@ -17,9 +17,9 @@
 
     <!-- Logo -->
     <div class="logo">
-      <span class="logo-icon">💊</span> SUSHRUSHA
+      <span class="logo-icon"></span> SUSHRUSHA
     </div>
-
+     <div class="hamburger">&#9776;</div> <!-- ☰ -->
     <!-- Right-side menu and actions -->
     <div class="nav-right">
       <nav class="nav-links">
@@ -27,6 +27,8 @@
         <a href="#">Features</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
+         <a href="#">FAQ</a>
+        
       </nav>
       <div class="nav-actions">
         <a href="login.php" class="nav-btn secondary">Login</a>
@@ -213,6 +215,16 @@
         </div>
     </footer>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hamburger = document.querySelector(".hamburger");
+    const navMenu = document.querySelector(".nav-right");
+
+    hamburger.addEventListener("click", () => {
+      navMenu.classList.toggle("active");
+    });
+  });
+</script>
 
 
 </body>

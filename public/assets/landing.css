@@ -11,12 +11,14 @@ body {
 
 /* NAVBAR */
 .navbar {
-  height: 72px;
+  height: 64px;
   display: flex;
   align-items: center;
 
   background: transparent;
-
+  width: 100%;              
+  left: 0;                 
+  top: 0; 
 
     position: absolute;
     
@@ -26,20 +28,18 @@ body {
 /* Container only for nav-right */
 .nav-container {
   display: flex;
-   /* nav-right goes to the right */
-  
-  gap: 20px;
-  width: 100%;
-  padding-right: 60px; /* optional padding for nav-right */
-  box-sizing: border-box;
-   position: relative;
-  z-index: 20;
-  
-
   justify-content: space-between;
   align-items: center;
-  padding: 0 60px;
+
+  width: 100%;
+  padding-left: 40px;   /* MATCH HERO */
+  padding-right: 80px;
+
+  box-sizing: border-box;
+  position: relative;
+  z-index: 20;
 }
+
 
 
 /* Logo fully left */
@@ -56,12 +56,14 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between; 
+  gap: 20px; 
 }
 
 .nav-links {
   display: flex;
-  gap: 45px;
+  gap: 80px;
+  margin-left: 80px;
 }
 
 .nav-links a {
@@ -78,7 +80,7 @@ body {
 
 
 .nav-btn {
-  padding: 8px 18px;
+  padding: 12px 24px;
   background: #2a79ff;
   color: #ffffff;
   border-radius: 20px;
@@ -92,7 +94,7 @@ body {
 /* Right-side buttons container */
 .nav-actions {
   display: flex;
-  gap: 10px;
+  gap: 40px;
 }
 
 
@@ -108,24 +110,44 @@ body {
   display: flex;
   align-items: center;
    min-height: 90vh;
-  padding: 0 6%;
+ padding-left: 40px;   
+  padding-right: 0;     
  position: relative;
   z-index: 1;
   overflow: hidden;
-    padding-top: 20px;
+    
 }
 
 
 /* Right curved background */
 .hero-shape {
   position: absolute;
-  right: -15%;
-  top: -35%;
+  right: -18%;
+  top: -40%;
+
   width: 60vw;
-  height: 120vh;   
+  height: 120vh;
+
   background: #2fb2e6;
-  border-radius: 50%;
+  border-radius: 60%;
+
+  display: flex;
+  align-items: flex-end;   /* anchor image bottom */
+  justify-content: center;
+
+  overflow: hidden;
   z-index: 1;
+}
+
+.hero-shape::before {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 16px;
+  top: 35%;
+  left: 18%;
 }
 
 
@@ -133,16 +155,21 @@ body {
 
 /* Image positioning */
 .hero-shape img {
-  width: 100%;
-  transform: translate(-10%, 30%);
+ 
   height: auto;
+  width: 100%;
+  transform: translateY(-40px,10px);
+
   
 }
 
+
 .hero-text {
   max-width: 600px;
-  width: 45%;
+  width: auto; 
   z-index: 2;
+   margin-left: 40px;
+    margin-left: 0 !important;
 }
 
 .hero-text h1 {
@@ -680,14 +707,174 @@ footer a {
   max-width: 260px;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .speciality-card {
-    grid-template-columns: 1fr;
+/* ===================== HAMBURGER & MOBILE RESPONSIVE ===================== */
+
+/* ===================== HAMBURGER & MOBILE RESPONSIVE ===================== */
+
+/* Hamburger icon */
+.hamburger {
+  display: none;
+  cursor: pointer;
+  font-size: 28px;
+  color: #2a79ff;
+}
+
+/* ===== Mobile: max-width 768px ===== */
+@media (max-width: 768px) {
+
+   .hamburger {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 18px;
+    z-index: 400;
+  }
+
+  /* MOBILE MENU OVERLAY */
+  .nav-right {
+    display: none;
+    position: fixed;              
+    top: 64px;                    /* navbar height */
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 20px 0;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-radius: 0 0 20px 20px;
+    z-index: 350;
+  }
+
+  .nav-right.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Nav links */
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Login / Register */
+  .nav-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .nav-actions .nav-btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 20px;
+  }
+
+  /* HERO FIX (NO OVERLAP EVER AGAIN) */
+  .hero {
+    padding-top: 90px;            
+    margin-top: 0;
+    flex-direction: column;
     text-align: center;
   }
 
-  .speciality-content {
+  .hero-text {
+    max-width: 85%;
+    margin: auto;
+  }
+
+  .hero-text p {
+    display: none;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  .hero-text p { font-size: 1rem; }
+
+  /* Hero shape */
+  .hero-shape {
+    width: 90vw;
+    height: 60vh;
+    right: -20%;
+    top: -20%;
+  }
+
+  /* Stack sections */
+  .about,
+  .features,
+  .medicine-box,
+  .benefit-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px !important;
+    padding: 50px 5%;
+  }
+
+  /* Images */
+  .about-img img,
+  .medicine-box-img img,
+  .illustration-wrapper img,
+  .feature img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Full width buttons */
+  .nav-btn,
+  .get-started,
+  .speciality-btn {
+    width: 100%;
     text-align: center;
+    padding: 12px 0 !important;
+  }
+
+  /* Speciality card */
+  .speciality-card {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    padding: 30px 20px !important;
+  }
+
+  .speciality-content {
+    text-align: center !important;
+  }
+
+  /* Testimonials */
+  .testimonial-cards {
+    flex-direction: column;
+    gap: 20px !important;
+  }
+
+  h1 { font-size: 2rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.2rem !important; }
+}
+
+/* ===== Extra small mobiles ===== */
+@media (max-width: 480px) {
+
+  .hero-text h1 { font-size: 1.5rem !important; }
+  .hero-text p { font-size: 0.9rem !important; }
+
+  .about-content h2,
+  .medicine-box-text h2,
+  .speciality h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .hero-shape {
+    display: none;
+  }
+
+  .about,
+  .features,
+  .medicine-box,
+  .benefit-cards {
+    padding: 30px 5%;
   }
 }
+

@@ -1,11 +1,10 @@
-// // After animation, show landing and change bg
-// setTimeout(function() {
-//     // Add class to change background color
-//     document.body.classList.add('splash-done');
 
-//     // Hide splash content
-//     document.getElementById('splash').style.display = 'none';
+  const hamburger = document.querySelector('.hamburger');
+  const navLinks = document.querySelector('.nav-links');
+  const navActions = document.querySelector('.nav-actions');
 
-//     // Show landing buttons
-//     document.getElementById('landing').classList.remove('hidden');
-// }, 1500);
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    navActions.classList.toggle('active');
+  });
+
