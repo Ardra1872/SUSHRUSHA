@@ -132,10 +132,9 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
+    // New user → insert
     $role = "patient";
-    $stmt = $conn->prepare(
-        "INSERT INTO users (name, email, role) VALUES (?, ?, ?)"
-    );
+    $stmt = $conn->prepare("INSERT INTO users (name, email, role) VALUES (?, ?, ?)");
     $stmt->bind_param("sss", $name, $email, $role);
     if (!$stmt->execute()) {
         error_log('DB insert failed: ' . $stmt->error);
@@ -143,15 +142,22 @@ if ($result->num_rows == 0) {
         header('Location: login.php');
         exit();
     }
+    $user_id = $conn->insert_id; // <-- get inserted user id
 } else {
+    // Existing user → fetch once
     $row = $result->fetch_assoc();
-    $role = $row['role'];
+    $user_id = $row['id'];
+    $role    = $row['role'];
 }
 
-/* STEP 4: Login */
+/* STEP 4: Set session and redirect */
+$_SESSION['user_id']    = $user_id; 
 $_SESSION['user_email'] = $email;
-$_SESSION['user_name'] = $name;
-$_SESSION['user_role'] = $role;
+$_SESSION['user_name']  = $name;
+$_SESSION['user_role']  = $role;
+
 header("Location: /Sushrusha/src/views/dashboard.php");
 exit();
+
+
 ?>

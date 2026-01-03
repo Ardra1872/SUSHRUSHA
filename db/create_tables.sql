@@ -73,3 +73,4 @@ CREATE TABLE caregivers (
     FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (caregiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
