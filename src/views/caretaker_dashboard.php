@@ -17,194 +17,297 @@ $first_login = $_SESSION['first_login'];
     <title>Caretaker Dashboard</title>
     <link rel="stylesheet" href="assets/dashboard.css">
     <style>
-    /* Simple modal styling */
-    .modal {display:none; position:fixed; top:0; left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;}
-    .modal-content {background:#fff;padding:20px;border-radius:8px;max-width:400px;width:90%;text-align:center;}
-
-
     /* ===== CARETAKER DASHBOARD STYLING ===== */
 
-/* Reset & base */
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f4f8fc;
+    /* Reset & base */
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f8fc;
+        color: #1f2d3d;
+    }
+
+  /* Layout */
+.app-container {
+    display: flex;
+    background: #eaf6ff;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: #eef9ff;
+    padding: 30px 20px;
+    margin: 20px;
+    border-radius: 20px;
+}
+
+.logo {
+    color: #2f6bff;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #6b7a8a;
+    margin-bottom: 30px;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu li {
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
     color: #1f2d3d;
 }
 
-/* Wrapper */
-.dashboard-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.menu li.active,
+.menu li:hover {
+    background: #dff1ff;
+    color: #2f6bff;
 }
 
-/* Header */
-.dashboard-header {
+.logout {
+    display: block;
+    margin-top: 40px;
+    color: #2f6bff;
+    text-decoration: none;
+}
+
+/* Main */
+.main-content {
+    flex: 1;
+    padding: 30px;
+}
+
+.top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
-.dashboard-header h1 {
-    font-size: 28px;
-    font-weight: 600;
-}
-
-.dashboard-header .logout-btn {
-    padding: 8px 16px;
-    background: #3498db;
-    color: #fff;
+.top-bar input {
+    padding: 10px 16px;
+    border-radius: 20px;
     border: none;
-    border-radius: 6px;
-    cursor: pointer;
+    width: 300px;
+    background: #f4f8fc;
 }
 
-.dashboard-header .logout-btn:hover {
-    background: #2575b8;
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Cards section */
-.dashboard-cards {
+.avatar {
+    background: #2f6bff;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Cards */
+.dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
 .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(50, 70, 90, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #f0fbff;
+    padding: 24px;
+    border-radius: 18px;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(50, 70, 90, 0.15);
+.card.wide {
+    grid-column: span 2;
 }
 
-.card h3 {
-    margin-top: 0;
-    font-size: 20px;
-    color: #1f2d3d;
+.emergency {
+    border: 1px solid #5a7bff;
+    background: #f6f9ff;
 }
 
-.card p {
-    font-size: 14px;
-    color: #6b7a8a;
-}
-
-/* Buttons */
-.btn-primary {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #3498db;
-    color: #fff;
-    font-weight: 600;
+.danger-btn {
+    background: #ff6b6b;
     border: none;
-    border-radius: 6px;
+    padding: 12px 22px;
+    color: white;
+    border-radius: 20px;
     cursor: pointer;
-    text-decoration: none;
-    transition: background 0.2s ease;
 }
 
-.btn-primary:hover {
-    background: #2575b8;
-}
 
-/* Modal for first login */
+   /* ===== FIRST LOGIN MODAL ===== */
 .modal {
     display: none;
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    inset: 0;
+    background: rgba(31, 45, 61, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 999;
 }
 
 .modal-content {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 400px;
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     text-align: center;
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .modal-content h2 {
-    margin: 0 0 12px;
     font-size: 22px;
+    margin-bottom: 8px;
+    color: #1f2d3d;
 }
 
 .modal-content p {
     font-size: 14px;
     color: #6b7a8a;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .modal-content input[type="password"] {
-    padding: 10px;
     width: 100%;
-    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
     border: 1px solid #dbe7f0;
-    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: #3498db;
 }
 
 .modal-content button {
-    padding: 10px 20px;
+    width: 100%;
+    padding: 12px;
     background: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+    color: #ffffff;
     font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .modal-content button:hover {
     background: #2575b8;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
     }
-}
-
     </style>
 </head>
 <body>
+<div class="app-container">
 
-<div class="dashboard-wrapper">
-    <div class="dashboard-header">
-        <h1>Welcome, <?php echo $_SESSION['user_name']; ?>!</h1>
-        <button class="logout-btn" onclick="window.location.href='../../public/landing.html'">Logout</button>
-    </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2 class="logo">SUSHRUSHA</h2>
+        <p class="subtitle">Caretaker Dashboard</p>
 
-    <div class="dashboard-cards">
-        <div class="card">
-            <h3>Assigned Patient</h3>
-            <p>Details about your patient here.</p>
+        <ul class="menu">
+            <li class="active">👩‍⚕️ Assigned Patient</li>
+            <li>💊 Medicine Status</li>
+            <li>🔔 Alerts</li>
+            <li>📊 Reports</li>
+            <li>🚨 Emergency Access</li>
+            <li>⚙️ Profile</li>
+        </ul>
+
+        <a class="logout" href="../../public/landing.html">← Logout</a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <input type="text" placeholder="Search patient..." />
+
+            <div class="profile">
+                <div class="profile-text">
+                    <strong><?php echo $_SESSION['user_name']; ?></strong><br>
+                    <small>Caretaker</small>
+                </div>
+                <div class="avatar">
+                    <?php echo strtoupper($_SESSION['user_name'][0]); ?>
+                </div>
+            </div>
         </div>
-        <div class="card">
-            <h3>Medicine Reminders</h3>
-            <p>Upcoming medicine alerts for your patient.</p>
+
+        <!-- DASHBOARD GRID -->
+        <div class="dashboard-grid">
+
+            <!-- WIDE CARD -->
+            <div class="card wide">
+                <h3>Today’s Responsibilities</h3>
+                <h1>3</h1>
+                <p>1 patient • Next medicine in 15 minutes</p>
+            </div>
+
+            <!-- CARD -->
+            <div class="card">
+                <h3>Patient Adherence</h3>
+                <p>✔ 4 doses taken<br>⚠ 1 missed</p>
+            </div>
+
+            <!-- CARD -->
+            <div class="card">
+                <h3>Availability Status</h3>
+                <p><strong>Available</strong></p>
+            </div>
+
+            <!-- CARD -->
+            <div class="card">
+                <h3>Alerts</h3>
+                <p>⚠ Missed dose<br>🔔 Reminder sent</p>
+            </div>
+
+            <!-- EMERGENCY -->
+            <div class="card emergency">
+                <h3>Emergency Quick Access</h3>
+                <button class="danger-btn">Call Emergency</button>
+            </div>
+
         </div>
-        <div class="card">
-            <h3>Notifications</h3>
-            <p>Important notifications will appear here.</p>
-        </div>
-    </div>
+    </main>
 </div>
 
-
-<?php if ($first_login == 1): ?>
+<?php if ($_SESSION['first_login'] ?? 0 == 1): ?>
 <div id="firstLoginModal" class="modal">
     <div class="modal-content">
         <h2>Change Your Password</h2>
