@@ -323,3 +323,78 @@ body{
   margin-right: 10px;
 }
 
+.caretaker-card {
+  margin-top: 20px;
+  background: #eef8fb;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.caretaker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.caretaker-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.status-badge {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.caretaker-info p {
+  margin: 6px 0;
+  color: #374151;
+}
+
+.assign-btn {
+  background: linear-gradient(135deg, #6366f1, #a78bfa); /* soft gradient purple */
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.assign-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+}
+
+.assign-btn:disabled {
+  background: #e0e7ff;
+  color: #7c3aed;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.remove-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background: #fecaca;
+}

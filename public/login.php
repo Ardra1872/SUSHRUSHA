@@ -2,45 +2,51 @@
 session_start();
 require '../src/config/db.php';
 
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-    $stmt = $conn->prepare("SELECT id, name, password, role FROM users WHERE email=?");
+    $stmt = $conn->prepare("SELECT id, name, password, role, first_login FROM users WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
-    $stmt->bind_result($id, $name, $hashed_password, $role);
+    $stmt->bind_result($id, $name, $hashed_password, $role, $first_login);
     $stmt->fetch();
 
-    if($stmt->num_rows > 0){
-        if(password_verify($password, $hashed_password)){
-            
+    if ($stmt->num_rows > 0) {
+        if (password_verify($password, $hashed_password)) {
+
             $_SESSION['user_id'] = $id;
             $_SESSION['user_name'] = $name;
             $_SESSION['user_role'] = $role;
+            $_SESSION['first_login'] = $first_login; // flag for dashboard
 
-            header("Location:../src/views/dashboard.php");
-            exit;
+            // Redirect based on role
+            if ($role === 'patient') {
+                header("Location: ../src/views/dashboard.php");
+                exit;
+            } elseif ($role === 'caretaker') {
+                header("Location: ../src/views/caretaker_dashboard.php");
+                exit;
+            } else {
+                header("Location: ../src/views/admin_dashboard.php");
+                exit;
+            }
 
         } else {
             $_SESSION['error'] = "Incorrect password!";
             header("Location: login.php");
             exit;
         }
-
     } else {
         $_SESSION['error'] = "User not found!";
         header("Location: login.php");
         exit;
     }
 }
- if(isset($_SESSION['success'])): ?>
-    <p class="message success-message">
-        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-    </p>
-<?php endif; ?>
+?>
+
 
 
 <!DOCTYPE html>

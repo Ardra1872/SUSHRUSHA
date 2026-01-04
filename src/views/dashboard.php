@@ -174,7 +174,7 @@ if ($user_id) {
           <p><b>Emergency Contact:</b> <?= $profile['emergency_contact'] ?? '—' ?></p>
         </div>
 
-        <!-- ASSIGN CARETAKER -->
+        
         <!-- ASSIGN CARETAKER -->
 <div class="card">
 

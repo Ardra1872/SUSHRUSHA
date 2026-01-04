@@ -10,26 +10,29 @@ navItems.forEach(item=>{
     document.getElementById(item.dataset.target).classList.add('active');
   });
 });
-
 // Real-time clock
 function updateTime() {
   const now = new Date();
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  
+
   const month = monthNames[now.getMonth()];
   const date = now.getDate();
   const day = dayNames[now.getDay()];
   const year = now.getFullYear();
-  const hours = String(now.getHours()).padStart(2, '0');
+
+  const hours24 = now.getHours();
   const minutes = String(now.getMinutes()).padStart(2, '0');
-  const ampm = now.getHours() >= 12 ? 'AM' : 'PM';
-  const displayHours = now.getHours() % 12 || 12;
-  
+  const ampm = hours24 >= 12 ? 'PM' : 'AM';
+  const displayHours = hours24 % 12 === 0 ? 12 : hours24 % 12;
+
   document.getElementById('current-time').textContent = `${month} ${date} ${day} ${year} | ${displayHours}:${minutes} ${ampm}`;
 }
 
-// Update time every second
+// Update every second
+updateTime();
+setInterval(updateTime, 1000);
+
 setInterval(updateTime, 1000);
 updateTime();
 

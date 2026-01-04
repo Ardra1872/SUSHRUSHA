@@ -6,23 +6,17 @@ body {
   overflow-x: hidden;
 }
 
-
-
-
 /* NAVBAR */
 .navbar {
   height: 64px;
   display: flex;
   align-items: center;
-
   background: transparent;
   width: 100%;              
   left: 0;                 
   top: 0; 
-
-    position: absolute;
-    
-    z-index: 5;
+  position: absolute;
+  z-index: 5;
 }
 
 /* Container only for nav-right */
@@ -30,19 +24,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   width: 100%;
-  padding-left: 40px;   /* MATCH HERO */
+  padding-left: 40px;   
   padding-right: 80px;
-
   box-sizing: border-box;
   position: relative;
   z-index: 20;
 }
-
-
-
-/* Logo fully left */
 .logo {
   display: flex;
   align-items: center;
@@ -51,8 +39,6 @@ body {
   font-weight: 700;
   color: #1aa6d9;
 }
-
-
 .nav-right {
   display: flex;
   align-items: center;
@@ -72,13 +58,9 @@ body {
   font-weight: 500;
   font-size: 14px;
 }
-
-
 .nav-links a:hover {
   color: #1aa6d9;
 }
-
-
 .nav-btn {
   padding: 12px 24px;
   background: #2a79ff;
@@ -89,27 +71,22 @@ body {
   font-size: 13px;
   box-shadow: none;
 }
-
-
 /* Right-side buttons container */
 .nav-actions {
   display: flex;
   gap: 40px;
 }
 
-
-/* Optional: make Login slightly less dominant */
 .nav-btn.secondary {
   background: #eef4ff;
   color: #2a79ff;
 }
 
-
 /* HERO */
 .hero {
   display: flex;
   align-items: center;
-   min-height: 90vh;
+min-height: 90vh;
  padding-left: 40px;   
   padding-right: 0;     
  position: relative;
@@ -118,23 +95,18 @@ body {
     
 }
 
-
 /* Right curved background */
 .hero-shape {
   position: absolute;
   right: -18%;
   top: -40%;
-
   width: 60vw;
   height: 120vh;
-
   background: #2fb2e6;
   border-radius: 60%;
-
   display: flex;
   align-items: flex-end;   /* anchor image bottom */
   justify-content: center;
-
   overflow: hidden;
   z-index: 1;
 }
@@ -149,21 +121,12 @@ body {
   top: 35%;
   left: 18%;
 }
-
-
-
-
 /* Image positioning */
 .hero-shape img {
- 
   height: auto;
   width: 100%;
   transform: translateY(-40px,10px);
-
-  
 }
-
-
 .hero-text {
   max-width: 600px;
   width: auto; 
@@ -178,8 +141,6 @@ body {
   line-height: 1.25;
   color: #1a1a1a;
 }
-
-
 .hero-text p {
   margin: 18px 0 28px;
   font-size: 1.1rem;
@@ -707,9 +668,9 @@ footer a {
   max-width: 260px;
 }
 
-/* ===================== HAMBURGER & MOBILE RESPONSIVE ===================== */
 
-/* ===================== HAMBURGER & MOBILE RESPONSIVE ===================== */
+
+
 
 /* Hamburger icon */
 .hamburger {

@@ -156,8 +156,20 @@ $_SESSION['user_email'] = $email;
 $_SESSION['user_name']  = $name;
 $_SESSION['user_role']  = $role;
 
-header("Location: /Sushrusha/src/views/dashboard.php");
-exit();
+if($role === 'patient'){
+    header("Location: /Sushrusha/src/views/dashboard.php");
+    exit();
+} elseif($role === 'caretaker'){
+    header("Location: /Sushrusha/src/views/caretaker_dashboard.php");
+    exit();
+} elseif($role === 'admin'){
+    header("Location: /Sushrusha/src/views/admin_dashboard.php");
+    exit();
+} else {
+    
+    header("Location: /Sushrusha/public/login.php");
+    exit();
+}
 
 
 ?>
