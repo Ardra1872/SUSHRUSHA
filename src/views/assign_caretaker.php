@@ -1,96 +1,43 @@
 <?php
 session_start();
-include '../config/db.php'; 
+include '../config/db.php';
 
-//  Check if user is logged in
-if (!isset($_SESSION['user_email'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../../public/login.php");
-    exit;
+    exit();
 }
 
-//  Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request");
 }
 
-// Get patient ID from session email
-$patient_email = $_SESSION['user_email'];
+$patient_id = $_SESSION['user_id'];
+$name       = trim($_POST['name']);
+$email      = trim($_POST['email']);
+$relation   = trim($_POST['relation']);
 
-$stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-if (!$stmt) {
-    die("Prepare failed: " . $conn->error);
-}
+// 1️⃣ Check if caretaker already exists (prevent duplicates)
+$stmt_check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+$stmt_check->bind_param("s", $email);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
 
-$stmt->bind_param("s", $patient_email);
-
-if (!$stmt->execute()) {
-    die("Execute failed: " . $stmt->error);
-}
-
-$res = $stmt->get_result();
-if (!$res || $res->num_rows === 0) {
-    die("Patient not found in DB");
-}
-
-$patient = $res->fetch_assoc();
-$patient_id = $patient['id'];
-
-//  Get caretaker details from form
-$name = $_POST['name'];
-$email = $_POST['email'];
-$relation = $_POST['relation'];
-
-// Check if caretaker already exists
-$stmt = $conn->prepare("SELECT id, role FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$res = $stmt->get_result();
-
-if ($res->num_rows > 0) {
-    $row = $res->fetch_assoc();
-
-    if ($row['role'] !== 'caretaker') {
-        die("Email already belongs to a patient");
-    }
-
-    $caretaker_id = $row['id'];
+if ($result_check->num_rows > 0) {
+    $caretaker_id = $result_check->fetch_assoc()['id'];
 } else {
-    // Create caretaker
-    $tempPassword = password_hash("caretaker@123", PASSWORD_DEFAULT);
-
-    $stmt2 = $conn->prepare(
-        "INSERT INTO users (name, role, email, password)
-         VALUES (?, 'caretaker', ?, ?)"
-    );
-    $stmt2->bind_param("sss", $name, $email, $tempPassword);
-
-    if (!$stmt2->execute()) {
-        die("Error creating caretaker: " . $stmt2->error);
-    }
-
-    $caretaker_id = $stmt2->insert_id;
+    // 2️⃣ Create caretaker user
+    $password = password_hash("default123", PASSWORD_DEFAULT); // temporary password
+    $stmt = $conn->prepare("INSERT INTO users (name, email, role, password) VALUES (?, ?, 'caretaker', ?)");
+    $stmt->bind_param("sss", $name, $email, $password);
+    $stmt->execute();
+    $caretaker_id = $conn->insert_id;
 }
 
-//  Prevent duplicate patient-caretaker link
-$check = $conn->prepare(
-    "SELECT id FROM caregivers WHERE patient_id = ? AND caregiver_id = ?"
-);
-$check->bind_param("ii", $patient_id, $caretaker_id);
-$check->execute();
-$check_res = $check->get_result();
-
-if ($check_res->num_rows === 0) {
-    $link = $conn->prepare(
-        "INSERT INTO caregivers (patient_id, caregiver_id, relation)
-         VALUES (?, ?, ?)"
-    );
-    $link->bind_param("iis", $patient_id, $caretaker_id, $relation);
-
-    if (!$link->execute()) {
-        die("Error linking caretaker: " . $link->error);
-    }
-}
-
+// 3️⃣ Insert into caregivers table
+$stmt2 = $conn->prepare("INSERT INTO caregivers (patient_id, caregiver_id, relation) VALUES (?, ?, ?)");
+$stmt2->bind_param("iis", $patient_id, $caretaker_id, $relation);
+$stmt2->execute();
 
 header("Location: dashboard.php");
-exit;
+exit();
+?>

@@ -8,7 +8,8 @@ session_start();
 include '../config/db.php'; 
 
 // Redirect to login if user is not logged in
-if (!isset($_SESSION['user_name']) || !isset($_SESSION['user_email'])) {
+if (!isset($_SESSION['user_name']) || !isset($_SESSION['user_id'])) {
+
     header('Location: ../../public/login.php');
     exit();
 }
@@ -56,9 +57,12 @@ if ($user_id) {
 
     if ($caretaker_res && $caretaker_res->num_rows > 0) {
         $caretaker_exists = true;
-        $caretaker = $caretaker_res->fetch_assoc(); // first assigned caretaker
+        $caretaker = $caretaker_res->fetch_assoc(); // assigned caretaker
     }
 }
+
+
+
 
 ?>
 
@@ -171,26 +175,47 @@ if ($user_id) {
         </div>
 
         <!-- ASSIGN CARETAKER -->
-        <div class="card">
-          <h3>Assign Caretaker</h3>
+        <!-- ASSIGN CARETAKER -->
+<div class="card">
 
-          <!-- Assign button -->
-         <!-- Assign button -->
-<button class="edit-btn" id="openCaretakerBtn"
-<?= $caretaker_exists ? 'disabled title="Caretaker already assigned"' : '' ?>>
-Assign Caretaker
-</button>
+  <div class="caretaker-header">
+    <h3>Caretaker</h3>
 
-<!-- Show assigned caretaker -->
-<?php if ($caretaker_exists): ?>
-    <div style="margin-top:15px;">
-        <p><b>Name:</b> <?= htmlspecialchars($caretaker['name']) ?></p>
-        <p><b>Email:</b> <?= htmlspecialchars($caretaker['email']) ?></p>
-        <p><b>Relation:</b> <?= htmlspecialchars($caretaker['relation']) ?></p>
+    <?php if ($caretaker_exists): ?>
+      <span class="status-badge">Assigned</span>
+    <?php endif; ?>
+  </div>
+   
+  <?php if ($caretaker_exists): ?>
+    <!-- Assigned caretaker info -->
+    <div class="caretaker-info">
+      <p><strong>Name:</strong> <?= htmlspecialchars($caretaker['name']) ?></p>
+      <p><strong>Email:</strong> <?= htmlspecialchars($caretaker['email']) ?></p>
+      <p><strong>Relation:</strong> <?= htmlspecialchars($caretaker['relation']) ?></p>
     </div>
-<?php endif; ?>
+    <form method="POST" action="remove_caretaker.php" 
+      onsubmit="return confirm('Are you sure you want to remove the caretaker?');">
+    <button type="submit" class="remove-btn">
+        Remove Caretaker
+    </button>
+</form>
 
-        </div>
+
+    <button class="assign-btn" disabled>
+      Caretaker Assigned
+    </button>
+
+  <?php else: ?>
+    <!-- No caretaker yet -->
+    <p>No caretaker assigned.</p>
+
+    <button class="assign-btn" id="openCaretakerModal">
+      Assign Caretaker
+    </button>
+  <?php endif; ?>
+
+</div>
+
 
         <!-- CARETAKER MODAL -->
         <?php if (!$caretaker_exists): ?>
@@ -218,6 +243,18 @@ Assign Caretaker
   // Topbar name & avatar
   document.getElementById('profile-name').textContent = "<?= addslashes($userName) ?> | <?= addslashes($userRole) ?>";
   document.getElementById('avatar-circle').textContent = "<?= strtoupper(substr($userName,0,1)) ?>";
+  // Open modal
+document.getElementById('openCaretakerModal')?.addEventListener('click', function() {
+    document.getElementById('caretakerModal').style.display = 'block';
+});
+
+// Close modal
+document.querySelectorAll('.modal .close').forEach(el => {
+    el.addEventListener('click', function() {
+        this.closest('.modal').style.display = 'none';
+    });
+});
+
 </script>
 </body>
 </html>
