@@ -75,12 +75,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </p>
             <?php endif; ?>
 
-            <form action="login.php" method="POST">
-                <input type="email" name="email" placeholder="Enter your email..." required>
-                <input type="password" name="password" placeholder="Enter your password" required>
-                <a href="forgot-password.php" class="forgot">Forgot your password?</a>
-                <button type="submit" class="btn-primary">Login</button>
-            </form>
+          <form id="loginForm" action="login.php" method="POST">
+    <input type="email" id="email" name="email" placeholder="Enter your email..." required>
+    <span id="emailError" class="error"></span>
+
+    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+    <span id="passwordError" class="error"></span>
+
+    <a href="forgot-password.php" class="forgot">Forgot your password?</a>
+    <button type="submit" class="btn-primary">Login</button>
+</form>
+
 
           <button class="google-btn" onclick="window.location.href='google-login.php'">
     <img src="assets/images/google-icon.svg" alt="Google">
@@ -93,4 +98,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </p>
         </div>
     </div>
+<script>
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const emailError = document.getElementById('emailError');
+const passwordError = document.getElementById('passwordError');
+const form = document.getElementById('loginForm');
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordPattern = /^(?=.*[A-Za-z])(?=.*[\W_]).{6,}$/;
+ // at least 6 characters
+
+function validateEmail() {
+    if (email.value === "") {
+        email.classList.remove('valid', 'invalid');
+        emailError.textContent = "";
+    } else if (emailPattern.test(email.value)) {
+        email.classList.add('valid');
+        email.classList.remove('invalid');
+        emailError.textContent = "";
+    } else {
+        email.classList.add('invalid');
+        email.classList.remove('valid');
+        emailError.textContent = "Enter a valid email";
+    }
+}
+
+function validatePassword() {
+    if (password.value === "") {
+        password.classList.remove('valid', 'invalid');
+        passwordError.textContent = "";
+    } else if (passwordPattern.test(password.value)) {
+        password.classList.add('valid');
+        password.classList.remove('invalid');
+        passwordError.textContent = "";
+    } else {
+        password.classList.add('invalid');
+        password.classList.remove('valid');
+        passwordError.textContent = "Password must be 6+ characters, with letters and a special character";
+    }
+}
+
+email.addEventListener('input', validateEmail);
+password.addEventListener('input', validatePassword);
+
+form.addEventListener('submit', (e) => {
+    validateEmail();
+    validatePassword();
+    if (!emailPattern.test(email.value) || !passwordPattern.test(password.value)) {
+        e.preventDefault();
+        alert('Please fix the errors before submitting.');
+    }
+});
+
+
+</script>
+
 </body>
+</html>
