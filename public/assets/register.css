@@ -178,3 +178,29 @@ body.register-page {
     padding-right: 0;
     background-position: right center; /* image on right */
 }
+input {
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    transition: border 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+}
+
+input.valid {
+    border-color: #4CAF50;  /* green */
+}
+
+input.invalid {
+    border-color: #f44336;  /* red */
+}
+
+.error {
+    color: #f44336;
+    font-size: 0.7rem;
+    margin-top: 2px;
+    display: block;
+}
