@@ -1,592 +1,454 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
 <?php
-
 session_start();
 
-include '../config/db.php'; 
+include '../config/db.php';
 
-// Redirect to login if user is not logged in
-if (!isset($_SESSION['user_name']) || !isset($_SESSION['user_id'])) {
-
-    header('Location: ../../public/login.php');
-    exit();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
 }
 
-// Logged-in user info
-
-$user_id = $_SESSION['user_id'] ?? null;
-$userName = $_SESSION['user_name'];
-$userRole = isset($_SESSION['user_role']) ? ucfirst($_SESSION['user_role']) : 'User';
-
-/* ------------------------------
-   Patient Profile
------------------------------- */
-$profile = [];
-if ($user_id) {
-    $stmt = $conn->prepare("
-        SELECT u.name, u.contact_number, u.emergency_contact,
-               p.dob, p.gender, p.blood_group, p.height_cm, p.weight_kg
-        FROM users u
-        LEFT JOIN patient_profile p ON u.id = p.patient_id
-        WHERE u.id = ?
-    ");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $profile = $stmt->get_result()->fetch_assoc();
-}
-
-/* ------------------------------
-   Caretaker Info
------------------------------- */
-$caretaker_exists = false;
-$caretaker = null;
-
-if ($user_id) {
-    // Fetch caretaker details including email
-    $stmt2 = $conn->prepare("
-        SELECT u.id, u.name, u.email, c.relation
-        FROM caregivers c
-        JOIN users u ON c.caregiver_id = u.id
-        WHERE c.patient_id = ?
-    ");
-    $stmt2->bind_param("i", $user_id);
-    $stmt2->execute();
-    $caretaker_res = $stmt2->get_result();
-
-    if ($caretaker_res && $caretaker_res->num_rows > 0) {
-        $caretaker_exists = true;
-        $caretaker = $caretaker_res->fetch_assoc(); // assigned caretaker
-    }
-}
+$userId = $_SESSION['user_id'];
+$role   = $_SESSION['user_role'];
+$name = $_SESSION['user_name'];
 
 
 
 
 ?>
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUSHRUSHA – Patient Dashboard</title>
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SUSHRUSHA – Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel ="stylesheet" href="../../public/assets/dashboard_styles.css">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#2563EB",
+        primaryDark: "#1D4ED8",
+        surface: "#FFFFFF",
+        bg: "#F3F6FA",
+        textMain: "#1E293B",
+        textSub: "#64748B",
+        success: "#10B981",
+        warning: "#F59E0B",
+        danger: "#EF4444",
+      },
+      fontFamily: {
+        display: ["Plus Jakarta Sans", "sans-serif"],
+        body: ["Inter", "sans-serif"]
+      },
+      boxShadow: {
+        soft: "0 8px 30px rgba(0,0,0,0.05)"
+      }
+    }
+  }
+}
+</script>
 </head>
 
-<body>
-  <div id="toast" class="toast"></div>
+<body class="bg-bg text-textMain font-body h-screen flex overflow-hidden">
 
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-<div class="app">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">
-      <h2>SUSHRUSHA</h2>
-      <span>Smart Medicine Reminder</span><br><br>
+<!-- SIDEBAR -->
+<aside class="w-72 bg-surface border-r border-slate-200 flex flex-col">
+  <div class="p-8 flex items-center gap-4">
+    <div class="size-12 rounded-2xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center text-white shadow-lg">
+      <span class="material-symbols-outlined text-[26px]">local_pharmacy</span>
     </div>
+    <div>
+      <h1 class="font-display text-xl font-bold">SUSHRUSHA</h1>
+      <p class="text-xs text-textSub font-medium">Smart Medicine Reminder</p>
+    </div>
+  </div>
 
-  <nav class="menu">
-  <a class="nav-item active" data-target="schedule">
-    <i data-lucide="calendar-check"></i>
-    <span>Medicine Schedule</span>
+ <nav class="flex-1 px-4 space-y-1">
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-semibold" data-section="dashboard">
+    <span class="material-symbols-outlined">dashboard</span> Dashboard
   </a>
 
-  <a class="nav-item" data-target="reports">
-    <i data-lucide="file-text"></i>
-    <span>Reports</span>
+  <!-- Patient -->
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="schedule">
+    <span class="material-symbols-outlined">calendar_month</span> My Schedule
+  </a>
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="prescriptions">
+    <span class="material-symbols-outlined">pill</span> Prescriptions
   </a>
 
-  <a class="nav-item" data-target="settings">
-    <i data-lucide="bell"></i>
-    <span>Reminder Settings</span>
+  <!-- Caretaker -->
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="assigned">
+    <span class="material-symbols-outlined">people</span> Assign Caretaker
+  </a>
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="alerts">
+    <span class="material-symbols-outlined">notifications</span> Alerts
   </a>
 
-  <a class="nav-item" data-target="emergency">
-    <i data-lucide="phone-call"></i>
-    <span>Emergency Contacts</span>
+  <!-- Admin -->
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="requests">
+    <span class="material-symbols-outlined">inventory_2</span> Medicine Requests
   </a>
-
-  <a class="nav-item" data-target="profile">
-    <i data-lucide="user"></i>
-    <span>Patient Profile</span>
-  </a>
+  <!-- <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="users">
+    <span class="material-symbols-outlined">manage_accounts</span> Manage Users
+  </a> -->
 </nav>
 
-  <div class="logout">
-  <a href="#" class="logout-btn" onclick="logout()">
-    <!-- Lucide Logout Icon -->
-    <i data-lucide="log-out" class="logout-icon"></i>
-    <span class="logout-text">Logout</span>
+<div class="p-6 space-y-3">
+  <a href="add_medicine.html"
+     class="w-full bg-gradient-to-r from-primary to-primaryDark text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition text-center block">
+    + Add Medicine
+  </a>
+
+  <a href="../../public/logout.php"
+     class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition text-center block">
+    Logout
   </a>
 </div>
 
 
-  </aside>
+</aside>
 
-  <!-- Main -->
-  <main class="main">
+<!-- MAIN -->
+<main class="flex-1 flex flex-col overflow-hidden">
 
-    <!-- Topbar -->
-    <div class="topbar">
-      <input class="search" placeholder="Search..." />
-      <div class="profile">
-        <div class="time-section">
-          <div class="time" id="current-time">12:00 PM</div>
-          <div class="name" id="profile-name"><?= htmlspecialchars($userName) ?> | <?= htmlspecialchars($userRole) ?></div>
-        </div>
-        <div class="avatar" id="avatar-circle"><?= strtoupper(substr($userName,0,1)) ?></div>
+<!-- TOPBAR -->
+<header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
+<p class="text-sm font-bold text-textMain leading-tight">
+  <?= htmlspecialchars($name) ?>
+</p>
+
+
+<p class="text-text-sub text-sm">
+  <?= ucfirst($role) ?> dashboard • <br>Here's your health overview for today
+</p>
+
+
+  <div class="flex items-center gap-5">
+    <input class="hidden md:block w-64 rounded-xl bg-slate-100 px-4 py-2 text-sm focus:ring-2 focus:ring-primary" placeholder="Search medicines…">
+    <button class="relative">
+      <span class="material-symbols-outlined text-textSub">notifications</span>
+      <span class="absolute top-0 right-0 size-2 bg-danger rounded-full"></span>
+    </button>
+    <div class="flex items-center gap-3">
+      <div class="text-right text-sm">
+        <p class="text-sm font-bold text-text-main dark:text-white leading-tight">
+  <?= htmlspecialchars($name) ?>
+</p>
+<p class="text-xs text-text-sub capitalize">
+  <?= htmlspecialchars($role) ?>
+</p>
+
       </div>
-    </div>
+      <div class="w-10 h-10 rounded-full bg-slate-200"></div>
 
-    
-  <section id="schedule" class="page active">
-
-  <section class="cards">
-    <div class="card">
-      <h3>Today's Reminder</h3>
-      <div class="big" id="today-med-count">0</div>
-       <p id="today-med-info">Loading medicines...</p>
-
-     <div class="action-buttons">
-   <div class="action-buttons">
-  <button class="dash-primary-btn"
-      onclick="document.getElementById('addMedicineModal').style.display='flex'">
-      <i data-lucide="plus"></i>
-      Add Medicine
-  </button>
-
-  <button class="dash-view-btn" onclick="openViewMedicineModal()">
-      <i data-lucide="eye"></i>
-      View Medicines
-  </button>
-</div>
-
-
-</div>
-
-
-<div class="modal" id="addMedicineModal">
-  <div class="modal-box" onclick="event.stopPropagation()">
-
-    <div class="modal-header">
-      <span class="modal-title"><i data-lucide="medicine"></i> Add Medicine</span>
-      <span class="close" onclick="closeMedicineModal()">×</span>
-    </div>
-
-    <form id="medicineForm" class="modal-body" action="add_medicine.php" method="post">
-
-  <div class="field full">
-    <label>Medicine Name</label>
-    <input type="text" name="medicine_name" placeholder="Paracetamol" required>
-  </div>
-
-  <div class="grid-2">
-    <div class="field">
-      <label>Dosage</label>
-      <input type="text" name="dosage" placeholder="500 mg">
-    </div>
-
-    <div class="field">
-      <label>Compartment</label>
-      <input type="number" name="compartment" placeholder="1" required>
     </div>
   </div>
+</header>
+<!-- CONTENT -->
+<div class="flex-1 overflow-y-auto p-8">
+  <div class="max-w-[1500px] mx-auto space-y-8">
 
-  <div class="grid-2">
-    <div class="field">
-      <label>Start Date</label>
-      <input type="date" name="start_date" required>
-    </div>
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="section">
+      <h2 class="text-2xl font-bold mb-4">Dashboard Overview</h2>
+      <p>Here’s your health overview for today.</p>
 
-    <div class="field">
-      <label>End Date</label>
-      <input type="date" name="end_date">
-    </div>
-  </div>
-
-  <div class="field full">
-    <label>Intake Time</label>
-    <input type="time" name="intake_time" required>
-  </div>
-
-  <button type="submit" class="primary-btn">Save Medicine</button>
-</form>
-
-  </div>
-</div>
-<div id="viewMedicineModal" class="modal">
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h2>💊 Your Medicines</h2>
-      <span class="close" onclick="closeViewMedicineModal()">×</span>
-    </div>
-
-    <div class="modal-body">
-      <table class="medicine-table">
-        <thead>
-  <tr>
-    <th>Name</th>
-    <th>Dosage</th>
-    <th>Time</th>
-    <th>Action</th>
-  </tr>
-</thead>
-
-        <tbody id="medicineList">
-          <!-- Medicines load here -->
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-</div>
-
-    </div>
-
-    <div class="alerts">
-      <h3>Medicine Alerts</h3>
-      <div class="alert">🔔 2 missed doses</div>
-      <div class="alert">⚠️ Stock running low</div>
-    </div>
- 
-
-</section>
-    <!-- <section class="grid"> <div class="card"> <h3>Medicine Intake</h3> <p>3 medicines today</p> </div> <div class="card"> <h3>Caregiver Status</h3> <p>Available</p> </div> <div class="card emergency"> <h3>Emergency Quick Access</h3> <button>Call Emergency</button> </div> </section> </section> -->
-    <section id="reports" class="page"> <div class="card"> <h3>Reports</h3> <p>Medicine history & analytics will appear here.</p> </div> </section>
-    <section id="settings" class="page"> <div class="card"> <h3>Reminder Settings</h3> <p>Manage medicine timing, alerts and frequency.</p> </div> </section>
-    <section id="emergency" class="page"> <div class="card emergency"> <h3>Emergency Contacts</h3> <p>Add & manage emergency numbers.</p> <button>Call Emergency</button> </div> </section>
-    
-    <!-- Profile Section -->
-    
-    <section id="profile" class="page">
-      <div class="profile-grid">
-
-        <!-- BASIC PROFILE -->
-        <div class="card">
-          <h3>Patient Profile</h3>
-          <div class="profile-header">
-            <div class="profile-avatar">
-              <?= strtoupper(substr($profile['name'] ?? 'U', 0, 1)) ?>
-            </div>
-            <div class="profile-info">
-              <h4><?= $profile['name'] ?? 'Not Updated' ?></h4>
-              <p><?= $profile['gender'] ?? '—' ?> | Blood: <?= $profile['blood_group'] ?? '—' ?></p>
-              <p>📞 <?= $profile['contact_number'] ?? '—' ?></p>
-            </div>
+      <!-- STATS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div class="bg-white p-6 rounded-2xl shadow-soft">
+          <p class="text-sm text-textSub">Adherence</p>
+          <h3 class="text-4xl font-display font-bold mt-2">92%</h3>
+          <div class="h-2 bg-slate-100 rounded-full mt-4">
+            <div class="h-2 bg-primary rounded-full w-[92%]"></div>
           </div>
-          <button class="edit-btn" onclick="openProfileEditModal()">Edit Profile</button>
-
-
-          <!-- EDIT PROFILE MODAL (ISOLATED) -->
-<div id="profileEditModal" class="profile-modal">
-  <div class="profile-modal-box">
-    <span class="profile-modal-close" onclick="closeProfileEditModal()">×</span>
-
-    <h3>Edit Patient Profile</h3>
-
-    <form method="POST" action="update_profile.php" class="profile-modal-grid">
-      <input type="hidden" name="patient_id" value="<?= $user_id ?>">
-
-      <div>
-        <label>Date of Birth</label>
-        <input type="date" name="dob">
-      </div>
-
-      <div>
-        <label>Gender</label>
-        <select name="gender">
-          <option value="">Select</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Blood Group</label>
-        <input type="text" name="blood_group">
-      </div>
-
-      <div>
-        <label>Height (cm)</label>
-        <input type="number" name="height_cm">
-      </div>
-
-      <div>
-        <label>Weight (kg)</label>
-        <input type="number" name="weight_kg">
-      </div>
-
-      <div class="full">
-        <label>Emergency Contact</label>
-        <input type="text" name="emergency_contact">
-      </div>
-
-      <button type="submit" class="edit-btn full">Save Profile</button>
-    </form>
-  </div>
-</div>
-
-</div>
-        <!-- MEDICAL & PERSONAL INFO -->
-        <div class="card profile-list">
-          <h3>Personal & Medical Info</h3>
-          <p><b>Date of Birth:</b> <?= $profile['dob'] ?? '—' ?></p>
-          <p><b>Height:</b> <?= $profile['height_cm'] ?? '—' ?> cm</p>
-          <p><b>Weight:</b> <?= $profile['weight_kg'] ?? '—' ?> kg</p>
-          <p><b>Emergency Contact:</b> <?= $profile['emergency_contact'] ?? '—' ?></p>
         </div>
 
-        
-        <!-- ASSIGN CARETAKER -->
-<div class="caretaker-card">
+        <div class="bg-white p-6 rounded-2xl shadow-soft">
+          <p class="text-sm text-textSub">Missed Doses</p>
+          <h3 class="text-4xl font-display font-bold mt-2 text-danger">1</h3>
+          <p class="text-xs text-textSub mt-2">This week</p>
+        </div>
 
-  <div class="caretaker-header">
-    <h3>Caretaker</h3>
-    <?php if ($caretaker_exists): ?>
-      <span class="status-badge">Assigned</span>
-    <?php endif; ?>
-  </div>
-
-  <?php if ($caretaker_exists): ?>
-    <div class="caretaker-box">
-      
-      <div class="caretaker-avatar">
-        <?= strtoupper(substr($caretaker['name'], 0, 1)) ?>
+        <div class="bg-white p-6 rounded-2xl shadow-soft">
+          <p class="text-sm text-textSub">Next Refill</p>
+          <h3 class="text-4xl font-display font-bold mt-2">Oct 24</h3>
+          <p class="text-xs text-textSub mt-2">Atorvastatin</p>
+        </div>
       </div>
 
-      <div class="caretaker-details">
-        <h4><?= htmlspecialchars($caretaker['name']) ?></h4>
-        <p class="email"><?= htmlspecialchars($caretaker['email']) ?></p>
-        <span class="relation"><?= htmlspecialchars($caretaker['relation']) ?></span>
-      </div>
-    </div>
+      <!-- SCHEDULE -->
+      <div class="bg-white rounded-2xl shadow-soft mt-6">
+        <div class="p-6 border-b">
+          <h3 class="font-display font-bold text-xl">Today’s Schedule</h3>
+          <p class="text-sm text-textSub">Your medicine intake timeline</p>
+        </div>
 
-    <div class="caretaker-actions">
-      <form method="POST" action="remove_caretaker.php"
-        onsubmit="return confirm('Remove caretaker?');">
-        <button type="submit" class="remove-btn">Remove Caretaker</button>
-      </form>
-
-      <button class="assign-btn" disabled>Caretaker Assigned</button>
-    </div>
-
-  <?php else: ?>
-    <p>No caretaker assigned.</p>
-    <button class="assign-btn" id="openCaretakerModal">Assign Caretaker</button>
-  <?php endif; ?>
-
-</div>
-
-
-
-
-        <!-- CARETAKER MODAL -->
-        <?php if (!$caretaker_exists): ?>
-        <div id="caretakerModal" class="modal">
-          <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Assign Caretaker</h3>
-            <form method="POST" action="assign_caretaker.php">
-              <input type="text" name="name" placeholder="Caretaker Name" required><br><br>
-              <input type="email" name="email" placeholder="Caretaker Email" required><br><br>
-              <input type="text" name="relation" placeholder="Relation (Eg: Daughter)" required><br><br>
-              <button class="edit-btn" type="submit">Assign Caretaker</button>
-            </form>
+        <div class="p-6 space-y-6">
+          <div class="flex items-start gap-6">
+            <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-success">check</span>
+            </div>
+            <div>
+              <p class="text-sm text-textSub">10:00 AM</p>
+              <h4 class="font-bold line-through">Metformin 500mg</h4>
+            </div>
           </div>
-        </div>  
-        <?php endif; ?>
 
+          <div class="flex items-start gap-6">
+            <div class="size-12 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
+              <span class="material-symbols-outlined">pill</span>
+            </div>
+            <div class="flex-1 bg-primary/10 p-6 rounded-2xl">
+              <p class="text-sm text-primary font-semibold">Next Up • 02:00 PM</p>
+              <h4 class="text-xl font-display font-bold">Vitamin D 1000 IU</h4>
+              <div class="flex gap-3 mt-4">
+                <button class="flex-1 bg-primary text-white py-2 rounded-xl font-bold">Mark Taken</button>
+                <button class="flex-1 border py-2 rounded-xl">Skip</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-6">
+            <div class="size-12 rounded-full bg-slate-100 flex items-center justify-center">
+              <span class="material-symbols-outlined text-textSub">bedtime</span>
+            </div>
+            <div>
+              <p class="text-sm text-textSub">08:00 PM</p>
+              <h4 class="font-bold">Atorvastatin 10mg</h4>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
+
+    <!-- My Schedule -->
+    <div id="schedule" class="section hidden">
+      <h2 class="text-2xl font-bold mb-4">My Schedule</h2>
+      <p>Check your medicine intake timeline here.</p>
+      <div id="scheduleList" class="mt-6 grid gap-4">
+    <!-- Medicine cards will be injected here -->
+  </div>
+    </div>
+
+    <!-- Prescriptions -->
+    <div id="prescriptions" class="section hidden">
+      <h2 class="text-2xl font-bold mb-4">Prescriptions</h2>
+      <p>View all your prescribed medicines.</p>
+    </div>
+
+
+    <!-- Assign Caretaker -->
+<div id="assigned" class="section hidden">
+  <h2 class="text-2xl font-bold mb-2">Assign Caretaker</h2>
+  <p class="text-textSub mb-6">Add a trusted caretaker who can help manage your medicines.</p>
+
+  <!-- Form -->
+  <form id="assignCaretakerForm" class="mb-6 space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1" for="caretakerName">Name</label>
+      <input type="text" id="caretakerName" name="name" required
+        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="caretakerEmail">Email</label>
+      <input type="email" id="caretakerEmail" name="email" required
+        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1" for="relation">Relation</label>
+      <input type="text" id="relation" name="relation" required
+        placeholder="e.g., Father, Sister, Friend"
+        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary">
+    </div>
+
+    <button type="submit"
+      class="bg-primary text-white py-2 px-6 rounded-xl font-bold hover:scale-[1.02] transition">
+      Assign Caretaker
+    </button>
+  </form>
+
+  <!-- Assigned Caretakers List -->
+  <div id="caretakerList" class="space-y-4">
+    <!-- Dynamically filled by JS -->
+  </div>
 </div>
 
-<script src="../../public/assets/dashboard_script.js"></script>
+
+    <!-- Alerts -->
+    <div id="alerts" class="section hidden">
+      <h2 class="text-2xl font-bold mb-4">Alerts</h2>
+      <p>See notifications and alerts.</p>
+    </div>
+
+    <!-- Medicine Requests -->
+    <div id="requests" class="section hidden">
+      <h2 class="text-2xl font-bold mb-4">Medicine Requests</h2>
+      <p>View all incoming medicine requests.</p>
+    </div>
+
+    <!-- Manage Users -->
+    <div id="users" class="section hidden">
+      <h2 class="text-2xl font-bold mb-4">Manage Users</h2>
+      <p>Admin panel for user management.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- NAVIGATION JS -->
 <script>
-  // Topbar name & avatar
-  document.getElementById('profile-name').textContent = "<?= addslashes($userName) ?> | <?= addslashes($userRole) ?>";
-  document.getElementById('avatar-circle').textContent = "<?= strtoupper(substr($userName,0,1)) ?>";
-  // Open modal
-document.getElementById('openCaretakerModal')?.addEventListener('click', function() {
-    document.getElementById('caretakerModal').style.display = 'block';
-});
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.section');
 
-// Close modal
-document.querySelectorAll('.modal .close').forEach(el => {
-    el.addEventListener('click', function() {
-        this.closest('.modal').style.display = 'none';
+  navItems.forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+
+      // Remove active style from all nav items
+      navItems.forEach(nav => nav.classList.remove('bg-primary/10', 'text-primary'));
+      navItems.forEach(nav => nav.classList.add('text-textSub'));
+
+      // Highlight clicked item
+      item.classList.add('bg-primary/10', 'text-primary');
+      item.classList.remove('text-textSub');
+
+      const sectionToShow = item.dataset.section;
+
+      // Hide all sections
+      sections.forEach(sec => sec.classList.add('hidden'));
+
+      // Show the selected section
+      const activeSection = document.getElementById(sectionToShow);
+      if (activeSection) activeSection.classList.remove('hidden');
     });
-});
+  });
+  async function loadSchedule() {
+  const container = document.getElementById("scheduleList");
+  container.innerHTML = "<p>Loading...</p>";
 
-function openProfileEditModal() {
-  document.getElementById('profileEditModal').style.display = 'flex';
+  try {
+    const res = await fetch("fetch_medicine.php");
+    const data = await res.json();
+
+    if (data.status !== "success") {
+      container.innerHTML = `<p>${data.message || "Failed to load schedule"}</p>`;
+      return;
+    }
+
+    if (!data.medicines.length) {
+      container.innerHTML = "<p>No medicines scheduled</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    data.medicines.forEach(med => {
+      const days = med.days.length ? med.days.join(", ") : "-";
+      const times = med.times.length ? med.times.join(", ") : (med.interval_hours ? med.interval_hours + "h interval" : "-");
+      const endDate = med.end_date || "-";
+
+      const card = document.createElement("div");
+      card.className = "p-4 bg-gray-50 rounded-xl border border-gray-200 shadow-sm";
+
+      card.innerHTML = `
+        <h3 class="text-lg font-bold">${med.name} (${med.dosage_value})</h3>
+        <p>Form: ${med.medicine_type}</p>
+        <p>Compartment: ${med.compartment_number}</p>
+        <p>Schedule: ${med.schedule_type} (${days})</p>
+        <p>Reminder: ${med.reminder_type} - ${times}</p>
+        <p>Duration: ${med.start_date} → ${endDate}</p>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Server error</p>";
+  }
 }
 
-function closeProfileEditModal() {
-  document.getElementById('profileEditModal').style.display = 'none';
-}
+// Call when page loads
+document.addEventListener("DOMContentLoaded", loadSchedule);
 
-document.getElementById('profileEditModal').addEventListener('click', function(e) {
-  if (e.target === this) closeProfileEditModal();
-});
+const form = document.getElementById("assignCaretakerForm");
+const list = document.getElementById("caretakerList");
 
-
-
-
-document.getElementById("medicineForm").addEventListener("submit", function(e) {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const formData = new FormData(this);
+  const formData = new FormData(form);
 
-  fetch("add_medicine.php", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") {
-    showToast("Medicine added successfully 💊");
-
-      document.getElementById("addMedicineModal").style.display = "none";
-      this.reset();
-    } else {
-      showToast(data.message || "Failed to add medicine", "error");
-
-    }
-  });
-});function openViewMedicineModal() {
-  const modal = document.getElementById('viewMedicineModal');
-  modal.style.display = 'flex';
-
-  // Fetch medicines from the server
-  fetch('fetch_medicine.php')
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById('medicineList');
-      list.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        list.innerHTML = '<tr><td colspan="4">No medicines added yet.</td></tr>';
-        return;
-      }
-
-      data.forEach(med => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-  <td>${med.name}</td>
-  <td>${med.dosage || '-'}</td>
-  <td>${med.intake_time}</td>
-  <td>
-    <button class="delete-btn" onclick="deleteMedicine(${med.id})">
-      🗑 Delete
-    </button>
-  </td>
-`;
-
-        list.appendChild(row);
-      });
-    })
-    .catch(err => console.error('Error fetching medicines:', err));
-}
-
-function closeViewMedicineModal() {
-  document.getElementById('viewMedicineModal').style.display = 'none';
-}
-
-// Close modal when clicking outside
-document.getElementById('viewMedicineModal').addEventListener('click', function(e) {
-  if (e.target === this) closeViewMedicineModal();
-});
-
-function updateTodayMedicines() {
-    fetch('fetch_medicine.php')
-        .then(res => res.json())
-        .then(data => {
-            const today = new Date().toISOString().split('T')[0];
-            // Filter medicines valid for today
-            const todaysMeds = data.filter(med => {
-                return (!med.start_date || med.start_date <= today) &&
-                       (!med.end_date || med.end_date >= today);
-            });
-
-            document.getElementById('today-med-count').textContent = todaysMeds.length;
-
-            if (todaysMeds.length === 0) {
-                document.getElementById('today-med-info').textContent = "No medicines for today";
-                return;
-            }
-
-            const nextIntake = calculateNextIntake(todaysMeds);
-            document.getElementById('today-med-info').textContent =
-                `${todaysMeds.length} medicines · Next in ${nextIntake} minutes`;
-        })
-        .catch(err => console.error(err));
-}
-
-// Calculate next intake in minutes
-function calculateNextIntake(meds) {
-    const now = new Date();
-    let minDiff = Infinity;
-
-    meds.forEach(med => {
-        if (!med.intake_time) return;
-        const [hours, minutes] = med.intake_time.split(':').map(Number);
-        const intakeTime = new Date();
-        intakeTime.setHours(hours, minutes, 0, 0);
-
-        let diff = (intakeTime - now) / 60000; // difference in minutes
-        if (diff < 0) diff += 24 * 60; // next day if already passed
-        if (diff < minDiff) minDiff = diff;
+  try {
+    const res = await fetch("assign_caretaker.php", {
+      method: "POST",
+      body: formData
     });
 
-    return Math.round(minDiff);
-}
+    const data = await res.text(); // because your PHP currently does a header redirect
+    // You may want to return JSON from PHP instead, but for now we just reload list
 
-// Call it on page load
-updateTodayMedicines();
-setInterval(updateTodayMedicines, 60 * 1000); // refresh every minute
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.className = "toast show";
+    // Reload caretakers list
+    loadCaretakers();
 
-  if (type === "error") {
-    toast.classList.add("error");
+    // Clear form
+    form.reset();
+  } catch (err) {
+    console.error(err);
+    alert("Error assigning caretaker");
   }
+});
 
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
+// Function to load caretakers from backend
+async function loadCaretakers() {
+  list.innerHTML = "<p>Loading...</p>";
 
-function deleteMedicine(medicineId) {
-  if (!confirm("Delete this medicine?")) return;
+  try {
+    const res = await fetch("fetch_caretaker.php"); // we'll create this
+    const data = await res.json();
 
-  fetch("delete_medicine.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ medicine_id: medicineId })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") {
-      showToast("Medicine deleted 🗑");
-      openViewMedicineModal(); // refresh list
-      updateTodayMedicines();  // update dashboard count
-    } else {
-      showToast(data.message || "Delete failed", "error");
+    if (data.status !== "success" || !data.caretakers.length) {
+      list.innerHTML = "<p>No caretakers assigned yet.</p>";
+      return;
     }
-  });
+
+    list.innerHTML = "";
+    data.caretakers.forEach(cg => {
+      const card = document.createElement("div");
+      card.className = "p-4 bg-white rounded-2xl shadow-soft border border-gray-200 flex items-center justify-between";
+
+      card.innerHTML = `
+        <div>
+          <h3 class="font-bold text-lg">${cg.name}</h3>
+          <p class="text-sm text-textSub">${cg.email}</p>
+          <p class="text-sm text-textSub capitalize">Relation: ${cg.relation}</p>
+        </div>
+        <div>
+          <span class="material-symbols-outlined text-primary">person</span>
+        </div>
+      `;
+
+      list.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<p>Server error</p>";
+  }
 }
 
-</script>
-<script>
-  lucide.createIcons();
+// Load caretakers on page load
+document.addEventListener("DOMContentLoaded", loadCaretakers);
+
 </script>
 
 </body>

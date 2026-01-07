@@ -12,9 +12,9 @@ body {
   display: flex;
   align-items: center;
   background: transparent;
-  width: 100%;              
-  left: 0;                 
-  top: 0; 
+  width: 100%;
+  left: 0;
+  top: 0;
   position: absolute;
   z-index: 5;
 }
@@ -25,12 +25,13 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding-left: 40px;   
+  padding-left: 40px;
   padding-right: 80px;
   box-sizing: border-box;
   position: relative;
   z-index: 20;
 }
+
 .logo {
   display: flex;
   align-items: center;
@@ -39,11 +40,12 @@ body {
   font-weight: 700;
   color: #1aa6d9;
 }
+
 .nav-right {
   display: flex;
   align-items: center;
-  justify-content: space-between; 
-  gap: 20px; 
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .nav-links {
@@ -58,9 +60,11 @@ body {
   font-weight: 500;
   font-size: 14px;
 }
+
 .nav-links a:hover {
   color: #1aa6d9;
 }
+
 .nav-btn {
   padding: 12px 24px;
   background: #2a79ff;
@@ -71,6 +75,7 @@ body {
   font-size: 13px;
   box-shadow: none;
 }
+
 /* Right-side buttons container */
 .nav-actions {
   display: flex;
@@ -86,13 +91,13 @@ body {
 .hero {
   display: flex;
   align-items: center;
-min-height: 90vh;
- padding-left: 40px;   
-  padding-right: 0;     
- position: relative;
+  min-height: 90vh;
+  padding-left: 40px;
+  padding-right: 0;
+  position: relative;
   z-index: 1;
   overflow: hidden;
-    
+
 }
 
 /* Right curved background */
@@ -105,7 +110,8 @@ min-height: 90vh;
   background: #2fb2e6;
   border-radius: 60%;
   display: flex;
-  align-items: flex-end;   /* anchor image bottom */
+  align-items: flex-end;
+  /* anchor image bottom */
   justify-content: center;
   overflow: hidden;
   z-index: 1;
@@ -116,23 +122,25 @@ min-height: 90vh;
   position: absolute;
   width: 70px;
   height: 70px;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 16px;
   top: 35%;
   left: 18%;
 }
+
 /* Image positioning */
 .hero-shape img {
   height: auto;
   width: 100%;
-  transform: translateY(-40px,10px);
+  transform: translateY(-40px, 10px);
 }
+
 .hero-text {
   max-width: 600px;
-  width: auto; 
+  width: auto;
   z-index: 2;
-   margin-left: 40px;
-    margin-left: 0 !important;
+  margin-left: 40px;
+  margin-left: 0 !important;
 }
 
 .hero-text h1 {
@@ -141,6 +149,7 @@ min-height: 90vh;
   line-height: 1.25;
   color: #1a1a1a;
 }
+
 .hero-text p {
   margin: 18px 0 28px;
   font-size: 1.1rem;
@@ -155,6 +164,7 @@ min-height: 90vh;
   text-decoration: none;
   font-weight: 600;
 }
+
 .get-started:hover,
 .nav-btn:hover {
   transform: translateY(-2px);
@@ -683,7 +693,7 @@ footer a {
 /* ===== Mobile: max-width 768px ===== */
 @media (max-width: 768px) {
 
-   .hamburger {
+  .hamburger {
     display: block;
     position: absolute;
     right: 20px;
@@ -694,14 +704,15 @@ footer a {
   /* MOBILE MENU OVERLAY */
   .nav-right {
     display: none;
-    position: fixed;              
-    top: 64px;                    /* navbar height */
+    position: fixed;
+    top: 64px;
+    /* navbar height */
     left: 0;
     width: 100%;
     background: white;
     padding: 20px 0;
 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     border-radius: 0 0 20px 20px;
     z-index: 350;
   }
@@ -736,7 +747,7 @@ footer a {
 
   /* HERO FIX (NO OVERLAP EVER AGAIN) */
   .hero {
-    padding-top: 90px;            
+    padding-top: 90px;
     margin-top: 0;
     flex-direction: column;
     text-align: center;
@@ -754,7 +765,10 @@ footer a {
   .hero-text h1 {
     font-size: 2rem;
   }
-  .hero-text p { font-size: 1rem; }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
 
   /* Hero shape */
   .hero-shape {
@@ -810,16 +824,29 @@ footer a {
     gap: 20px !important;
   }
 
-  h1 { font-size: 2rem !important; }
-  h2 { font-size: 1.5rem !important; }
-  h3 { font-size: 1.2rem !important; }
+  h1 {
+    font-size: 2rem !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  h3 {
+    font-size: 1.2rem !important;
+  }
 }
 
 /* ===== Extra small mobiles ===== */
 @media (max-width: 480px) {
 
-  .hero-text h1 { font-size: 1.5rem !important; }
-  .hero-text p { font-size: 0.9rem !important; }
+  .hero-text h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem !important;
+  }
 
   .about-content h2,
   .medicine-box-text h2,
@@ -838,4 +865,3 @@ footer a {
     padding: 30px 5%;
   }
 }
-

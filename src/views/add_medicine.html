@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sushrusha - Add Medicine</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "card-light": "#ffffff",
+                        "card-dark": "#182635",
+                        "input-border-light": "#cfdbe7",
+                        "input-border-dark": "#2d3b4e",
+                        "text-main-light": "#0d141b",
+                        "text-main-dark": "#e0e6ed",
+                        "text-sub-light": "#4c739a",
+                        "text-sub-dark": "#94a3b8",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-display min-h-screen flex flex-col transition-colors duration-200">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full bg-card-light dark:bg-card-dark border-b border-input-border-light dark:border-input-border-dark shadow-sm">
+<div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<!-- Logo -->
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">local_hospital</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Sushrusha</span>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="dashboard.php">Dashboard</a>
+<a class="text-sm font-medium text-text-main-light dark:text-text-main-dark" href="#">Reminders</a> <!-- Active State -->
+<a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Reports</a>
+<a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Profile</a>
+</nav>
+<!-- User Profile -->
+<div class="flex items-center gap-4">
+<button class="p-2 text-text-sub-light dark:text-text-sub-dark hover:bg-background-light dark:hover:bg-background-dark rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-9 rounded-full bg-cover bg-center border border-input-border-light dark:border-input-border-dark cursor-pointer" data-alt="Portrait of a smiling male user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAb8YJD0lIvx5ydgnMIf7VnNBPErUu3MTQ6bCNwnzinkOy2Y_fUNgn31JWjHneVR8cNxrz4Rm28xqhF4teoMj1LtN6Vsqv-wphvS2rwqY7hzOaZX6-sxGDq9vSW3u-TcRuWSqipmk9dGyuba4PEls_cEZCdQkP18okvItGky2Jbd0gJs4K2ekR576bDAWjQxnPWua3NR3UAOdRNyuk-7jLTGCTA0ozy11KxtOLuyvPFEpE9_SuoAPX7YekhGPxwoxjiytEbDKXcX_g');">
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Layout -->
+<main class="flex-1 w-full max-w-[960px] mx-auto px-4 py-8 sm:px-6 lg:px-8">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex mb-6">
+<ol class="inline-flex items-center space-x-1 md:space-x-2">
+<li class="inline-flex items-center">
+<a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary" href="#">
+                        Dashboard
+                    </a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark text-lg mx-1">chevron_right</span>
+<a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary" href="#">Reminders</a>
+</div>
+</li>
+<li aria-current="page">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark text-lg mx-1">chevron_right</span>
+<span class="text-sm font-medium text-primary">Add Medicine</span>
+</div>
+</li>
+</ol>
+</nav>
+<!-- Page Heading -->
+<div class="mb-8">
+<h1 class="text-3xl sm:text-4xl font-black text-text-main-light dark:text-text-main-dark tracking-tight mb-3">Add New Medication</h1>
+<p class="text-base sm:text-lg text-text-sub-light dark:text-text-sub-dark">Enter the details below to set up your smart reminders and tracking.</p>
+</div>
+<!-- Form Container -->
+<form class="flex flex-col gap-6" >
+
+  <!-- Section 1: Medicine Details -->
+  <div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center gap-3 bg-background-light/50 dark:bg-background-dark/50">
+      <div class="bg-primary/10 p-2 rounded-lg text-primary">
+        <span class="material-symbols-outlined">medication</span>
+      </div>
+      <h2 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">Medicine Details</h2>
+    </div>
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Medicine Name -->
+      <div class="space-y-2 col-span-1 md:col-span-2 relative">
+  <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="medName">Medicine Name</label>
+  <div class="flex gap-2 items-center">
+    <input id="medName" name="medName" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-text-sub-light/70 transition-all outline-none" placeholder="Type medicine name..." type="text" autocomplete="off"/>
+
+    <!-- Request New Medicine Button -->
+    <button type="button" id="requestNewMed" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1">
+      <span class="material-symbols-outlined text-lg">add</span>Request
+    </button>
+  </div>
+
+  <!-- Autocomplete Dropdown -->
+  <ul id="medSuggestions" class="absolute z-50 w-full bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark rounded-lg mt-1 max-h-48 overflow-auto hidden"></ul>
+</div>
+
+      <!-- Dosage -->
+  <div class="space-y-2">
+  <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="dosage">Dosage</label>
+  <select id="dosage" name="dosage" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+    <option value="">Select dosage</option>
+  </select>
+</div>
+
+      <!-- Medicine Form -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark">Form</label>
+        <div class="grid grid-cols-3 gap-3">
+          <label class="cursor-pointer relative group">
+            <input checked name="form" value="Pill" class="peer sr-only" type="radio"/>
+            <div class="h-12 flex items-center justify-center gap-2 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary text-text-sub-light transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
+              <span class="material-symbols-outlined text-lg">pill</span>
+              <span class="text-sm font-medium">Pill</span>
+            </div>
+          </label>
+          <label class="cursor-pointer relative group">
+            <input name="form" value="Liquid" class="peer sr-only" type="radio"/>
+            <div class="h-12 flex items-center justify-center gap-2 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary text-text-sub-light transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
+              <span class="material-symbols-outlined text-lg">water_drop</span>
+              <span class="text-sm font-medium">Liquid</span>
+            </div>
+          </label>
+          <label class="cursor-pointer relative group">
+            <input name="form" value="Injection" class="peer sr-only" type="radio"/>
+            <div class="h-12 flex items-center justify-center gap-2 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary text-text-sub-light transition-all hover:bg-gray-100 dark:hover:bg-gray-800">
+              <span class="material-symbols-outlined text-lg">syringe</span>
+              <span class="text-sm font-medium">Injection</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section 2: Schedule & Frequency -->
+  <div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center gap-3 bg-background-light/50 dark:bg-background-dark/50">
+      <div class="bg-primary/10 p-2 rounded-lg text-primary">
+        <span class="material-symbols-outlined">calendar_month</span>
+      </div>
+      <h2 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">Schedule &amp; Frequency</h2>
+    </div>
+    <div class="p-6 space-y-6">
+
+      <!-- Frequency -->
+      <div class="space-y-3">
+        <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="frequency">How often?</label>
+        <select name="frequency" id="frequency" class="h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-full md:w-auto min-w-[200px]">
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Specific Days">Specific Days</option>
+          <option value="As Needed">As Needed</option>
+        </select>
+      </div>
+
+      <!-- Specific Days -->
+      <div class="flex gap-2 flex-wrap">
+        <input type="checkbox" name="specific_days[]" value="M" id="dayM" class="hidden">
+        <label for="dayM" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">M</label>
+
+        <input type="checkbox" name="specific_days[]" value="T" id="dayT" class="hidden">
+        <label for="dayT" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">T</label>
+
+        <input type="checkbox" name="specific_days[]" value="W" id="dayW" class="hidden">
+        <label for="dayW" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">W</label>
+
+        <input type="checkbox" name="specific_days[]" value="T" id="dayTh" class="hidden">
+        <label for="dayTh" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">T</label>
+
+        <input type="checkbox" name="specific_days[]" value="F" id="dayF" class="hidden">
+        <label for="dayF" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">F</label>
+
+        <input type="checkbox" name="specific_days[]" value="S" id="dayS" class="hidden">
+        <label for="dayS" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">S</label>
+
+        <input type="checkbox" name="specific_days[]" value="S" id="daySu" class="hidden">
+        <label for="daySu" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">S</label>
+      </div>
+
+      <hr class="border-input-border-light dark:border-input-border-dark border-dashed"/>
+
+     <!-- Reminder Times Section -->
+<div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center gap-3 bg-background-light/50 dark:bg-background-dark/50">
+    <div class="bg-primary/10 p-2 rounded-lg text-primary">
+      <span class="material-symbols-outlined">schedule</span>
+    </div>
+    <h2 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">Reminder Times</h2>
+  </div>
+
+  <div class="p-6 space-y-4">
+    <!-- Reminder Mode -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark">Reminder Type</label>
+      <div class="flex gap-4">
+        <label class="cursor-pointer flex items-center gap-2">
+          <input type="radio" name="reminder_mode" value="fixed" checked class="peer sr-only">
+          <div class="px-3 py-2 rounded-lg border border-input-border-light dark:border-input-border-dark peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary text-text-sub-light hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            Fixed Times
+          </div>
+        </label>
+        <label class="cursor-pointer flex items-center gap-2">
+          <input type="radio" name="reminder_mode" value="interval" class="peer sr-only">
+          <div class="px-3 py-2 rounded-lg border border-input-border-light dark:border-input-border-dark peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary text-text-sub-light hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            Interval-based
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Fixed Times Picker -->
+    <div id="fixed-times-container" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark">Times</label>
+        <button type="button" id="addFixedTimeBtn" class="text-sm text-primary font-medium hover:text-blue-600 flex items-center gap-1">
+          <span class="material-symbols-outlined text-lg">add_circle</span>Add Time
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-4" id="fixedTimesInputs">
+        <input name="times[]" type="time" value="08:00" class="bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark rounded-lg p-2"/>
+        <input name="times[]" type="time" value="20:00" class="bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark rounded-lg p-2"/>
+      </div>
+    </div>
+
+    <!-- Interval Picker -->
+   <div id="interval-container" class="space-y-3 hidden">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="intervalStart">Start Time</label>
+      <input type="time" id="intervalStart" name="intervalStart" value="08:00" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"/>
+    </div>
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="intervalHours">Interval (hours)</label>
+      <input type="number" id="intervalHours" name="intervalHours" min="1" max="24" value="8" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"/>
+    </div>
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark">Generated Times</label>
+      <div id="generatedTimes" class="p-2 bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark rounded-lg min-h-[50px] text-text-sub-light dark:text-text-sub-dark"></div>
+    </div>
+  </div>
+</div>
+
+
+        
+      <hr class="border-input-border-light dark:border-input-border-dark border-dashed"/>
+
+      <!-- Duration Dates -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="start_date">Start Date</label>
+          <input id="start_date" name="start_date" type="date" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"/>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="end_date">End Date (Optional)</label>
+          <input id="end_date" name="end_date" type="date" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"/>
+        </div>
+      </div>
+
+      <!-- Compartment Number -->
+      <div class="space-y-2">
+  <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="compartment_number">
+    Compartment Number
+  </label>
+
+  <select
+    id="compartment_number"
+    name="compartment_number"
+    class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+    required
+  >
+    <option value="" disabled selected>Select compartment</option>
+    <option value="1">Compartment 1</option>
+    <option value="2">Compartment 2</option>
+    <option value="3">Compartment 3</option>
+    <option value="4">Compartment 4</option>
+  </select>
+</div>
+
+
+    </div>
+  </div>
+
+  <!-- Section 3: Instructions & Notes -->
+  <div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center gap-3 bg-background-light/50 dark:bg-background-dark/50">
+      <div class="bg-primary/10 p-2 rounded-lg text-primary">
+        <span class="material-symbols-outlined">notes</span>
+      </div>
+      <h2 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">Instructions &amp; Notes</h2>
+    </div>
+    <div class="p-6">
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-text-main-light dark:text-text-main-dark" for="instructions">Special Instructions</label>
+        <textarea id="instructions" name="instructions" rows="4" placeholder="e.g. Take with food, avoid sunlight..." class="w-full p-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-text-sub-light/70 transition-all outline-none resize-none"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-end gap-4 py-4">
+    <button class="px-6 py-3 rounded-lg text-sm font-semibold text-text-sub-light dark:text-text-sub-dark hover:text-text-main-light dark:hover:text-text-main-dark transition-colors" type="button">Cancel</button>
+    <button class="px-8 py-3 rounded-lg text-sm font-bold text-white bg-primary hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2" type="submit">
+      <span class="material-symbols-outlined text-lg">check</span>Save Medicine
+    </button>
+  </div>
+
+</form>
+
+</main>
+<footer class="mt-auto py-6 border-t border-input-border-light dark:border-input-border-dark bg-card-light dark:bg-card-dark text-center">
+<p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2023 Sushrusha Health. All rights reserved.</p>
+</footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* ===============================
+     ELEMENT REFERENCES
+  =============================== */
+  const form = document.querySelector("form");
+
+  const medInput = document.getElementById("medName");
+  const suggestions = document.getElementById("medSuggestions");
+  const dosageSelect = document.getElementById("dosage");
+  const formRadios = document.querySelectorAll('input[name="form"]');
+
+  const frequencySelect = document.getElementById("frequency");
+  const dayCheckboxes = document.querySelectorAll('input[name="specific_days[]"]');
+
+  const fixedTimesContainer = document.getElementById("fixed-times-container");
+  const intervalContainer = document.getElementById("interval-container");
+  const addFixedTimeBtn = document.getElementById("addFixedTimeBtn");
+  const fixedTimesInputs = document.getElementById("fixedTimesInputs");
+
+  const intervalStart = document.getElementById("intervalStart");
+  const intervalHours = document.getElementById("intervalHours");
+  const generatedTimes = document.getElementById("generatedTimes");
+
+  let allDosages = [];
+
+  /* ===============================
+     MEDICINE AUTOCOMPLETE
+  =============================== */
+  medInput.addEventListener("input", async () => {
+    const query = medInput.value.trim();
+    suggestions.innerHTML = "";
+    dosageSelect.innerHTML = '<option value="">Select dosage</option>';
+    allDosages = [];
+
+    if (!query) {
+      suggestions.classList.add("hidden");
+      return;
+    }
+
+    const res = await fetch(`medicines_autocomplete.php?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (!data.length) {
+      suggestions.classList.add("hidden");
+      return;
+    }
+
+    data.forEach(med => {
+      const li = document.createElement("li");
+      li.textContent = med.name;
+      li.className = "px-4 py-2 hover:bg-primary/20 cursor-pointer";
+      li.onclick = () => {
+        medInput.value = med.name;
+        suggestions.classList.add("hidden");
+        loadDosages(med.name);
+      };
+      suggestions.appendChild(li);
+    });
+
+    suggestions.classList.remove("hidden");
+  });
+
+  document.addEventListener("click", e => {
+    if (!medInput.contains(e.target) && !suggestions.contains(e.target)) {
+      suggestions.classList.add("hidden");
+    }
+  });
+
+  async function loadDosages(medicine) {
+    const res = await fetch(`medicines_autocomplete.php?medicine=${encodeURIComponent(medicine)}`);
+    const data = await res.json();
+    allDosages = data;
+
+    dosageSelect.innerHTML = '<option value="">Select dosage</option>';
+
+    const forms = new Set();
+    data.forEach(d => forms.add(d.form));
+
+    data.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.dosage;
+      opt.textContent = d.dosage;
+      opt.dataset.form = d.form;
+      dosageSelect.appendChild(opt);
+    });
+
+    if (forms.size === 1) {
+      const onlyForm = [...forms][0];
+      formRadios.forEach(r => r.checked = r.value === onlyForm);
+    } else {
+      formRadios.forEach(r => r.checked = false);
+    }
+
+    filterDosages();
+  }
+
+  function filterDosages() {
+    const selectedForm = document.querySelector('input[name="form"]:checked')?.value;
+    dosageSelect.innerHTML = '<option value="">Select dosage</option>';
+
+    if (!selectedForm) return;
+
+    allDosages
+      .filter(d => d.form === selectedForm)
+      .forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.dosage;
+        opt.textContent = d.dosage;
+        dosageSelect.appendChild(opt);
+      });
+  }
+
+  formRadios.forEach(r => r.addEventListener("change", filterDosages));
+
+  /* ===============================
+     FREQUENCY → DAYS LOGIC
+  =============================== */
+  function updateDays() {
+    if (frequencySelect.value === "Daily") {
+      dayCheckboxes.forEach(cb => {
+        cb.checked = true;
+        cb.disabled = true;
+        cb.nextElementSibling.classList.add("bg-primary/20","border-primary","text-primary","opacity-60");
+      });
+    } else {
+      dayCheckboxes.forEach(cb => {
+        cb.checked = false;
+        cb.disabled = false;
+        cb.nextElementSibling.classList.remove("bg-primary/20","border-primary","text-primary","opacity-60");
+      });
+    }
+  }
+  updateDays();
+  frequencySelect.addEventListener("change", updateDays);
+
+  /* ===============================
+     REMINDER TYPE TOGGLE
+  =============================== */
+  document.querySelectorAll('input[name="reminder_mode"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      fixedTimesContainer.classList.toggle("hidden", radio.value !== "fixed");
+      intervalContainer.classList.toggle("hidden", radio.value !== "interval");
+    });
+  });
+
+  /* ===============================
+     FIXED TIME ADD / REMOVE
+  =============================== */
+  addFixedTimeBtn.addEventListener("click", () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex items-center gap-2";
+
+    wrap.innerHTML = `
+      <input type="time" name="times[]" value="08:00"
+        class="bg-background-light border rounded-lg p-2"/>
+      <span class="material-symbols-outlined cursor-pointer text-red-500">close</span>
+    `;
+
+    wrap.querySelector("span").onclick = () => wrap.remove();
+    fixedTimesInputs.appendChild(wrap);
+  });
+
+  /* ===============================
+     INTERVAL GENERATOR
+  =============================== */
+function generateIntervals() {
+  const start = intervalStart.value;          
+  const interval = parseInt(intervalHours.value); 
+
+  if (!start || isNaN(interval) || interval < 1 || interval > 24) {
+    generatedTimes.textContent = "";
+    return;
+  }
+
+  const [startH, startM] = start.split(":").map(Number);
+  let currentH = startH;
+  let currentM = startM;
+
+  const times = [];
+
+  while (currentH < 24) {
+    const hh = String(currentH).padStart(2, "0");
+    const mm = String(currentM).padStart(2, "0");
+    times.push(`${hh}:${mm}`);
+    currentH += interval;
+  }
+
+  generatedTimes.textContent = times.join(", ");
+}
+
+// 🔥 LISTEN FOR CHANGES
+intervalStart.addEventListener("input", generateIntervals);
+intervalHours.addEventListener("input", generateIntervals);
+
+// Initial call
+generateIntervals();
+
+
+  /* ===============================
+     FORM SUBMISSION (🔥 IMPORTANT)
+  =============================== */
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("add_medicine.php", {
+        method: "POST",
+        body: formData,
+        credentials: "same-origin" 
+      });
+
+      const data = await res.json();
+      console.log("SERVER:", data);
+
+      if (data.status === "success") {
+        alert("✅ Medicine added successfully");
+        form.reset();
+      } else {
+        alert("❌ " + (data.message || "Failed"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Server error");
+    }
+  });
+
+});
+</script>
+
+
+
+</body></html>

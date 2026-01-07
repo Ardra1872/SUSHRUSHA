@@ -18,15 +18,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (password_verify($password, $hashed_password)) {
 
             $_SESSION['user_id'] = $id;
-            $_SESSION['user_name'] = $name;
-            $_SESSION['user_role'] = $role;
-            $_SESSION['first_login'] = $first_login; // flag for dashboard
+$_SESSION['user_name'] = $name;
+$_SESSION['role'] = $role;
+$_SESSION['first_login'] = $first_login;
 
             // Redirect based on role
             if ($role === 'patient') {
+                 $_SESSION['active_patient_id'] = $id; 
                 header("Location: ../src/views/dashboard.php");
                 exit;
             } elseif ($role === 'caretaker') {
+                $_SESSION['active_patient_id'] = $selected_patient_id;
                 header("Location: ../src/views/caretaker_dashboard.php");
                 exit;
             } else {
