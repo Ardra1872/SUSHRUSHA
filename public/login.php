@@ -124,20 +124,20 @@ function validateEmail() {
     }
 }
 
-function validatePassword() {
-    if (password.value === "") {
-        password.classList.remove('valid', 'invalid');
-        passwordError.textContent = "";
-    } else if (passwordPattern.test(password.value)) {
-        password.classList.add('valid');
-        password.classList.remove('invalid');
-        passwordError.textContent = "";
-    } else {
-        password.classList.add('invalid');
-        password.classList.remove('valid');
-        passwordError.textContent = "Password must be 6+ characters, with letters and a special character";
-    }
-}
+// function validatePassword() {
+//     if (password.value === "") {
+//         password.classList.remove('valid', 'invalid');
+//         passwordError.textContent = "";
+//     } else if (passwordPattern.test(password.value)) {
+//         password.classList.add('valid');
+//         password.classList.remove('invalid');
+//         passwordError.textContent = "";
+//     } else {
+//         password.classList.add('invalid');
+//         password.classList.remove('valid');
+//         passwordError.textContent = "Password must be 6+ characters, with letters and a special character";
+//     }
+// }
 
 email.addEventListener('input', validateEmail);
 password.addEventListener('input', validatePassword);

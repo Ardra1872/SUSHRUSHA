@@ -229,6 +229,19 @@ $first_login = $_SESSION['first_login'];
             gap: 10px;
         }
     }
+#assignedPatientMedicines table th {
+    text-align: left;
+    padding: 10px;
+    color: #2f6bff;
+    font-size: 14px;
+}
+
+#assignedPatientMedicines table td {
+    padding: 10px;
+    border-top: 1px solid #e3eef7;
+    font-size: 13px;
+}
+
     </style>
 </head>
 <body>
@@ -273,11 +286,11 @@ $first_login = $_SESSION['first_login'];
         <div class="dashboard-grid">
 
             <!-- WIDE CARD -->
-            <div class="card wide">
-                <h3>Today’s Responsibilities</h3>
-                <h1>3</h1>
-                <p>1 patient • Next medicine in 15 minutes</p>
-            </div>
+           <div class="card wide" id="assignedPatientMedicines">
+    <h3>Assigned Patient – Medicines</h3>
+    <div id="medicineList">Loading medicines…</div>
+</div>
+
 
             <!-- CARD -->
             <div class="card">
@@ -318,10 +331,64 @@ $first_login = $_SESSION['first_login'];
         </form>
     </div>
 </div>
-<script>
-document.getElementById('firstLoginModal').style.display = 'flex';
-</script>
+
 <?php endif; ?>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  fetch('fetch_patient_medicine.php')
+    .then(res => res.json())
+    .then(data => {
+
+      const container = document.getElementById('medicineList');
+
+      if (!container) {
+        console.error("medicineList container not found");
+        return;
+      }
+
+      if (data.status === 'empty') {
+        container.innerHTML = "<p>No patient assigned yet.</p>";
+        return;
+      }
+
+      if (data.status !== 'success' || data.medicines.length === 0) {
+        container.innerHTML = "<p>No medicines added for this patient.</p>";
+        return;
+      }
+
+      let html = `
+        <table style="width:100%; border-collapse: collapse;">
+          <tr>
+            <th>Medicine</th>
+            <th>Dosage</th>
+            <th>Time</th>
+            <th>Compartment</th>
+          </tr>`;
+
+      data.medicines.forEach(m => {
+        html += `
+          <tr>
+            <td>${m.name}</td>
+            <td>${m.dosage || '-'}</td>
+            <td>${m.intake_time}</td>
+            <td>${m.compartment_number}</td>
+          </tr>`;
+      });
+
+      html += "</table>";
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('medicineList').innerHTML =
+        "<p>Error loading medicines.</p>";
+    });
+
+});
+</script>
+
 
 </body>
 </html>

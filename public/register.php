@@ -120,76 +120,100 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 </div>
 
+<script>
+const registerForm = document.getElementById('registerForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
 
+// Optional: add error spans dynamically
+const nameError = document.createElement('span');
+nameError.className = 'error';
+nameInput.after(nameError);
 
+const emailError = document.createElement('span');
+emailError.className = 'error';
+emailInput.after(emailError);
 
+const passwordError = document.createElement('span');
+passwordError.className = 'error';
+passwordInput.after(passwordError);
 
-<!-- <script>
-    console.log("Validation script loaded!");
+// Validation patterns
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordPattern = /^(?=.*[A-Za-z])(?=.*[\W_]).{6,}$/;
 
-    document.addEventListener('DOMContentLoaded', function() {
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const form = document.getElementById('registerForm');
-
-    function validateName() {
-        if(nameInput.value.trim().length < 3) {
-            nameInput.classList.add('invalid');
-            nameInput.classList.remove('valid');
-            return false;
-        } else {
-            nameInput.classList.add('valid');
-            nameInput.classList.remove('invalid');
-            return true;
-        }
+// Validation functions
+function validateName() {
+    if (nameInput.value.trim() === "") {
+        nameInput.classList.add('invalid');
+        nameInput.classList.remove('valid');
+        nameError.textContent = "Name cannot be empty";
+        return false;
+    } else {
+        nameInput.classList.add('valid');
+        nameInput.classList.remove('invalid');
+        nameError.textContent = "";
+        return true;
     }
+}
 
-    function validateEmail() {
-        let pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!pattern.test(emailInput.value.trim())) {
-            emailInput.classList.add('invalid');
-            emailInput.classList.remove('valid');
-            return false;
-        } else {
-            emailInput.classList.add('valid');
-            emailInput.classList.remove('invalid');
-            return true;
-        }
+function validateEmail() {
+    if (emailInput.value.trim() === "") {
+        emailInput.classList.remove('valid', 'invalid');
+        emailError.textContent = "";
+        return false;
+    } else if (emailPattern.test(emailInput.value)) {
+        emailInput.classList.add('valid');
+        emailInput.classList.remove('invalid');
+        emailError.textContent = "";
+        return true;
+    } else {
+        emailInput.classList.add('invalid');
+        emailInput.classList.remove('valid');
+        emailError.textContent = "Enter a valid email";
+        return false;
     }
+}
 
-    function validatePassword() {
-        let pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-        if(!pattern.test(passwordInput.value)) {
-            passwordInput.classList.add('invalid');
-            passwordInput.classList.remove('valid');
-            return false;
-        } else {
-            passwordInput.classList.add('valid');
-            passwordInput.classList.remove('invalid');
-            return true;
-        }
+function validatePassword() {
+    if (passwordInput.value.trim() === "") {
+        passwordInput.classList.remove('valid', 'invalid');
+        passwordError.textContent = "";
+        return false;
+    } else if (passwordPattern.test(passwordInput.value)) {
+        passwordInput.classList.add('valid');
+        passwordInput.classList.remove('invalid');
+        passwordError.textContent = "";
+        return true;
+    } else {
+        passwordInput.classList.add('invalid');
+        passwordInput.classList.remove('valid');
+        passwordError.textContent = "Password must be 6+ characters, with letters and a special character";
+        return false;
     }
+}
 
-    // Live validation on input
-    nameInput.addEventListener('input', validateName);
-    emailInput.addEventListener('input', validateEmail);
-    passwordInput.addEventListener('input', validatePassword);
+// Event listeners for live validation
+nameInput.addEventListener('input', validateName);
+emailInput.addEventListener('input', validateEmail);
+passwordInput.addEventListener('input', validatePassword);
 
-    // Validation on blur (when user leaves the field)
-    nameInput.addEventListener('blur', validateName);
-    emailInput.addEventListener('blur', validateEmail);
-    passwordInput.addEventListener('blur', validatePassword);
+// Form submission
+registerForm.addEventListener('submit', (e) => {
+    const isNameValid = validateName();
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
 
-    // Validate on form submit
-    form.addEventListener('submit', function(e) {
-        if(!validateName() || !validateEmail() || !validatePassword()) {
-            e.preventDefault();
-            alert("Please fix the highlighted fields before submitting.");
-        }
-    });
+    if (!isNameValid || !isEmailValid || !isPasswordValid) {
+        e.preventDefault();
+        alert('Please fix the errors before submitting.');
+    }
 });
+</script>
 
-    </script> -->
+
+
+   
 </body>
 </html>
