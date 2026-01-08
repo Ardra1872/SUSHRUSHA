@@ -4,7 +4,9 @@ require '../src/config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $email = trim($_POST['email']);
+   $email = strtolower(trim($_POST['email']));
+
+
     $password = trim($_POST['password']);
 
     $stmt = $conn->prepare("SELECT id, name, password, role, first_login FROM users WHERE email=?");

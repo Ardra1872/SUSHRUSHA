@@ -118,13 +118,19 @@
     <input id="medName" name="medName" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-text-sub-light/70 transition-all outline-none" placeholder="Type medicine name..." type="text" autocomplete="off"/>
 
     <!-- Request New Medicine Button -->
-    <button type="button" id="requestNewMed" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1">
+    <!-- <button type="button" id="requestNewMed" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1">
       <span class="material-symbols-outlined text-lg">add</span>Request
     </button>
-  </div>
+  </div> -->
 
   <!-- Autocomplete Dropdown -->
+
   <ul id="medSuggestions" class="absolute z-50 w-full bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark rounded-lg mt-1 max-h-48 overflow-auto hidden"></ul>
+<p id="medNotFound" class="hidden mt-1 text-sm text-red-500">
+  ❌ Medicine not found
+</p>
+
+
 </div>
 
       <!-- Dosage -->
@@ -189,25 +195,25 @@
 
       <!-- Specific Days -->
       <div class="flex gap-2 flex-wrap">
-        <input type="checkbox" name="specific_days[]" value="M" id="dayM" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="M" id="dayM" class="hidden day-checkbox">
         <label for="dayM" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">M</label>
 
-        <input type="checkbox" name="specific_days[]" value="T" id="dayT" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="T" id="dayT" class="hidden day-checkbox">
         <label for="dayT" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">T</label>
 
-        <input type="checkbox" name="specific_days[]" value="W" id="dayW" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="W" id="dayW" class="hidden day-checkbox">
         <label for="dayW" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">W</label>
 
-        <input type="checkbox" name="specific_days[]" value="T" id="dayTh" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="T" id="dayTh"class="hidden day-checkbox">
         <label for="dayTh" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">T</label>
 
-        <input type="checkbox" name="specific_days[]" value="F" id="dayF" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="F" id="dayF" class="hidden day-checkbox">
         <label for="dayF" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">F</label>
 
-        <input type="checkbox" name="specific_days[]" value="S" id="dayS" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="S" id="dayS" class="hidden day-checkbox">
         <label for="dayS" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">S</label>
 
-        <input type="checkbox" name="specific_days[]" value="S" id="daySu" class="hidden">
+        <input type="checkbox" name="specific_days[]" value="S" id="daySu" class="hidden day-checkbox">
         <label for="daySu" class="size-12 rounded-full border border-input-border-light dark:border-input-border-dark flex items-center justify-center text-sm font-medium text-text-sub-light hover:border-primary hover:text-primary bg-background-light dark:bg-background-dark cursor-pointer transition-all">S</label>
       </div>
 
@@ -370,6 +376,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const generatedTimes = document.getElementById("generatedTimes");
 
   let allDosages = [];
+  let medicineFound = false;
+let clickingSuggestion = false;
+const medNotFound = document.getElementById("medNotFound");
 
   /* ===============================
      MEDICINE AUTOCOMPLETE
@@ -387,21 +396,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const res = await fetch(`medicines_autocomplete.php?query=${encodeURIComponent(query)}`);
     const data = await res.json();
+   medicineFound = data.length > 0;
 
-    if (!data.length) {
-      suggestions.classList.add("hidden");
-      return;
-    }
+if (!medicineFound) {
+  suggestions.classList.add("hidden");
 
+  if (!medicineFound) {
+  suggestions.classList.add("hidden");
+
+  // show inline error
+  medNotFound.classList.remove("hidden");
+  medInput.classList.add("border-red-500");
+
+  dosageSelect.innerHTML = '<option value="">Select dosage</option>';
+  return;
+}
+
+}
+
+
+    
     data.forEach(med => {
       const li = document.createElement("li");
       li.textContent = med.name;
       li.className = "px-4 py-2 hover:bg-primary/20 cursor-pointer";
-      li.onclick = () => {
-        medInput.value = med.name;
-        suggestions.classList.add("hidden");
-        loadDosages(med.name);
-      };
+     li.onmousedown = () => {
+  clickingSuggestion = true;
+};
+
+li.onclick = () => {
+  medInput.value = med.name;
+  suggestions.classList.add("hidden");
+  medicineFound = true;  
+   medNotFound.classList.add("hidden");
+  medInput.classList.remove("border-red-500");
+   
+  loadDosages(med.name);
+
+  setTimeout(() => clickingSuggestion = false, 0);
+};
+
+
       suggestions.appendChild(li);
     });
 
@@ -413,6 +448,8 @@ document.addEventListener("DOMContentLoaded", () => {
       suggestions.classList.add("hidden");
     }
   });
+
+
 
   async function loadDosages(medicine) {
     const res = await fetch(`medicines_autocomplete.php?medicine=${encodeURIComponent(medicine)}`);
@@ -442,44 +479,87 @@ document.addEventListener("DOMContentLoaded", () => {
     filterDosages();
   }
 
-  function filterDosages() {
-    const selectedForm = document.querySelector('input[name="form"]:checked')?.value;
-    dosageSelect.innerHTML = '<option value="">Select dosage</option>';
+ function filterDosages() {
+  const selectedForm = document.querySelector('input[name="form"]:checked')?.value;
+  
+  // Clear the dropdown first
+  dosageSelect.innerHTML = '<option value="">Select dosage</option>';
 
-    if (!selectedForm) return;
+  if (!selectedForm) return;
 
-    allDosages
-      .filter(d => d.form === selectedForm)
-      .forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d.dosage;
-        opt.textContent = d.dosage;
-        dosageSelect.appendChild(opt);
-      });
+  // Filter for dosages that match selected form
+  const filtered = allDosages.filter(d => d.form === selectedForm);
+
+  if (filtered.length === 0) {
+    // No dosages for this form
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No dosage available";
+    opt.disabled = true;
+    dosageSelect.appendChild(opt);
+    return;
   }
+
+  filtered.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d.dosage;
+    opt.textContent = d.dosage;
+    dosageSelect.appendChild(opt);
+  });
+}
 
   formRadios.forEach(r => r.addEventListener("change", filterDosages));
 
   /* ===============================
      FREQUENCY → DAYS LOGIC
   =============================== */
-  function updateDays() {
-    if (frequencySelect.value === "Daily") {
-      dayCheckboxes.forEach(cb => {
-        cb.checked = true;
-        cb.disabled = true;
-        cb.nextElementSibling.classList.add("bg-primary/20","border-primary","text-primary","opacity-60");
-      });
+function updateDays() {
+  const isDaily = frequencySelect.value === "Daily";
+
+  dayCheckboxes.forEach(cb => {
+    if (isDaily) {
+      cb.checked = true;     // auto-select
+      cb.disabled = true;   // lock
+      cb.nextElementSibling.classList.add(
+        "bg-primary/20","border-primary","text-primary","opacity-60"
+      );
+   } else {
+  cb.disabled = false;
+  cb.checked = false;
+
+  cb.nextElementSibling.classList.remove(
+    "bg-primary/20",
+    "border-primary",
+    "text-primary",
+    "opacity-60"
+  );
+}
+
+
+  });
+}
+dayCheckboxes.forEach(cb => {
+  cb.addEventListener("change", () => {
+    const label = cb.nextElementSibling;
+
+    if (cb.checked) {
+      label.classList.add(
+        "bg-primary/20",
+        "border-primary",
+        "text-primary"
+      );
     } else {
-      dayCheckboxes.forEach(cb => {
-        cb.checked = false;
-        cb.disabled = false;
-        cb.nextElementSibling.classList.remove("bg-primary/20","border-primary","text-primary","opacity-60");
-      });
+      label.classList.remove(
+        "bg-primary/20",
+        "border-primary",
+        "text-primary"
+      );
     }
-  }
-  updateDays();
-  frequencySelect.addEventListener("change", updateDays);
+  });
+});
+
+ updateDays(); // run once on page load
+frequencySelect.addEventListener("change", updateDays);
 
   /* ===============================
      REMINDER TYPE TOGGLE

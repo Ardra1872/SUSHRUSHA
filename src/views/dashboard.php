@@ -78,7 +78,7 @@ tailwind.config = {
 
   <!-- Patient -->
   <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="schedule">
-    <span class="material-symbols-outlined">calendar_month</span> My Schedule
+    <span class="material-symbols-outlined">calendar_month</span> My Medicines
   </a>
   <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="prescriptions">
     <span class="material-symbols-outlined">pill</span> Prescriptions
@@ -231,8 +231,8 @@ tailwind.config = {
 
     <!-- My Schedule -->
     <div id="schedule" class="section hidden">
-      <h2 class="text-2xl font-bold mb-4">My Schedule</h2>
-      <p>Check your medicine intake timeline here.</p>
+      <h2 class="text-2xl font-bold mb-4">My Medicines</h2>
+      <p>Medicine list </p>
       <div id="scheduleList" class="mt-6 grid gap-4">
     <!-- Medicine cards will be injected here -->
   </div>
