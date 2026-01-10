@@ -79,3 +79,13 @@ CREATE TABLE IF NOT EXISTS medicine_catalog (
     name VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE medicine_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    dosage VARCHAR(100) NOT NULL,
+    form ENUM('Pill','Liquid','Injection') NOT NULL,
+    requested_by INT NOT NULL,
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (requested_by) REFERENCES users(id) ON DELETE CASCADE
+);

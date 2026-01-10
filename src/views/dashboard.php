@@ -9,7 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-$role   = $_SESSION['role'];
+$role = $_SESSION['user_role'] ?? null;
+
 $name = $_SESSION['user_name'];
 
 // Fetch profile photo
@@ -68,13 +69,14 @@ tailwind.config = {
 }
 </script>
 </head>
+<body class="bg-bg text-textMain font-body h-screen flex">
 
-<body class="bg-bg text-textMain font-body h-screen flex overflow-hidden">
 
 <!-- SIDEBAR -->
 <aside id="sidebar"
   class="fixed inset-y-0 left-0 z-40 w-72 bg-surface border-r border-slate-200 flex flex-col
-         transform -translate-x-full transition-transform duration-300">
+         transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static">
+
 
   <div class="p-8 flex items-center gap-4">
     <div class="size-12 rounded-2xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center text-white shadow-lg">
@@ -141,7 +143,8 @@ tailwind.config = {
   class="fixed inset-0 bg-black/40 z-30 hidden">
 </div>
 <!-- MAIN -->
-<main class="flex-1 flex flex-col overflow-hidden">
+<main class="flex-1 flex flex-col">
+
 
 <!-- TOPBAR -->
 
@@ -150,9 +153,10 @@ tailwind.config = {
   <!-- LEFT: Hamburger + Brand -->
   <div class="flex items-center gap-4 min-w-[220px]">
 
-    <button id="menuBtn" class="text-textSub">
-      <span class="material-symbols-outlined text-3xl">menu</span>
-    </button>
+ <button id="menuBtn" class="text-textSub md:hidden">
+  <span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+
 
     <div>
       <p class="font-display font-bold leading-tight"data-i18n="brand_name_topbar">SUSHRUSHA</p>
@@ -167,7 +171,7 @@ tailwind.config = {
     <span id="greeting">Good Morning</span>,
 
     <span class="text-primary dynamic-text">
-      <?= htmlspecialchars($name) ?>
+      <?= htmlspecialchars($name)  ?> <br>
     </span>
     <span id="liveClock" class="ml-2 text-sm text-gray-500 font-normal"></span>
   </p>
@@ -276,14 +280,16 @@ tailwind.config = {
         <div id="todaySchedule" class="p-6 space-y-6">
   <p class="text-sm text-textSub">Loading today’s schedule...</p>
 </div>
+      </div>
 
     </div>
 
     <!-- My Schedule -->
     <div id="schedule" class="section hidden">
-      <h2 class="text-2xl font-bold mb-4">My Medicines</h2>
-      <p>Medicine list </p>
-      <div id="scheduleList" class="mt-6 grid gap-4">
+      
+    <div id="scheduleList" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 auto-rows-fr">
+
+
     <!-- Medicine cards will be injected here -->
   </div>
     </div>
@@ -354,6 +360,89 @@ tailwind.config = {
 
   </div>
 </div>
+
+<!-- Edit Medicine Modal -->
+<div id="editModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 relative   max-h-screen overflow-y-auto">
+    <h2 class="text-xl font-bold mb-4">Edit Medicine</h2>
+    <form id="editMedicineForm" class="space-y-4">
+      <input type="hidden" name="id" id="editMedId">
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Medicine Name</label>
+        <input type="text" id="editName" name="medName" class="w-full rounded-xl border px-4 py-2" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Dosage</label>
+        <input type="text" id="editDosage" name="dosage" class="w-full rounded-xl border px-4 py-2" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Type</label>
+        <select id="editType" name="form" class="w-full rounded-xl border px-4 py-2">
+          <option value="pill">Tablet / Pill</option>
+          <option value="capsule">Capsule</option>
+          <option value="syrup">Syrup</option>
+          <option value="injection">Injection</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Reminder Type</label>
+        <select id="editReminderType" name="reminder_mode" class="w-full rounded-xl border px-4 py-2">
+          <option value="fixed">Fixed Times</option>
+          <option value="interval">Interval</option>
+        </select>
+      </div>
+
+      <div id="intervalSection" class="hidden">
+        <label class="block text-sm font-medium mb-1">Interval (hours)</label>
+        <input type="number" id="editInterval" name="intervalHours" class="w-full rounded-xl border px-4 py-2" min="1">
+      </div>
+
+      <div id="timesSection">
+        <label class="block text-sm font-medium mb-1">Times (HH:MM, comma separated)</label>
+        <input type="text" id="editTimes" name="times" class="w-full rounded-xl border px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Schedule Type</label>
+        <select id="editScheduleType" name="schedule_type" class="w-full rounded-xl border px-4 py-2">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div id="daysSection" class="hidden">
+        <label class="block text-sm font-medium mb-1">Specific Days (comma separated, e.g., Mon,Tue)</label>
+        <input type="text" id="editDays" name="specific_days" class="w-full rounded-xl border px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Start Date</label>
+        <input type="date" id="editStart" name="start_date" class="w-full rounded-xl border px-4 py-2" required>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">End Date</label>
+        <input type="date" id="editEnd" name="end_date" class="w-full rounded-xl border px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Compartment Number</label>
+        <input type="number" id="editCompartment" name="compartment_number" class="w-full rounded-xl border px-4 py-2" min="1">
+      </div>
+
+      <div class="flex justify-end gap-3 mt-4">
+        <button type="button" id="closeModal" class="px-4 py-2 rounded-xl border">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white font-bold">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 <!-- NAVIGATION JS -->
 <script>
@@ -459,6 +548,7 @@ function closeSidebar() {
    MEDICINE SCHEDULE
 ===================================================== */
 async function loadSchedule() {
+ 
   const container = document.getElementById("scheduleList");
   container.innerHTML = "<p>Loading...</p>";
 
@@ -477,37 +567,118 @@ async function loadSchedule() {
     console.error(err);
     container.innerHTML = "<p>Server error</p>";
   }
-}
-
-function renderMedicines(medicines) {
+}function renderMedicines(medicines) {
   const container = document.getElementById("scheduleList");
+  container.innerHTML = "";
 
   if (!medicines.length) {
-    container.innerHTML = "<p>No medicines found</p>";
+    container.innerHTML = `
+      <div class="bg-surface-light p-6 rounded-xl shadow-sm text-center text-textSub">
+        No medicines added yet.
+      </div>`;
     return;
   }
 
-  container.innerHTML = "";
-
   medicines.forEach(med => {
-    const times = med.times.length
-      ? med.times.join(", ")
-      : (med.interval_hours ? med.interval_hours + "h interval" : "-");
+    // Status
+    let statusLabel = "Active";
+    let statusBg = "bg-green-50";
+    let statusText = "text-green-600";
 
-    const card = document.createElement("div");
-    card.className = "p-4 bg-white rounded-2xl shadow-soft border border-gray-200";
+    const today = new Date();
+    if (med.end_date && med.end_date !== "0000-00-00") {
+      const endDate = new Date(med.end_date);
+      const diffDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        statusLabel = "Expired";
+        statusBg = "bg-gray-100";
+        statusText = "text-gray-600";
+      } else if (diffDays <= 7) {
+        statusLabel = "Expiring";
+        statusBg = "bg-amber-50";
+        statusText = "text-amber-600";
+      }
+    }
+
+    // Start & End date formatting
+    const startDate = med.start_date ? new Date(med.start_date).toLocaleDateString() : "-";
+    const endDate = med.end_date ? new Date(med.end_date).toLocaleDateString() : "-";
+
+    // Example inventory (optional, can pull from DB)
+    const total = med.dosage_value || 60; // default total
+    const remaining = Math.floor(total * 0.75); // just for demo
+    const percent = Math.min(Math.max((remaining / total) * 100, 0), 100);
+
+   const card = document.createElement("div");
+card.className = "bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-3 hover:shadow-xl transition aspect-[1/1]";
+
+
+
 
     card.innerHTML = `
-      <h3 class="text-lg font-bold">${med.name}</h3>
-      <p class="text-sm text-textSub">Dosage: ${med.dosage_value}</p>
-      <p class="text-sm text-textSub">Form: ${med.medicine_type}</p>
-      <p class="text-sm text-textSub">Schedule: ${med.schedule_type}</p>
-      <p class="text-sm text-textSub">Time: ${times}</p>
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl">
+            <span class="material-symbols-outlined">pill</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-textMain">${med.name}</h3>
+            <p class="text-textSub text-sm">${med.dosage_value || ""} • ${med.medicine_type || ""}</p>
+          </div>
+        </div>
+        <span class="text-xs px-2 py-1 rounded-full ${statusBg} ${statusText}">${statusLabel}</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-sm text-textSub">
+        <div><span class="font-semibold">Start:</span> ${startDate}</div>
+        <div><span class="font-semibold">End:</span> ${endDate}</div>
+      </div>
+
+      <div>
+        <span class="text-xs text-textSub font-semibold">Inventory Status</span>
+        <div class="w-full h-2 bg-gray-200 rounded-full mt-1">
+          <div class="h-2 rounded-full bg-primary" style="width:${percent}%"></div>
+        </div>
+        <div class="text-xs text-textSub mt-1">${remaining} / ${total} Pills</div>
+      </div>
+
+      <div class="flex gap-2 mt-3">
+        <button class="bg-primary text-white px-4 py-2 rounded-xl hover:scale-105 transition" onclick="openEditModal(${med.id})">Edit</button>
+        <button class="bg-red-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition" onclick="deleteMedicine(${med.id})">Delete</button>
+      </div>
     `;
 
     container.appendChild(card);
   });
 }
+
+
+
+// Delete function
+function deleteMedicine(id) {
+  if (!confirm("Are you sure you want to delete this medicine?")) return;
+
+  fetch("delete_medicine.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") loadSchedule();
+    else alert("Failed to delete medicine");
+  })
+  .catch(err => console.error(err));
+}
+
+// Example placeholders
+function requestRefill(id) { alert("Refill requested for medicine ID " + id); }
+function openEditModal(id) { console.log("Open edit modal for", id); }
+
+  // Attach DELETE button event listeners
+ 
+
 
 async function loadTodaySchedule() {
   const container = document.getElementById("todaySchedule");
@@ -593,6 +764,7 @@ searchInput.addEventListener("input", () => {
   if (query && !previousSectionBeforeSearch) {
     previousSectionBeforeSearch = currentSection;
     switchSection("schedule");
+    loadSchedule(); // always load before filtering
   }
 
   if (!query) {
@@ -610,6 +782,7 @@ searchInput.addEventListener("input", () => {
 
   renderMedicines(filtered);
 });
+
 
 
 /* =====================================================
@@ -692,9 +865,87 @@ sidebar.addEventListener("click", e => e.stopPropagation());
 navItems.forEach(item => {
   item.addEventListener("click", e => {
     e.preventDefault();
-    switchSection(item.dataset.section);
+
+    const section = item.dataset.section;
+    switchSection(section);
+
+    if (section === "schedule") {
+      loadSchedule(); 
+    }
+
     closeSidebar();
   });
+});
+
+//edit my medicines
+// Modal elements
+const editModal = document.getElementById("editModal");
+const editForm = document.getElementById("editMedicineForm");
+const closeModalBtn = document.getElementById("closeModal");
+
+function openEditModal(med) {
+  editModal.classList.remove("hidden");
+
+  document.getElementById("editMedId").value = med.id;
+  document.getElementById("editName").value = med.name;
+  document.getElementById("editDosage").value = med.dosage_value;
+  document.getElementById("editType").value = med.medicine_type || "pill";
+  document.getElementById("editReminderType").value = med.reminder_type;
+  document.getElementById("editScheduleType").value = med.schedule_type;
+  document.getElementById("editInterval").value = med.interval_hours || "";
+  document.getElementById("editTimes").value = (med.times || []).join(",");
+  document.getElementById("editStart").value = med.start_date;
+  document.getElementById("editEnd").value = med.end_date !== "0000-00-00" ? med.end_date : "";
+  document.getElementById("editCompartment").value = med.compartment_number;
+  document.getElementById("editDays").value = (med.selected_days || []).join(",");
+
+  toggleReminderSections();
+  toggleScheduleDays();
+}
+
+closeModalBtn.addEventListener("click", () => {
+  editModal.classList.add("hidden");
+});
+
+document.getElementById("editReminderType").addEventListener("change", toggleReminderSections);
+document.getElementById("editScheduleType").addEventListener("change", toggleScheduleDays);
+
+function toggleReminderSections() {
+  const type = document.getElementById("editReminderType").value;
+  document.getElementById("intervalSection").classList.toggle("hidden", type !== "interval");
+  document.getElementById("timesSection").classList.toggle("hidden", type !== "fixed");
+}
+
+function toggleScheduleDays() {
+  const scheduleType = document.getElementById("editScheduleType").value;
+  document.getElementById("daysSection").classList.toggle("hidden", scheduleType !== "custom");
+}
+editForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(editForm);
+
+  // Convert times & specific_days back to arrays
+  formData.set("times", formData.get("times").split(",").map(t => t.trim()));
+  formData.set("specific_days", formData.get("specific_days").split(",").map(d => d.trim()));
+
+  try {
+    const res = await fetch("edit_medicine.php", {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.status === "success") {
+      loadSchedule();          // reload medicine list
+      editModal.classList.add("hidden");
+    } else {
+      alert(data.message || "Failed to update medicine");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
 });
 
 
@@ -702,7 +953,7 @@ navItems.forEach(item => {
    INIT
 ===================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  loadSchedule();
+ 
   loadCaretakers();
   initTranslationSystem();
 });

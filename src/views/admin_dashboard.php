@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 
 <html class="light" lang="en"><head>
@@ -96,9 +98,10 @@
 <span class="material-symbols-outlined text-[22px]">group</span>
 <span class="text-sm font-medium">Users</span>
 </a>
+
 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all" href="#">
 <span class="material-symbols-outlined text-[22px]">article</span>
-<span class="text-sm font-medium">Content</span>
+<span class="text-sm font-medium">Medicine Requests</span>
 </a>
 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all" href="#">
 <span class="material-symbols-outlined text-[22px]">monitoring</span>
@@ -323,6 +326,36 @@
 </div>
 </div>
 </div>
+<!-- Medicine Requests -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+    <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+      Medicine Requests
+    </h3>
+    <p class="text-sm text-slate-500">
+      Pending medicine approval requests from users
+    </p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-xs">
+        <tr>
+          <th class="p-4 text-left">Medicine</th>
+          <th class="p-4">Dosage</th>
+          <th class="p-4">Form</th>
+          <th class="p-4">Requested By</th>
+          <th class="p-4 text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="medicineRequestsTable"
+        class="divide-y divide-slate-100 dark:divide-slate-800">
+        <!-- populated by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <!-- Quick Actions -->
 <div>
 <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h2>
@@ -482,10 +515,76 @@
 </div>
 
 <script>
-// Initialize Language Selector and Translation System
-document.addEventListener('DOMContentLoaded', () => {
-    initLanguageSelector('#langSelectorPlaceholder');
-    initTranslationSystem();
-});
+async function loadMedicineRequests() {
+  const res = await fetch("admin.php?action=medicine_requests");
+  const data = await res.json();
+
+  if (data.status !== 'success') return;
+
+  const table = document.getElementById("medicineRequestsTable");
+  table.innerHTML = "";
+
+  if (data.requests.length === 0) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="5" class="p-6 text-center text-slate-400">
+          No pending requests 🎉
+        </td>
+      </tr>`;
+    return;
+  }
+
+  data.requests.forEach(req => {
+    table.innerHTML += `
+      <tr>
+        <td class="p-4 font-medium">${req.name}</td>
+        <td class="p-4 text-center">${req.dosage}</td>
+        <td class="p-4 text-center">${req.form}</td>
+        <td class="p-4 text-center">${req.requester}</td>
+        <td class="p-4 text-right space-x-2">
+          <button onclick="approveRequest(${req.id})"
+            class="px-3 py-1 bg-green-500 text-white rounded text-xs">
+            Approve
+          </button>
+          <button onclick="rejectRequest(${req.id})"
+            class="px-3 py-1 bg-red-500 text-white rounded text-xs">
+            Reject
+          </button>
+        </td>
+      </tr>`;
+  });
+}
+
+async function approveRequest(id) {
+  if (!confirm("Approve this medicine?")) return;
+
+  const res = await fetch("admin.php", {
+    method: "POST",
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: `action=approve_medicine&id=${id}`
+  });
+
+  const data = await res.json();
+  alert(data.message);
+  loadMedicineRequests();
+}
+
+async function rejectRequest(id) {
+  if (!confirm("Reject this medicine request?")) return;
+
+  const res = await fetch("admin.php", {
+    method: "POST",
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: `action=reject_medicine&id=${id}`
+  });
+
+  const data = await res.json();
+  alert(data.message);
+  loadMedicineRequests();
+}
+
+// Load on page start
+document.addEventListener("DOMContentLoaded", loadMedicineRequests);
 </script>
+
 </body></html>

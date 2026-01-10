@@ -132,23 +132,19 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
-    // New user → insert
+    // New user → insert as patient only if not in DB
     $role = "patient";
-    $stmt = $conn->prepare("INSERT INTO users (name, email, role) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, '')");
     $stmt->bind_param("sss", $name, $email, $role);
-    if (!$stmt->execute()) {
-        error_log('DB insert failed: ' . $stmt->error);
-        $_SESSION['error'] = 'Unable to create user account. Try again later.';
-        header('Location: login.php');
-        exit();
-    }
-    $user_id = $conn->insert_id; // <-- get inserted user id
+    $stmt->execute();
+    $user_id = $conn->insert_id;
 } else {
-    // Existing user → fetch once
+    // Existing user → fetch role from DB
     $row = $result->fetch_assoc();
     $user_id = $row['id'];
-    $role    = $row['role'];
+    $role    = $row['role']; // <-- this ensures admin stays admin
 }
+
 
 /* STEP 4: Set session and redirect */
 $_SESSION['user_id']    = $user_id; 

@@ -122,10 +122,10 @@
     <input id="medName" name="medName" class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-text-sub-light/70 transition-all outline-none" placeholder="Type medicine name..." type="text" autocomplete="off"/>
 
     <!-- Request New Medicine Button -->
-    <!-- <button type="button" id="requestNewMed" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1">
+    <button type="button" id="requestNewMed" class="px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1">
       <span class="material-symbols-outlined text-lg">add</span>Request
     </button>
-  </div> -->
+  </div>
 
   <!-- Autocomplete Dropdown -->
 
@@ -354,6 +354,35 @@
 <footer class="mt-auto py-6 border-t border-input-border-light dark:border-input-border-dark bg-card-light dark:bg-card-dark text-center">
 <p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2026 Sushrusha Health. All rights reserved.</p>
 </footer>
+<div id="requestModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-card-light dark:bg-card-dark rounded-xl w-full max-w-md p-6">
+    <h2 class="text-xl font-bold mb-4">Request New Medicine</h2>
+
+    <form id="requestMedForm" class="space-y-4">
+      <input name="name" required placeholder="Medicine name"
+        class="w-full h-12 px-4 rounded-lg border" />
+
+      <input name="dosage" required placeholder="Dosage (e.g. 500mg)"
+        class="w-full h-12 px-4 rounded-lg border" />
+
+      <select name="form" required class="w-full h-12 px-4 rounded-lg border">
+        <option value="">Select form</option>
+        <option value="Pill">Pill</option>
+        <option value="Liquid">Liquid</option>
+        <option value="Injection">Injection</option>
+      </select>
+
+      <div class="flex justify-end gap-3">
+        <button type="button" id="closeModal">Cancel</button>
+        <button type="submit"
+          class="px-5 py-2 bg-primary text-white rounded-lg">
+          Send Request
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -659,9 +688,38 @@ generateIntervals();
   });
 
 // Initialize Language Selector and Translation System
-document.addEventListener('DOMContentLoaded', () => {
-    initLanguageSelector('#langSelectorPlaceholder');
-    initTranslationSystem();
+// Initialize Language Selector and Translation System
+initLanguageSelector('#langSelectorPlaceholder');
+initTranslationSystem();
+//request medicine
+const requestBtn = document.getElementById("requestNewMed");
+const modal = document.getElementById("requestModal");
+const closeModal = document.getElementById("closeModal");
+
+requestBtn.onclick = () => modal.classList.remove("hidden");
+closeModal.onclick = () => modal.classList.add("hidden");
+
+document.getElementById("requestMedForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+
+  const res = await fetch("request_medicine.php", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if (data.status === "success") {
+    alert("✅ Request sent to admin");
+    modal.classList.add("hidden");
+    e.target.reset();
+  } else {
+    alert("❌ " + data.message);
+  }
+});
+
 });
 </script>
 
