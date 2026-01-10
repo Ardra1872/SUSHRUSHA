@@ -43,6 +43,8 @@ function getAllMedicines($conn, $patient_id) {
 <title>Sushrusha - Caretaker Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../../public/assets/translations.js"></script>
+<script src="../../public/assets/language-selector.js"></script>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -88,15 +90,15 @@ table td, table th { vertical-align: middle; }
   <nav class="flex flex-col gap-2" id="sidebarNav">
     <a data-section="dashboard" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white transition-colors group cursor-pointer">
       <span class="material-symbols-outlined">dashboard</span>
-      <p class="text-sm font-medium">Dashboard</p>
+      <p class="text-sm font-medium" data-i18n="dashboard">Dashboard</p>
     </a>
     <a data-section="patients" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer">
       <span class="material-symbols-outlined group-hover:text-primary">group</span>
-      <p class="text-sm font-medium">Patient List</p>
+      <p class="text-sm font-medium" data-i18n="patient_list">Patient List</p>
     </a>
     <a data-section="schedule" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer">
       <span class="material-symbols-outlined group-hover:text-primary">calendar_month</span>
-      <p class="text-sm font-medium">Schedule</p>
+      <p class="text-sm font-medium" data-i18n="schedule">Schedule</p>
     </a>
     <a data-section="messages" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer">
       <span class="material-symbols-outlined group-hover:text-primary">chat</span>
@@ -139,6 +141,7 @@ table td, table th { vertical-align: middle; }
     <h2 class="text-xl font-bold">Welcome, <?php echo htmlspecialchars($caretakerName); ?> 👋</h2>
      </div>
   <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+    <div id="langSelectorPlaceholder" class="flex items-center"></div>
     <div class="relative group w-full md:w-80">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <span class="material-symbols-outlined text-slate-400">search</span>
@@ -309,6 +312,12 @@ document.querySelectorAll('.nav-link').forEach(link => {
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('bg-primary','text-white'));
     link.classList.add('bg-primary','text-white');
   });
+});
+
+// Initialize Language Selector and Translation System
+document.addEventListener('DOMContentLoaded', () => {
+  initLanguageSelector('#langSelectorPlaceholder');
+  initTranslationSystem();
 });
 </script>
 </body>

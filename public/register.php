@@ -82,6 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <link rel="stylesheet" href="assets/register.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="assets/translations.js"></script>
+    <script src="assets/language-selector.js"></script>
 </head>
 
 
@@ -89,11 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="register-page">
 
 <div class="auth-wrapper">
+    <!-- Language Selector -->
+    <div id="langSelectorPlaceholder" style="position: absolute; top: 20px; right: 20px; z-index: 100;"></div>
 
     <div class="auth-card">
 
-        <h2>Create Account</h2>
-        <p class="subtitle">Start managing your medicine schedule today</p>
+        <h2 data-i18n="create_account_title">Create Account</h2>
+        <p class="subtitle" data-i18n="register_subtitle">Start managing your medicine schedule today</p>
 
         <?php if(isset($_SESSION['error'])): ?>
             <p class="message error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
@@ -104,16 +108,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <form id="registerForm" action="register.php" method="POST" novalidate>
-            <input type="text" id="name" name="name" placeholder="Full Name" required>
-            <input type="email" id="email" name="email" placeholder="Email" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="text" id="name" name="name" placeholder="Full Name" data-i18n-placeholder="full_name_placeholder" required>
+            <input type="email" id="email" name="email" placeholder="Email" data-i18n-placeholder="email_placeholder" required>
+            <input type="password" id="password" name="password" placeholder="Password" data-i18n-placeholder="password_placeholder" required>
 
-            <button type="submit" class="btn-primary">Register</button>
+            <button type="submit" class="btn-primary" data-i18n="register">Register</button>
         </form>
 
         <p class="switch">
-            Already have an account?
-            <a href="login.php">Login</a>
+            <span data-i18n="already_have_account">Already have an account?</span>
+            <a href="login.php" data-i18n="login">Login</a>
         </p>
 
     </div>
@@ -209,6 +213,12 @@ registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         alert('Please fix the errors before submitting.');
     }
+});
+
+// Initialize Language Selector and Translation System
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageSelector('#langSelectorPlaceholder');
+    initTranslationSystem();
 });
 </script>
 

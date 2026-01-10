@@ -13,6 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../../public/assets/translations.js"></script>
+<script src="../../public/assets/language-selector.js"></script>
 <!-- Theme Config -->
 <script id="tailwind-config">
         tailwind.config = {
@@ -145,6 +147,7 @@
 </div>
 <!-- Right Actions -->
 <div class="flex items-center gap-3">
+<div id="langSelectorPlaceholder"></div>
 <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-primary/20 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
 <span class="material-symbols-outlined text-[18px]">edit_square</span>
 <span class="hidden sm:inline">Edit Layout</span>
@@ -477,4 +480,12 @@
 </div>
 </main>
 </div>
+
+<script>
+// Initialize Language Selector and Translation System
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageSelector('#langSelectorPlaceholder');
+    initTranslationSystem();
+});
+</script>
 </body></html>

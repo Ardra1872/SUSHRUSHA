@@ -62,13 +62,17 @@ $_SESSION['first_login'] = $first_login;
 
     <link rel="stylesheet" href="assets/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="assets/translations.js"></script>
+    <script src="assets/language-selector.js"></script>
 </head>
 <body>
     <div class="auth-wrapper">
+        <!-- Language Selector -->
+        <div id="langSelectorPlaceholder" style="position: absolute; top: 20px; right: 20px; z-index: 100;"></div>
         <!-- LOGIN FORM CARD -->
         <div class="auth-card">
-            <h2>Welcome Back!</h2>
-            <p class="subtitle">
+            <h2 data-i18n="welcome_back">Welcome Back!</h2>
+            <p class="subtitle" data-i18n="login_subtitle">
                 Login to access your medicine reminders and care dashboard
             </p>
 
@@ -80,25 +84,25 @@ $_SESSION['first_login'] = $first_login;
             <?php endif; ?>
 
           <form id="loginForm" action="login.php" method="POST">
-    <input type="email" id="email" name="email" placeholder="Enter your email..." required>
+    <input type="email" id="email" name="email" placeholder="Enter your email..." data-i18n-placeholder="enter_email" required>
     <span id="emailError" class="error"></span>
 
-    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+    <input type="password" id="password" name="password" placeholder="Enter your password" data-i18n-placeholder="enter_password" required>
     <span id="passwordError" class="error"></span>
 
-    <a href="forgot-password.php" class="forgot">Forgot your password?</a>
-    <button type="submit" class="btn-primary">Login</button>
+    <a href="forgot-password.php" class="forgot" data-i18n="forgot_password">Forgot your password?</a>
+    <button type="submit" class="btn-primary" data-i18n="login">Login</button>
 </form>
 
 
           <button class="google-btn" onclick="window.location.href='google-login.php'">
     <img src="assets/images/google-icon.svg" alt="Google">
-    Continue with Google
+    <span data-i18n="continue_with_google">Continue with Google</span>
 </button>
 
             <p class="switch">
-                Don’t have an account?
-                <a href="/Sushrusha/public/register.php">Create Account</a>
+                <span data-i18n="dont_have_account">Don't have an account?</span>
+                <a href="/Sushrusha/public/register.php" data-i18n="create_account">Create Account</a>
             </p>
         </div>
     </div>
@@ -155,7 +159,11 @@ form.addEventListener('submit', (e) => {
     }
 });
 
-
+// Initialize Language Selector and Translation System
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageSelector('#langSelectorPlaceholder');
+    initTranslationSystem();
+});
 </script>
 
 </body>

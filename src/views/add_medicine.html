@@ -11,6 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../../public/assets/translations.js"></script>
+<script src="../../public/assets/language-selector.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -58,6 +60,8 @@
 <a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Reports</a>
 <a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">Profile</a>
 </nav>
+<!-- Language Selector -->
+<div id="langSelectorPlaceholder" class="flex items-center"></div>
 <!-- User Profile -->
 <div class="flex items-center gap-4">
 <button class="p-2 text-text-sub-light dark:text-text-sub-dark hover:bg-background-light dark:hover:bg-background-dark rounded-full transition-colors">
@@ -348,7 +352,7 @@
 
 </main>
 <footer class="mt-auto py-6 border-t border-input-border-light dark:border-input-border-dark bg-card-light dark:bg-card-dark text-center">
-<p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2023 Sushrusha Health. All rights reserved.</p>
+<p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2026 Sushrusha Health. All rights reserved.</p>
 </footer>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -654,6 +658,10 @@ generateIntervals();
     }
   });
 
+// Initialize Language Selector and Translation System
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageSelector('#langSelectorPlaceholder');
+    initTranslationSystem();
 });
 </script>
 
