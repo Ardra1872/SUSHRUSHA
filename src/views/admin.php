@@ -1,163 +1,203 @@
 <?php
 session_start();
-$isApiCall = isset($_GET['action']) || isset($_POST['action']);
 include '../config/db.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    if ($isApiCall) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            "status" => "error",
-            "message" => "Unauthorized"
-        ]);
-        exit;
-    } else {
-        header("Location: login.php");
-        exit;
-    }
-}
+// Force JSON output for all responses
+header('Content-Type: application/json');
 
-
-
-
-
+// ---------------------------
+// API call detection
+// ---------------------------
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
+$isApiCall = !empty($action);
 
-switch($action) {
+// ---------------------------
+// Admin authentication
+// ---------------------------
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Unauthorized'
+    ]);
+    exit;
+}
 
-    // Fetch metrics
-    case 'metrics':
-        $activePatients = $conn->query("SELECT COUNT(*) as total FROM users WHERE role='patient' AND status='active'")->fetch_assoc()['total'];
-        $activeCaretakers = $conn->query("SELECT COUNT(*) as total FROM users WHERE role='caretaker' AND status='active'")->fetch_assoc()['total'];
-        $missedDoses = $conn->query("SELECT COUNT(*) as total FROM medicine_logs WHERE status='missed' AND DATE(date)=CURDATE()")->fetch_assoc()['total'];
-        $avgAdherence = $conn->query("SELECT AVG(adherence) as avg FROM medicine_logs WHERE DATE(date)=CURDATE()")->fetch_assoc()['avg'];
+// ---------------------------
+// Action resolver
+// ---------------------------
+switch ($action) {
+
+    // ---------------------------
+    // Get Pending Medicine Requests
+    // ---------------------------
+    case 'medicine_requests':
+        $sql = "
+            SELECT mr.id, mr.name, mr.dosage, mr.form, u.name AS requester
+            FROM medicine_requests mr
+            JOIN users u ON mr.requested_by = u.id
+            WHERE mr.status = 'pending'
+            ORDER BY mr.created_at DESC
+        ";
+        $result = $conn->query($sql);
+
+        $requests = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $requests[] = [
+                    'id' => $row['id'],
+                    'name' => $row['name'],
+                    'dosage' => $row['dosage'],
+                    'form' => $row['form'],
+                    'requester' => $row['requester']
+                ];
+            }
+        }
 
         echo json_encode([
-            'status'=>'success',
-            'activePatients'=>$activePatients,
-            'activeCaretakers'=>$activeCaretakers,
-            'missedDoses'=>$missedDoses,
-            'avgAdherence'=>round($avgAdherence)
+            'status' => 'success',
+            'requests' => $requests
         ]);
-        break;
-
-    // Fetch recent users
-    case 'recent_users':
-        $sql = "SELECT id, name, email, role, status, adherence FROM users ORDER BY created_at DESC LIMIT 10";
-        $result = $conn->query($sql);
-        $users = [];
-        while($row = $result->fetch_assoc()) {
-            $users[] = $row;
-        }
-        echo json_encode(['status'=>'success','users'=>$users]);
-        break;
-
-    // Add patient
-    case 'add_patient':
-        $name = $_POST['name'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $password = password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT);
-
-        if($name && $email && $password) {
-            $stmt = $conn->prepare("INSERT INTO users (name,email,password,role,status) VALUES (?,?,?,?,?)");
-            $role = 'patient';
-            $status = 'active';
-            $stmt->bind_param("sssss",$name,$email,$password,$role,$status);
-            $stmt->execute();
-            echo json_encode(['status'=>'success','message'=>'Patient added successfully']);
-        } else {
-            echo json_encode(['status'=>'error','message'=>'Missing fields']);
-        }
-        break;
-
-    // Broadcast alert
-    case 'broadcast_alert':
-        $message = $_POST['message'] ?? '';
-        if($message) {
-            $stmt = $conn->prepare("INSERT INTO alerts (message,created_at) VALUES (?,NOW())");
-            $stmt->bind_param("s",$message);
-            $stmt->execute();
-            echo json_encode(['status'=>'success','message'=>'Alert broadcasted']);
-        } else {
-            echo json_encode(['status'=>'error','message'=>'Message cannot be empty']);
-        }
-        break;
-
-    // Review flags
-    case 'flags':
-        $sql = "SELECT id, user_id, type, description, created_at FROM flags ORDER BY created_at DESC";
-        $result = $conn->query($sql);
-        $flags = [];
-        while($row = $result->fetch_assoc()) {
-            $flags[] = $row;
-        }
-        echo json_encode(['status'=>'success','flags'=>$flags]);
-        break;
-
-    default:
-        echo json_encode(['status'=>'error','message'=>'Invalid action']);
-        break;
-}
-case 'medicine_requests':
-    $sql = "
-      SELECT mr.id, mr.name, mr.dosage, mr.form, u.name AS requester
-      FROM medicine_requests mr
-      JOIN users u ON u.id = mr.requested_by
-      WHERE mr.status = 'pending'
-      ORDER BY mr.created_at DESC
-    ";
-
-    $result = $conn->query($sql);
-    $requests = [];
-
-    while ($row = $result->fetch_assoc()) {
-        $requests[] = $row;
-    }
-
-    echo json_encode(['status'=>'success','requests'=>$requests]);
-    break;
-case 'approve_medicine':
-    $id = $_POST['id'] ?? 0;
-
-    $stmt = $conn->prepare("
-      SELECT name FROM medicine_requests WHERE id=? AND status='pending'
-    ");
-    $stmt->bind_param("i",$id);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-
-    if (!$res) {
-        echo json_encode(['status'=>'error','message'=>'Request not found']);
         exit;
+
+    // ---------------------------
+    // Approve Medicine Request
+    // ---------------------------
+   case 'approve_medicine':
+    $id = intval($_POST['id'] ?? 0);
+    if ($id > 0) {
+
+        // 1️⃣ Fetch the request details
+        $stmt = $conn->prepare("SELECT name, dosage, form FROM medicine_requests WHERE id=? AND status='pending'");
+        if (!$stmt) {
+            echo json_encode(['status' => 'error', 'message' => 'Prepare failed: '.$conn->error]);
+            exit;
+        }
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $request = $result->fetch_assoc();
+        $stmt->close();
+
+        if (!$request) {
+            echo json_encode(['status' => 'error', 'message' => 'Request not found or already processed']);
+            exit;
+        }
+
+        // 2️⃣ Insert into medicine_catalogue (check table name!)
+        $stmt = $conn->prepare("INSERT INTO  medicine_catalog (name, dosage, form) VALUES (?, ?, ?)");
+        if (!$stmt) {
+            echo json_encode(['status' => 'error', 'message' => 'Insert prepare failed: '.$conn->error]);
+            exit;
+        }
+        $stmt->bind_param("sss", $request['name'], $request['dosage'], $request['form']);
+        if (!$stmt->execute()) {
+            echo json_encode(['status' => 'error', 'message' => 'Insert failed: '.$stmt->error]);
+            exit;
+        }
+        $stmt->close();
+
+        // 3️⃣ Update the request status to approved
+        $stmt = $conn->prepare("UPDATE medicine_requests SET status='approved' WHERE id=?");
+        if (!$stmt) {
+            echo json_encode(['status' => 'error', 'message' => 'Update prepare failed: '.$conn->error]);
+            exit;
+        }
+        $stmt->bind_param("i", $id);
+        if (!$stmt->execute()) {
+            echo json_encode(['status' => 'error', 'message' => 'Update failed: '.$stmt->error]);
+            exit;
+        }
+        $stmt->close();
+
+        echo json_encode(['status' => 'success', 'message' => 'Medicine request approved and added to catalogue']);
+
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid ID']);
     }
+    exit;
 
-    // Insert into catalog (ignore duplicates safely)
-    $stmt = $conn->prepare("
-      INSERT IGNORE INTO medicine_catalog (name)
-      VALUES (?)
-    ");
-    $stmt->bind_param("s",$res['name']);
-    $stmt->execute();
+    // ---------------------------
+    // Reject Medicine Request
+    // ---------------------------
+  case 'reject_medicine':
+    $id = intval($_POST['id'] ?? 0);
+    if ($id > 0) {
+        $conn->query("UPDATE medicine_requests SET status='rejected' WHERE id=$id");
+        echo json_encode(['status' => 'success', 'message' => 'Medicine request rejected']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid ID']);
+    }
+    exit;
 
-    // Update request status
-    $conn->query("
-      UPDATE medicine_requests
-      SET status='approved'
-      WHERE id=$id
-    ");
 
-    echo json_encode(['status'=>'success','message'=>'Medicine approved & added']);
-    break;
-case 'reject_medicine':
-    $id = $_POST['id'] ?? 0;
 
-    $conn->query("
-      UPDATE medicine_requests
-      SET status='rejected'
-      WHERE id=$id
-    ");
+    // ---------------------------
+    // Get Patient Count
+    // ---------------------------
+    case 'patient_count':
+        $result = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role='patient'");
+        $count = $result->fetch_assoc()['total'] ?? 0;
+        echo json_encode([
+            'status' => 'success',
+            'total_patients' => $count
+        ]);
+        exit;
 
-    echo json_encode(['status'=>'success','message'=>'Request rejected']);
-    break;
+    // ---------------------------
+    // Invalid Action
+    // ---------------------------
+    default:
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Invalid action'
+        ]);
+        exit;
+case 'fetch_users':
+    $result = $conn->query("SELECT id, name, role, emergency_contact FROM users");
+    $users = [];
+    while($row = $result->fetch_assoc()){
+        $users[] = $row;
+    }
+    echo json_encode(['status'=>'success','users'=>$users]);
+    exit;
 
+
+case 'delete_user':
+    $id = intval($_POST['id'] ?? 0);
+    if($id > 0){
+        $conn->query("DELETE FROM users WHERE id=$id");
+        echo json_encode(['status'=>'success','message'=>'User deleted successfully']);
+    } else {
+        echo json_encode(['status'=>'error','message'=>'Invalid User ID']);
+    }
+    exit;
+ case 'add_user':
+        $name = trim($_POST['name']);
+        $email = trim($_POST['email']);
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $role = $_POST['role'] ?? 'patient';
+
+        // Check if email exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            echo json_encode(['status'=>'error','message'=>'Email already exists']);
+            exit;
+        }
+
+        $stmt = $conn->prepare("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)");
+        $stmt->bind_param("ssss", $name, $email, $password, $role);
+        if($stmt->execute()){
+            echo json_encode(['status'=>'success','message'=>'User added successfully']);
+        } else {
+            echo json_encode(['status'=>'error','message'=>'Failed to add user']);
+        }
+        exit;
+}
+
+
+
+$conn->close();
 ?>
