@@ -156,7 +156,7 @@ if($role === 'patient'){
     header("Location: /Sushrusha/src/views/dashboard.php");
     exit();
 } elseif($role === 'caretaker'){
-    header("Location: /Sushrusha/src/views/caretaker_dashboard.php");
+    header("Location: /Sushrusha/src/views/caretaker_dashboard.html");
     exit();
 } elseif($role === 'admin'){
     header("Location: /Sushrusha/src/views/admin_dashboard.html");

@@ -31,10 +31,10 @@ $_SESSION['first_login'] = $first_login;
                 exit;
             } elseif ($role === 'caretaker') {
                 $_SESSION['active_patient_id'] = $selected_patient_id;
-                header("Location: ../src/views/caretaker_dashboard.php");
+                header("Location: ../src/views/caretaker_dashboard.html");
                 exit;
             } else {
-                header("Location: ../src/views/admin_dashboard.php");
+                header("Location: ../src/views/admin_dashboard.html");
                 exit;
             }
 

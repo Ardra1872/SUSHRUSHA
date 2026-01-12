@@ -129,11 +129,7 @@ tailwind.config = {
     + Add Medicine
   </a>
 
-  <a href="../../public/logout.php"
-     class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition text-center block"
-     data-i18n="logout">
-    Logout
-  </a>
+ 
 </div>
 
 
@@ -159,20 +155,19 @@ tailwind.config = {
 
 
     <div>
-      <p class="font-display font-bold leading-tight"data-i18n="brand_name_topbar">SUSHRUSHA</p>
-      <p class="text-xs text-textSub leading-tight"data-i18n="brand_tagline_topbar">Smart Medicine Reminder</p>
+      <div class="flex-1 text-center hidden md:block">
+  <p class="text-lg font-semibold">
+    <span id="greeting">Good Morning</span>,
+
+    <span class="text-primary dynamic-text">
+      <?= htmlspecialchars($name)  ?> |<br>
+    </span>
     </div>
 
   </div>
 
   <!-- CENTER: Greeting -->
-  <div class="flex-1 text-center hidden md:block">
-  <p class="text-lg font-semibold">
-    <span id="greeting">Good Morning</span>,
-
-    <span class="text-primary dynamic-text">
-      <?= htmlspecialchars($name)  ?> <br>
-    </span>
+  
     <span id="liveClock" class="ml-2 text-sm text-gray-500 font-normal"></span>
   </p>
 </div>
@@ -209,9 +204,6 @@ tailwind.config = {
       <!-- <span class="absolute top-0 right-0 size-2 bg-danger rounded-full"></span> -->
     </button>
     <div class="relative">
-  <button id="langBtn" class="p-2 rounded-full hover:bg-gray-100">
-    🌐
-  </button>
 
   <div id="langMenu"
        class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-md z-50">
@@ -224,17 +216,23 @@ tailwind.config = {
 
 
     <!-- Profile -->
-    <a href="profile.php" class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
-      <?php if (!empty($profilePhoto)): ?>
-        <img src="<?= $profilePhoto ?>" 
-             alt="Profile picture" 
-             class="w-full h-full object-cover">
-      <?php else: ?>
-        <div class="w-full h-full bg-primary/10 flex items-center justify-center">
-          <span class="text-primary font-semibold text-sm"><?= htmlspecialchars($userInitials) ?></span>
-        </div>
-      <?php endif; ?>
-    </a>
+   <div class="relative">
+  <button id="profileBtn" class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm focus:outline-none">
+    <?php if (!empty($profilePhoto)): ?>
+      <img src="<?= $profilePhoto ?>" alt="Profile picture" class="w-full h-full object-cover">
+    <?php else: ?>
+      <div class="w-full h-full bg-primary/10 flex items-center justify-center">
+        <span class="text-primary font-semibold text-sm"><?= htmlspecialchars($userInitials) ?></span>
+      </div>
+    <?php endif; ?>
+  </button>
+
+  <!-- Dropdown menu -->
+  <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-xl shadow-lg z-50">
+    <a href="profile.php" class="block px-4 py-2 text-textMain hover:bg-slate-100 rounded-t-xl">Profile</a>
+    <a href="../../public/logout.php" class="block px-4 py-2 text-textMain hover:bg-slate-100 rounded-b-xl">Logout</a>
+  </div>
+</div>
 
   </div>
 
@@ -301,56 +299,71 @@ tailwind.config = {
     </div>
 
 
-    <!-- Assign Caretaker -->
-<div id="assigned" class="section hidden">
-  <h2 class="text-2xl font-bold mb-2"data-i18n="assign_caretaker">Assign Caretaker</h2>
-  <p class="text-textSub mb-6"data-i18n="assign_caretaker_text">Add a trusted caretaker who can help manage your medicines.</p>
+ <!-- Assign Caretaker -->
+<div id="assigned" class="section hidden p-6 md:p-10 bg-surface-light rounded-3xl shadow-lg">
+  <h2 class="text-3xl font-extrabold mb-3 text-textMain" data-i18n="assign_caretaker">
+    Assign Caretaker
+  </h2>
+  <p class="text-textSub mb-6 text-sm md:text-base" data-i18n="assign_caretaker_text">
+    Add a trusted caretaker who can help manage your medicines.
+  </p>
 
   <!-- Form -->
-  <form id="assignCaretakerForm" class="mb-6 space-y-4">
+  <form id="assignCaretakerForm" class="mb-8 space-y-5 bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100">
     <div>
-      <label class="block text-sm font-medium mb-1" for="caretakerName"data-i18n="caretaker_name">Name</label>
+      <label class="block text-sm font-semibold mb-2 text-textMain" for="caretakerName" data-i18n="caretaker_name">
+        Name
+      </label>
       <input type="text" id="caretakerName" name="name" required
-        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary">
+        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1" for="caretakerEmail" caretaker_email>Email</label>
+      <label class="block text-sm font-semibold mb-2 text-textMain" for="caretakerEmail" data-i18n="caretaker_email">
+        Email
+      </label>
       <input type="email" id="caretakerEmail" name="email" required
-        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary">
+        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1" for="relation"caretaker_relation>Relation</label>
+      <label class="block text-sm font-semibold mb-2 text-textMain" for="relation" data-i18n="caretaker_relation">
+        Relation
+      </label>
       <input type="text" id="relation" name="relation" required
         placeholder="e.g., Father, Sister, Friend"
-        class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary"data-i18n-placeholder="relation_placeholder">
+        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition" data-i18n-placeholder="relation_placeholder">
     </div>
 
     <button type="submit"
-      class="bg-primary text-white py-2 px-6 rounded-xl font-bold hover:scale-[1.02] transition"data-i18n="assign_caretaker_btn">
+      class="w-full md:w-auto bg-primary text-white py-3 px-6 rounded-xl font-bold hover:scale-105 hover:shadow-lg transition transform" data-i18n="assign_caretaker_btn">
       Assign Caretaker
     </button>
   </form>
 
   <!-- Assigned Caretakers List -->
-  <div id="caretakerList" class="space-y-4 dynamic-text">
+  <div id="caretakerList" class="space-y-4">
     <!-- Dynamically filled by JS -->
   </div>
 </div>
 
 
     <!-- Alerts -->
-    <div id="alerts" class="section hidden">
-      <h2 class="text-2xl font-bold mb-4">Alerts</h2>
-      <p>See notifications and alerts.</p>
-    </div>
+ <section id="alerts" class="section hidden">
+  <h2 class="text-xl font-bold mb-4">Admin Alerts</h2>
+
+  <div id="alertsContainer" class="space-y-4">
+    <!-- alerts will load here -->
+  </div>
+</section>
 
     <!-- Medicine Requests -->
     <div id="requests" class="section hidden">
-      <h2 class="text-2xl font-bold mb-4">Medicine Requests</h2>
-      <p>View all incoming medicine requests.</p>
-    </div>
+  <h2 class="text-2xl font-bold mb-4">Medicine Requests</h2>
+  <p>View all your medicine requests.</p> 
+  <div id="requestsContainer" class="mt-4"></div>
+</div>
+
 
     <!-- Manage Users -->
     <div id="users" class="section hidden">
@@ -360,88 +373,28 @@ tailwind.config = {
 
   </div>
 </div>
+<!-- View Medicine Modal -->
+<div id="viewMedicineModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-3xl shadow-xl w-full max-w-xl p-6 md:p-8 relative max-h-screen overflow-y-auto">
 
-<!-- Edit Medicine Modal -->
-<div id="editModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 relative   max-h-screen overflow-y-auto">
-    <h2 class="text-xl font-bold mb-4">Edit Medicine</h2>
-    <form id="editMedicineForm" class="space-y-4">
-      <input type="hidden" name="id" id="editMedId">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-bold text-textMain">Medicine Details</h2>
+      <button id="closeViewModal" class="text-gray-400 hover:text-gray-600 text-xl">
+        ✕
+      </button>
+    </div>
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Medicine Name</label>
-        <input type="text" id="editName" name="medName" class="w-full rounded-xl border px-4 py-2" required>
-      </div>
+    <!-- Content -->
+    <div id="medicineDetails" class="space-y-4">
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Dosage</label>
-        <input type="text" id="editDosage" name="dosage" class="w-full rounded-xl border px-4 py-2" required>
-      </div>
+      <!-- Filled dynamically by JS -->
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Type</label>
-        <select id="editType" name="form" class="w-full rounded-xl border px-4 py-2">
-          <option value="pill">Tablet / Pill</option>
-          <option value="capsule">Capsule</option>
-          <option value="syrup">Syrup</option>
-          <option value="injection">Injection</option>
-        </select>
-      </div>
+    </div>
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Reminder Type</label>
-        <select id="editReminderType" name="reminder_mode" class="w-full rounded-xl border px-4 py-2">
-          <option value="fixed">Fixed Times</option>
-          <option value="interval">Interval</option>
-        </select>
-      </div>
-
-      <div id="intervalSection" class="hidden">
-        <label class="block text-sm font-medium mb-1">Interval (hours)</label>
-        <input type="number" id="editInterval" name="intervalHours" class="w-full rounded-xl border px-4 py-2" min="1">
-      </div>
-
-      <div id="timesSection">
-        <label class="block text-sm font-medium mb-1">Times (HH:MM, comma separated)</label>
-        <input type="text" id="editTimes" name="times" class="w-full rounded-xl border px-4 py-2">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Schedule Type</label>
-        <select id="editScheduleType" name="schedule_type" class="w-full rounded-xl border px-4 py-2">
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
-
-      <div id="daysSection" class="hidden">
-        <label class="block text-sm font-medium mb-1">Specific Days (comma separated, e.g., Mon,Tue)</label>
-        <input type="text" id="editDays" name="specific_days" class="w-full rounded-xl border px-4 py-2">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Start Date</label>
-        <input type="date" id="editStart" name="start_date" class="w-full rounded-xl border px-4 py-2" required>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">End Date</label>
-        <input type="date" id="editEnd" name="end_date" class="w-full rounded-xl border px-4 py-2">
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Compartment Number</label>
-        <input type="number" id="editCompartment" name="compartment_number" class="w-full rounded-xl border px-4 py-2" min="1">
-      </div>
-
-      <div class="flex justify-end gap-3 mt-4">
-        <button type="button" id="closeModal" class="px-4 py-2 rounded-xl border">Cancel</button>
-        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white font-bold">Save Changes</button>
-      </div>
-    </form>
   </div>
 </div>
+
 
 
 <!-- NAVIGATION JS -->
@@ -644,7 +597,11 @@ card.className = "bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-3 hover:s
       </div>
 
       <div class="flex gap-2 mt-3">
-        <button class="bg-primary text-white px-4 py-2 rounded-xl hover:scale-105 transition" onclick="openEditModal(${med.id})">Edit</button>
+      <button class="bg-primary text-white px-4 py-2 rounded-xl"
+        onclick="viewMedicine(${med.id})">
+  View
+</button>
+
         <button class="bg-red-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition" onclick="deleteMedicine(${med.id})">Delete</button>
       </div>
     `;
@@ -879,75 +836,241 @@ navItems.forEach(item => {
 
 //edit my medicines
 // Modal elements
-const editModal = document.getElementById("editModal");
-const editForm = document.getElementById("editMedicineForm");
-const closeModalBtn = document.getElementById("closeModal");
 
-function openEditModal(med) {
-  editModal.classList.remove("hidden");
 
-  document.getElementById("editMedId").value = med.id;
-  document.getElementById("editName").value = med.name;
-  document.getElementById("editDosage").value = med.dosage_value;
-  document.getElementById("editType").value = med.medicine_type || "pill";
-  document.getElementById("editReminderType").value = med.reminder_type;
-  document.getElementById("editScheduleType").value = med.schedule_type;
-  document.getElementById("editInterval").value = med.interval_hours || "";
-  document.getElementById("editTimes").value = (med.times || []).join(",");
-  document.getElementById("editStart").value = med.start_date;
-  document.getElementById("editEnd").value = med.end_date !== "0000-00-00" ? med.end_date : "";
-  document.getElementById("editCompartment").value = med.compartment_number;
-  document.getElementById("editDays").value = (med.selected_days || []).join(",");
 
-  toggleReminderSections();
-  toggleScheduleDays();
-}
 
-closeModalBtn.addEventListener("click", () => {
-  editModal.classList.add("hidden");
+document.querySelector('[data-section="alerts"]').addEventListener('click', () => {
+  loadAlerts();
 });
 
-document.getElementById("editReminderType").addEventListener("change", toggleReminderSections);
-document.getElementById("editScheduleType").addEventListener("change", toggleScheduleDays);
-
-function toggleReminderSections() {
-  const type = document.getElementById("editReminderType").value;
-  document.getElementById("intervalSection").classList.toggle("hidden", type !== "interval");
-  document.getElementById("timesSection").classList.toggle("hidden", type !== "fixed");
-}
-
-function toggleScheduleDays() {
-  const scheduleType = document.getElementById("editScheduleType").value;
-  document.getElementById("daysSection").classList.toggle("hidden", scheduleType !== "custom");
-}
-editForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(editForm);
-
-  // Convert times & specific_days back to arrays
-  formData.set("times", formData.get("times").split(",").map(t => t.trim()));
-  formData.set("specific_days", formData.get("specific_days").split(",").map(d => d.trim()));
+async function loadAlerts() {
+  const container = document.getElementById('alertsContainer');
+  container.innerHTML = '<p class="text-gray-500">Loading alerts...</p>';
 
   try {
-    const res = await fetch("edit_medicine.php", {
-      method: "POST",
-      body: formData
-    });
+    const res = await fetch('get_alerts.php');
     const data = await res.json();
 
-    if (data.status === "success") {
-      loadSchedule();          // reload medicine list
-      editModal.classList.add("hidden");
-    } else {
-      alert(data.message || "Failed to update medicine");
+    container.innerHTML = '';
+
+    if (data.status !== 'success' || data.alerts.length === 0) {
+      container.innerHTML = `
+        <p class="text-slate-500 text-center">
+          No alerts from admin
+        </p>`;
+      return;
     }
+
+    data.alerts.forEach(alert => {
+      container.innerHTML += `
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-amber-600">
+              notifications
+            </span>
+            <div>
+              <p class="text-slate-800">${alert.message}</p>
+              <p class="text-xs text-slate-400 mt-1">
+                ${new Date(alert.created_at).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
   } catch (err) {
     console.error(err);
-    alert("Server error");
+    container.innerHTML = `
+      <p class="text-red-500 text-center">
+        Failed to load alerts
+      </p>`;
   }
+}
+const profileBtn = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+
+// Toggle dropdown
+profileBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  profileDropdown.classList.toggle("hidden");
 });
 
+// Close dropdown if clicked outside
+document.addEventListener("click", () => {
+  profileDropdown.classList.add("hidden");
+});
+
+// Stop propagation inside dropdown so it doesn't close immediately
+profileDropdown.addEventListener("click", (e) => e.stopPropagation());
+async function loadMedicineRequests() {
+  const container = document.getElementById("requestsContainer");
+  container.innerHTML = "<p class='text-textSub'>Loading requests...</p>";
+
+  try {
+    const res = await fetch("fetch_req.php"); // same file can handle fetching/deleting
+    const data = await res.json();
+
+    if (data.status !== "success" || !data.requests.length) {
+      container.innerHTML = "<p class='text-textSub'>No medicine requests found.</p>";
+      return;
+    }
+
+    let html = `<table class="w-full border border-slate-300 text-left rounded-lg overflow-hidden">
+      <thead class="bg-slate-100">
+        <tr>
+          <th class="px-4 py-2 border">Name</th>
+          <th class="px-4 py-2 border">Dosage</th>
+          <th class="px-4 py-2 border">Form</th>
+          <th class="px-4 py-2 border">Status</th>
+          <th class="px-4 py-2 border">Requested At</th>
+          <th class="px-4 py-2 border">Action</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    data.requests.forEach(req => {
+      let statusClass = "text-gray-600";
+      if (req.status === "pending") statusClass = "text-yellow-600 font-semibold";
+      if (req.status === "approved") statusClass = "text-green-600 font-semibold";
+      if (req.status === "rejected") statusClass = "text-red-600 font-semibold";
+
+      html += `<tr>
+        <td class="px-4 py-2 border">${req.name}</td>
+        <td class="px-4 py-2 border">${req.dosage}</td>
+        <td class="px-4 py-2 border">${req.form}</td>
+        <td class="px-4 py-2 border"><span class="${statusClass}">${req.status.charAt(0).toUpperCase() + req.status.slice(1)}</span></td>
+        <td class="px-4 py-2 border">${new Date(req.created_at).toLocaleString()}</td>
+        <td class="px-4 py-2 border">
+          <button class="deleteBtn px-2 py-1 rounded bg-red-500 text-white text-sm" data-id="${req.id}">Delete</button>
+        </td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+
+    // Attach delete handlers
+    document.querySelectorAll('.deleteBtn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const requestId = this.dataset.id;
+        if (!confirm("Are you sure you want to delete this request?")) return;
+
+        try {
+          const res = await fetch("fetch_req.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `action=delete_request&request_id=${requestId}`
+          });
+          const result = await res.json();
+          if (result.status === "success") loadMedicineRequests();
+          else alert("Failed to delete request");
+        } catch (err) {
+          console.error(err);
+          alert("Server error");
+        }
+      });
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p class='text-red-500'>Failed to load requests.</p>";
+  }
+}
+
+// Automatically load requests when user clicks "requests" nav
+document.querySelector('[data-section="requests"]')?.addEventListener("click", () => {
+  loadMedicineRequests();
+});
+const viewModal = document.getElementById("viewMedicineModal");
+const viewContainer = document.getElementById("medicineDetails");
+const closeViewModal = document.getElementById("closeViewModal");
+
+function viewMedicine(id) {
+  viewContainer.innerHTML = "<p class='text-textSub'>Loading details...</p>";
+  viewModal.classList.remove("hidden");
+
+  fetch(`fetch_single_medicine.php?id=${id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status !== "success") {
+        viewContainer.innerHTML = "<p class='text-red-500'>Failed to load medicine details</p>";
+        return;
+      }
+
+      const med = data.medicine;
+
+      viewContainer.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 text-sm">
+
+          <div>
+            <p class="text-textSub">Medicine Name</p>
+            <p class="font-semibold">${med.name}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Type</p>
+            <p class="font-semibold capitalize">${med.medicine_type}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Dosage</p>
+            <p class="font-semibold">${med.dosage_value}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Reminder Mode</p>
+            <p class="font-semibold capitalize">${med.reminder_type}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Schedule</p>
+            <p class="font-semibold capitalize">${med.schedule_type}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Interval</p>
+            <p class="font-semibold">${med.interval_hours || "—"}</p>
+          </div>
+
+          <div class="col-span-2">
+            <p class="text-textSub">Times</p>
+            <p class="font-semibold">${(med.times || []).join(", ") || "—"}</p>
+          </div>
+
+          <div class="col-span-2">
+            <p class="text-textSub">Selected Days</p>
+            <p class="font-semibold">${(med.selected_days || []).join(", ") || "—"}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Start Date</p>
+            <p class="font-semibold">${med.start_date}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">End Date</p>
+            <p class="font-semibold">${med.end_date || "—"}</p>
+          </div>
+
+          <div>
+            <p class="text-textSub">Compartment</p>
+            <p class="font-semibold">${med.compartment_number}</p>
+          </div>
+
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error(err);
+      viewContainer.innerHTML = "<p class='text-red-500'>Server error</p>";
+    });
+}
+
+closeViewModal.addEventListener("click", () => {
+  viewModal.classList.add("hidden");
+});
 
 /* =====================================================
    INIT
@@ -957,6 +1080,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCaretakers();
   initTranslationSystem();
 });
+
 </script>
 
 
