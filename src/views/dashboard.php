@@ -394,6 +394,16 @@ tailwind.config = {
 
   </div>
 </div>
+<!-- Confirm Modal -->
+<div id="confirmModal" class="fixed inset-0 flex items-center justify-center bg-black/40 hidden z-50">
+  <div id="confirmBox" class="bg-white rounded-3xl shadow-xl p-6 md:p-8 w-96 scale-95 opacity-0 transition-all">
+    <h3 id="confirmMessage" class="text-lg font-semibold text-textMain mb-4">Are you sure?</h3>
+    <div class="flex justify-end gap-4">
+      <button id="confirmNo" class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100">No</button>
+      <button id="confirmYes" class="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primaryDark">Yes</button>
+    </div>
+  </div>
+</div>
 
 
 
@@ -614,20 +624,25 @@ card.className = "bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-3 hover:s
 
 // Delete function
 function deleteMedicine(id) {
-  if (!confirm("Are you sure you want to delete this medicine?")) return;
+  // Open the custom confirm modal instead of using confirm()
+  openConfirmModal("Are you sure you want to delete this medicine?", async () => {
+    try {
+      const res = await fetch("delete_medicine.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
 
-  fetch("delete_medicine.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") loadSchedule();
-    else alert("Failed to delete medicine");
-  })
-  .catch(err => console.error(err));
+      const data = await res.json();
+      if (data.status === "success") loadSchedule();
+      else alert("Failed to delete medicine");
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  });
 }
+
 
 // Example placeholders
 function requestRefill(id) { alert("Refill requested for medicine ID " + id); }
@@ -1080,6 +1095,31 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCaretakers();
   initTranslationSystem();
 });
+let pendingAction = null; // stores the callback to run on confirm
+
+function openConfirmModal(message, actionCallback) {
+    pendingAction = actionCallback;
+    document.getElementById("confirmMessage").innerText = message;
+    const modal = document.getElementById("confirmModal");
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+        document.getElementById("confirmBox").classList.remove("scale-95", "opacity-0");
+    }, 10);
+}
+
+function closeConfirmModal() {
+    const modal = document.getElementById("confirmModal");
+    document.getElementById("confirmBox").classList.add("scale-95", "opacity-0");
+    setTimeout(() => modal.classList.add("hidden"), 300);
+    pendingAction = null;
+}
+
+document.getElementById("confirmYes").addEventListener("click", () => {
+    if (pendingAction) pendingAction();
+    closeConfirmModal();
+});
+
+document.getElementById("confirmNo").addEventListener("click", closeConfirmModal);
 
 </script>
 

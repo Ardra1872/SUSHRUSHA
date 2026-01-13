@@ -354,7 +354,7 @@
 <footer class="mt-auto py-6 border-t border-input-border-light dark:border-input-border-dark bg-card-light dark:bg-card-dark text-center">
 <p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2026 Sushrusha Health. All rights reserved.</p>
 </footer>
-<div id="requestModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+<div id="requestModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
   <div class="bg-card-light dark:bg-card-dark rounded-xl w-full max-w-md p-6">
     <h2 class="text-xl font-bold mb-4">Request New Medicine</h2>
 
@@ -382,6 +382,21 @@
     </form>
   </div>
 </div>
+<!-- Custom Alert / Toast -->
+<div id="toast"
+     class="fixed top-6 right-6 z-[9999] hidden max-w-sm rounded-2xl shadow-lg border p-4 flex items-start gap-3 transition-all">
+
+  <span id="toastIcon" class="material-symbols-outlined text-xl"></span>
+
+  <div class="flex-1">
+    <p id="toastMessage" class="text-sm font-medium"></p>
+  </div>
+
+  <button onclick="hideToast()" class="text-textSub hover:text-textMain">
+    <span class="material-symbols-outlined text-lg">close</span>
+  </button>
+</div>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -676,14 +691,15 @@ generateIntervals();
       console.log("SERVER:", data);
 
       if (data.status === "success") {
-        alert("✅ Medicine added successfully");
+       showToast("Medicine added successfully", "success");
+
         form.reset();
       } else {
-        alert("❌ " + (data.message || "Failed"));
+        showToast("❌ " + (data.message || "Failed"));
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Server error");
+      showToast("❌ Server error");
     }
   });
 
@@ -696,8 +712,16 @@ const requestBtn = document.getElementById("requestNewMed");
 const modal = document.getElementById("requestModal");
 const closeModal = document.getElementById("closeModal");
 
-requestBtn.onclick = () => modal.classList.remove("hidden");
-closeModal.onclick = () => modal.classList.add("hidden");
+requestBtn.onclick = () => {
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+};
+
+closeModal.onclick = () => {
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+};
+
 
 document.getElementById("requestMedForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -712,15 +736,49 @@ document.getElementById("requestMedForm").addEventListener("submit", async e => 
   const data = await res.json();
 
   if (data.status === "success") {
-    alert("✅ Request sent to admin");
+    showToast("✅ Request sent to admin");
     modal.classList.add("hidden");
     e.target.reset();
   } else {
-    alert("❌ " + data.message);
+    showToast("❌ " + data.message);
   }
 });
 
 });
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  const msg = document.getElementById("toastMessage");
+  const icon = document.getElementById("toastIcon");
+
+  // reset
+  toast.className =
+    "fixed top-6 right-6 z-[9999] max-w-sm rounded-2xl shadow-lg border p-4 flex items-start gap-3 transition-all";
+
+  // type styles
+  if (type === "success") {
+    toast.classList.add("bg-green-50", "border-green-200", "text-green-700");
+    icon.textContent = "check_circle";
+  } else if (type === "error") {
+    toast.classList.add("bg-red-50", "border-red-200", "text-red-700");
+    icon.textContent = "error";
+  } else if (type === "warning") {
+    toast.classList.add("bg-yellow-50", "border-yellow-200", "text-yellow-700");
+    icon.textContent = "warning";
+  }
+
+  msg.textContent = message;
+
+  toast.classList.remove("hidden");
+
+  // auto hide after 3s
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(hideToast, 3000);
+}
+
+function hideToast() {
+  document.getElementById("toast").classList.add("hidden");
+}
+
 </script>
 
 
