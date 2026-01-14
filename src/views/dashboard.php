@@ -777,8 +777,8 @@ form.addEventListener("submit", async (e) => {
     alert("Error assigning caretaker");
   }
 });
-
 async function loadCaretakers() {
+  const list = document.getElementById("caretakerList");
   list.innerHTML = "<p>Loading...</p>";
 
   try {
@@ -791,28 +791,51 @@ async function loadCaretakers() {
     }
 
     list.innerHTML = "";
+  data.caretakers.forEach(cg => {
+  const card = document.createElement("div");
+  card.className = "p-4 bg-white rounded-2xl shadow-soft border border-gray-200 flex items-center justify-between";
 
-    data.caretakers.forEach(cg => {
-      const card = document.createElement("div");
-      card.className =
-        "p-4 bg-white rounded-2xl shadow-soft border border-gray-200 flex items-center justify-between";
+  card.innerHTML = `
+    <div>
+      <h3 class="font-bold text-lg">${cg.name}</h3>
+      <p class="text-sm text-textSub">${cg.email}</p>
+      <p class="text-sm text-textSub capitalize">Relation: ${cg.relation}</p>
+      <input type="text" placeholder="Type message..." class="messageInput mt-1 p-1 border rounded w-full"/>
+      <button class="sendBtn mt-2 px-3 py-1 bg-blue-500 text-white rounded">Send</button>
+    </div>
+    <span class="material-symbols-outlined text-primary">person</span>
+  `;
 
-      card.innerHTML = `
-        <div>
-          <h3 class="font-bold text-lg">${cg.name}</h3>
-          <p class="text-sm text-textSub">${cg.email}</p>
-          <p class="text-sm text-textSub capitalize">Relation: ${cg.relation}</p>
-        </div>
-        <span class="material-symbols-outlined text-primary">person</span>
-      `;
+  list.appendChild(card);
 
-      list.appendChild(card);
+  const sendBtn = card.querySelector(".sendBtn");
+  const messageInput = card.querySelector(".messageInput");
+
+  sendBtn.addEventListener("click", async () => {
+    const message = messageInput.value.trim();
+    if (!message) return alert("Enter a message");
+
+    const res = await fetch("send_message.php?action=send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ caretaker_id: cg.id, message })
     });
+    const data = await res.json();
+    if (data.status === "success") {
+      alert("Message sent!");
+      messageInput.value = "";
+    } else {
+      alert(data.msg);
+    }
+  });
+});
+
   } catch (err) {
     console.error(err);
     list.innerHTML = "<p>Server error</p>";
   }
 }
+
 
 
 /* =====================================================

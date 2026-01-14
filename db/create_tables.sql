@@ -108,3 +108,13 @@ CREATE TABLE broadcast_reads (
     FOREIGN KEY (broadcast_id) REFERENCES broadcasts(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    caretaker_id INT NOT NULL,
+    message TEXT NOT NULL,
+    status ENUM('unread','read') DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES users(id),
+    FOREIGN KEY (caretaker_id) REFERENCES users(id)
+);

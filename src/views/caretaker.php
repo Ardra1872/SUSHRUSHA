@@ -6,6 +6,8 @@ header('Content-Type: application/json');
 
 $caretakerId = $_SESSION['user_id'] ?? null;
 
+
+
 if (!$caretakerId) {
     echo json_encode([
         'status' => 'error',
@@ -23,31 +25,28 @@ switch ($action) {
     =============================== */
     case 'getCaretaker':
 
-        $stmt = $conn->prepare(
-            "SELECT name, role, profile_photo 
-             FROM users 
-             WHERE id = ? AND role = 'caretaker'"
-        );
+        $stmt = $conn->prepare("
+            SELECT 
+                name,
+                role,
+                profile_photo
+            FROM users
+            WHERE id = ? AND role = 'caretaker'
+        ");
         $stmt->bind_param("i", $caretakerId);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $caretaker = $result->fetch_assoc();
 
-        if ($caretaker) {
-            echo json_encode([
-                'status' => 'success',
-                'data' => $caretaker
-            ]);
-        } else {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Caretaker not found'
-            ]);
-        }
+        $caretaker = $stmt->get_result()->fetch_assoc();
+
+        echo json_encode(
+            $caretaker
+                ? ['status' => 'success', 'data' => $caretaker]
+                : ['status' => 'error', 'message' => 'Caretaker not found']
+        );
         break;
 
     /* ===============================
-       2️⃣ SEARCH (medicine / notes)
+       2️⃣ SEARCH MEDICINES
     =============================== */
     case 'search':
 
@@ -61,24 +60,26 @@ switch ($action) {
             exit;
         }
 
-        $results = [];
+        $stmt = $conn->prepare("
+            SELECT 
+                name AS title,
+                dosage_value AS detail
+            FROM medicines
+            WHERE name LIKE ?
+            LIMIT 5
+        ");
 
-        // 🔹 Example medicine search
-        $stmt = $conn->prepare(
-            "SELECT medicine_name AS title, dosage AS detail 
-             FROM medicines 
-             WHERE medicine_name LIKE ? 
-             LIMIT 5"
-        );
         $like = "%$q%";
         $stmt->bind_param("s", $like);
         $stmt->execute();
+
+        $results = [];
         $res = $stmt->get_result();
 
         while ($row = $res->fetch_assoc()) {
             $results[] = [
-                'type' => 'medicine',
-                'title' => $row['title'],
+                'type'   => 'medicine',
+                'title'  => $row['title'],
                 'detail' => $row['detail']
             ];
         }
@@ -96,8 +97,8 @@ switch ($action) {
 
         $stmt = $conn->prepare("
             SELECT 
-                u.id AS patient_id,
-                u.name AS patient_name,
+                u.id            AS patient_id,
+                u.name          AS patient_name,
                 c.relation,
                 pp.profile_photo,
                 pp.dob,
@@ -106,29 +107,87 @@ switch ($action) {
                 pp.height_cm,
                 pp.weight_kg
             FROM caregivers c
-            JOIN users u ON u.id = c.patient_id
-            LEFT JOIN patient_profile pp ON pp.patient_id = u.id
+            JOIN users u 
+                ON u.id = c.patient_id
+            LEFT JOIN patient_profile pp 
+                ON pp.patient_id = u.id
             WHERE c.caregiver_id = ?
             LIMIT 1
         ");
 
         $stmt->bind_param("i", $caretakerId);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $patient = $result->fetch_assoc();
 
-        if ($patient) {
-            echo json_encode([
-                'status' => 'success',
-                'data' => $patient
-            ]);
-        } else {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'No patient assigned to this caretaker'
-            ]);
-        }
+        $patient = $stmt->get_result()->fetch_assoc();
+
+        echo json_encode(
+            $patient
+                ? ['status' => 'success', 'data' => $patient]
+                : ['status' => 'error', 'message' => 'No patient assigned']
+        );
         break;
+       /* ===============================
+   4️⃣ GET PATIENT MEDICINES
+=============================== */
+case 'getPatientMedicines':
+
+    // Get the assigned patient for this caretaker
+    $stmt = $conn->prepare("
+        SELECT c.patient_id
+        FROM caregivers c
+        WHERE c.caregiver_id = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param("i", $caretakerId);
+    $stmt->execute();
+    $patient = $stmt->get_result()->fetch_assoc();
+
+    if (!$patient) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No patient assigned'
+        ]);
+        exit;
+    }
+
+    $patientId = $patient['patient_id'];
+
+    // Fetch medicines for this patient
+    $stmt = $conn->prepare("
+        SELECT 
+            id,
+            name,
+            dosage,
+            dosage_value,
+            dosage_unit,
+            frequency,
+            schedule_type,
+            specific_days,
+            instructions,
+            days,
+            reminder_type,
+            medicine_type,
+            interval_hours
+        FROM medicines
+        WHERE patient_id = ?
+        ORDER BY id DESC
+    ");
+    $stmt->bind_param("i", $patientId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    $medicines = [];
+    while ($row = $res->fetch_assoc()) {
+        $medicines[] = $row;
+    }
+
+    echo json_encode([
+        'status' => 'success',
+        'data' => $medicines
+    ]);
+    break;
+
+
 
     /* ===============================
        ❌ INVALID ACTION

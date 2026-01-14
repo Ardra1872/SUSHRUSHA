@@ -114,15 +114,16 @@
   <span class="material-symbols-outlined">notifications</span>
   <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
   </button>
-  <div class="h-8 w-[1px] bg-[#cfdbe7] dark:bg-slate-800 mx-1"></div>
+  <!-- <div class="h-8 w-[1px] bg-[#cfdbe7] dark:bg-slate-800 mx-1"></div>
   <div class="flex items-center gap-2">
   <p class="text-xs font-medium text-[#4c739a] hidden sm:block">Syncing...</p>
   <span class="material-symbols-outlined text-primary text-sm animate-spin">sync</span>
   </div>
-  </div>
+  </div> -->
   </header>
   <div class="p-6 space-y-6 max-w-6xl mx-auto w-full">
   <!-- Urgent Alert -->
+   
   <div class="p-4 @container">
   <div class="flex flex-1 flex-col items-start justify-between gap-4 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/30 p-5 @[480px]:flex-row @[480px]:items-center">
   <div class="flex items-center gap-4">
@@ -320,6 +321,15 @@
   </div>
   </div>
   </div>
+  <!-- Medicine History Section -->
+<div id="section-medicine-history" class="hidden p-6 max-w-6xl mx-auto w-full space-y-4">
+  <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white">Medicine History</h2>
+
+  <div id="medicine-history-list" class="flex flex-col gap-3">
+    <!-- Medicines will be injected here dynamically -->
+  </div>
+</div>
+
   </main>
   <!-- Right Sidebar (Caregiver Notes) -->
   <aside class="w-80 border-l border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hidden xl:flex flex-col p-6 gap-6 overflow-y-auto h-screen sticky top-0">
@@ -399,6 +409,59 @@
 </div>
 
   <script>
+    // ====== Section Switching ======
+const sidebarLinks = document.querySelectorAll('aside nav a[data-section]');
+const allSections = document.querySelectorAll('main > div');
+
+sidebarLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.getAttribute('data-section');
+
+        // Hide all sections
+        allSections.forEach(sec => sec.classList.add('hidden'));
+
+        // Remove active class from sidebar links
+        sidebarLinks.forEach(l => l.classList.remove('bg-primary/10', 'text-primary'));
+        sidebarLinks.forEach(l => l.classList.add('text-[#4c739a]'));
+
+        // Add active styles to clicked link
+        link.classList.add('bg-primary/10', 'text-primary');
+
+        // Show selected section
+        if(section === 'dashboard') {
+            document.querySelector('#section-dashboard').classList.remove('hidden');
+        } else if(section === 'history') {
+            document.querySelector('#section-medicine-history').classList.remove('hidden');
+
+            // Fetch medicines when showing the section
+            fetch('caretaker.php?action=getPatientMedicines', {credentials: 'same-origin'})
+            .then(res => res.json())
+            .then(res => {
+                const list = document.getElementById('medicine-history-list');
+                list.innerHTML = ''; // clear previous data
+
+                if(res.status === 'success' && res.data.length) {
+                    res.data.forEach(med => {
+                        list.innerHTML += `
+                            <div class="flex justify-between items-center p-4 rounded-xl border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                                <div class="flex flex-col">
+                                    <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">${med.name}</h4>
+                                    <p class="text-[#4c739a] text-sm">${med.dosage} • ${med.schedule}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">${med.status}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No medicines found.</p>';
+                }
+            })
+            .catch(err => console.error('Error fetching medicines:', err));
+        }
+    });
+});
+
   document.addEventListener('DOMContentLoaded', () => {
       // ====== 1️⃣ Fetch Caretaker Profile ======
     fetch('caretaker.php?action=getCaretaker', {
@@ -584,8 +647,53 @@ fullHistoryBtn.addEventListener('click', () => {
     })
     .catch(err => console.error(err));
 });
+// ====== Medicine History Section ======
+const historyLink = document.querySelector('[data-section="history"]');
+const medicineHistorySection = document.getElementById('section-medicine-history');
 
 
+historyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // Hide other sections
+    document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+
+    // Show medicine history section
+    medicineHistorySection.classList.remove('hidden');
+
+    // Fetch medicines for the assigned patient
+    fetch('caretaker.php?action=getPatientMedicines', { credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(res => {
+            const list = document.getElementById('medicine-history-list');
+            list.innerHTML = ''; // clear previous data
+
+            if (res.status === 'success' && res.data.length) {
+                res.data.forEach(med => {
+                    const dosage = med.dosage || (med.dosage_value ? med.dosage_value + (med.dosage_unit || '') : '-');
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center p-4 rounded-xl border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm mb-2">
+                            <div class="flex flex-col">
+                                <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">${med.name}</h4>
+                                <p class="text-[#4c739a] text-sm">
+                                    Dosage: ${dosage} • 
+                                    Type: ${med.medicine_type} • 
+                                    Frequency: ${med.frequency || '-'}
+                                </p>
+                                ${med.instructions ? `<p class="text-[#4c739a] text-sm italic mt-1">Notes: ${med.instructions}</p>` : ''}
+                            </div>
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
+                                Reminder: ${med.reminder_type || '-'}
+                            </span>
+                        </div>
+                    `;
+                });
+            } else {
+                list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No medicines found.</p>';
+            }
+        })
+        .catch(err => console.error('Error fetching medicines:', err));
+});
 
   </script>
 
