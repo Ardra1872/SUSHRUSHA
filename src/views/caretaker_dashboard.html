@@ -33,10 +33,11 @@
           }
       </style>
   </head>
-  <body class="bg-background-light dark:bg-background-dark text-[#0d141b] dark:text-slate-100 font-display min-h-screen">
-  <div class="flex h-full min-h-screen w-full">
+<body class="bg-background-light dark:bg-background-dark text-[#0d141b] dark:text-slate-100 font-display h-screen overflow-hidden">
+<div class="flex w-full h-full">
+
   <!-- Side Navigation -->
-  <aside class="w-64 border-r border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hidden lg:flex flex-col sticky top-0 h-screen">
+  <aside class="w-64 border-r border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hidden lg:flex flex-col sticky top-0 h-full flex-shrink-0">
   <div class="flex flex-col h-full justify-between p-4">
   <div class="flex flex-col gap-8">
   <!-- Brand -->
@@ -83,25 +84,34 @@
   <span class="material-symbols-outlined text-sm">add</span>
   <span>Add Note</span>
   </button>
-  <div class="pt-4 border-t border-[#cfdbe7] dark:border-slate-800 flex items-center gap-3 px-2">
-  <div id="caretaker-photo" class="bg-primary text-white flex items-center justify-center aspect-square rounded-full size-8">
-      <span class="material-symbols-outlined text-xl">medical_services</span>
-  </div>
-
-  <div class="flex-1 overflow-hidden">
-      <p id="caretaker-name" class="text-[#0d141b] dark:text-white text-xs font-bold truncate">Loading...</p>
-      <p id="caretaker-role" class="text-[#4c739a] text-[10px] truncate">Loading...</p>
-  </div>
-
-  <!-- <span class="material-symbols-outlined text-[#4c739a] text-sm">settings</span> -->
+  <div class="pt-4 border-t border-[#cfdbe7] dark:border-slate-800 relative">
+    <button id="profile-dropdown-btn" class="flex items-center gap-3 px-2 py-2 w-full hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+      <div id="caretaker-photo" class="bg-primary text-white flex items-center justify-center aspect-square rounded-full size-8">
+          <span class="material-symbols-outlined text-xl">medical_services</span>
+      </div>
+      <div class="flex-1 overflow-hidden text-left">
+          <p id="caretaker-name" class="text-[#0d141b] dark:text-white text-xs font-bold truncate">Loading...</p>
+          <p id="caretaker-role" class="text-[#4c739a] text-[10px] truncate">Loading...</p>
+      </div>
+      <span class="material-symbols-outlined text-[#4c739a] text-sm">expand_more</span>
+    </button>
+    <!-- Profile Dropdown Menu -->
+    <div id="profile-dropdown-menu" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-800 border border-[#cfdbe7] dark:border-slate-700 rounded-lg shadow-lg z-50">
+      <a href="../../public/logout.php" class="flex items-center gap-3 px-4 py-3 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium transition-colors w-full rounded-lg">
+        <span class="material-symbols-outlined text-base">logout</span>
+        <span>Logout</span>
+      </a>
+    </div>
   </div>
   </div>
   </div>
   </aside>
   <!-- Main Content Area -->
-  <main class="flex-1 flex flex-col overflow-y-auto max-w-full">
+ <main class="flex-1 flex flex-col w-full min-h-0">
+
+
   <!-- Top Nav -->
-  <header class="flex items-center justify-between border-b border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-10">
+  <header class="flex items-center justify-between border-b border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-10 flex-shrink-0">
   <div class="flex items-center gap-4">
   <h2 class="text-[#0d141b] dark:text-white text-lg font-bold">Caretaker Dashboard</h2>
   </div>
@@ -110,9 +120,9 @@
   <span class="material-symbols-outlined text-[#4c739a] mr-2">search</span>
   <input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-[#4c739a]" placeholder="Search medicine or notes..." type="text"/>
   </label>
-  <button class="relative p-2 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+  <button id="notification-btn" class="relative p-2 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
   <span class="material-symbols-outlined">notifications</span>
-  <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+  <span id="notification-badge" class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
   </button>
   <!-- <div class="h-8 w-[1px] bg-[#cfdbe7] dark:bg-slate-800 mx-1"></div>
   <div class="flex items-center gap-2">
@@ -121,32 +131,91 @@
   </div>
   </div> -->
   </header>
-  <div class="p-6 space-y-6 max-w-6xl mx-auto w-full">
-  <!-- Urgent Alert -->
-   
-  <div class="p-4 @container">
-  <div class="flex flex-1 flex-col items-start justify-between gap-4 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/30 p-5 @[480px]:flex-row @[480px]:items-center">
-  <div class="flex items-center gap-4">
-  <div class="bg-red-500 text-white p-2 rounded-full flex items-center justify-center">
-  <span class="material-symbols-outlined">priority_high</span>
+  <!-- Notifications Dropdown -->
+  <div id="notifications-dropdown" class="hidden absolute top-16 right-6 w-96 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 rounded-xl shadow-xl z-50 flex flex-col">
+    <div class="p-4 border-b border-[#cfdbe7] dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+      <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Messages</h3>
+      <button id="close-notifications" class="text-[#4c739a] hover:text-[#0d141b] dark:hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="notifications-list" class="divide-y divide-[#cfdbe7] dark:divide-slate-800 overflow-y-auto max-h-64 flex-1">
+      <!-- Messages will be loaded here -->
+    </div>
   </div>
-  <div class="flex flex-col gap-1">
-  <p class="text-red-700 dark:text-red-400 text-base font-bold leading-tight">Missed Dose Alert</p>
-  <p class="text-red-600 dark:text-red-300 text-base font-normal leading-normal">Urgent: Mom missed her 8:00 AM Metformin (500mg) dose.</p>
+  <!-- Add Note Modal -->
+  <div id="add-note-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md">
+      <div class="flex items-center justify-between p-6 border-b border-[#cfdbe7] dark:border-slate-800">
+        <h2 class="text-xl font-bold text-[#0d141b] dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">note_add</span>
+          Add Note
+        </h2>
+        <button id="close-note-modal" class="text-[#4c739a] hover:text-[#0d141b] dark:hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-[#0d141b] dark:text-white mb-2">Note Type</label>
+          <select id="note-medicine-select" class="w-full px-4 py-2 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+            <option value="">-- General Note --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-[#0d141b] dark:text-white mb-2">Message</label>
+          <textarea id="note-message" placeholder="Enter your note here..." class="w-full px-4 py-3 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent resize-none h-32" style="font-family: 'Inter', sans-serif;"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 p-6 border-t border-[#cfdbe7] dark:border-slate-800">
+        <button id="cancel-note-btn" class="flex-1 px-4 py-2 rounded-lg border border-[#cfdbe7] dark:border-slate-700 text-[#0d141b] dark:text-white text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          Cancel
+        </button>
+        <button id="save-note-btn" class="flex-1 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors">
+          Save Note
+        </button>
+      </div>
+    </div>
   </div>
+  <!-- Send Message Modal -->
+  <div id="send-message-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md">
+      <div class="flex items-center justify-between p-6 border-b border-[#cfdbe7] dark:border-slate-800">
+        <h2 class="text-xl font-bold text-[#0d141b] dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">send</span>
+          Send Message to Patient
+        </h2>
+        <button id="close-message-modal" class="text-[#4c739a] hover:text-[#0d141b] dark:hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-[#0d141b] dark:text-white mb-2">Patient Name</label>
+          <p id="message-patient-name" class="px-4 py-2 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-[#0d141b] dark:text-white text-sm">--</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-[#0d141b] dark:text-white mb-2">Message</label>
+          <textarea id="message-text" placeholder="Type your message here..." class="w-full px-4 py-3 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent resize-none h-32" style="font-family: 'Inter', sans-serif;"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 p-6 border-t border-[#cfdbe7] dark:border-slate-800">
+        <button id="cancel-message-btn" class="flex-1 px-4 py-2 rounded-lg border border-[#cfdbe7] dark:border-slate-700 text-[#0d141b] dark:text-white text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          Cancel
+        </button>
+        <button id="send-message-submit-btn" class="flex-1 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors">
+          Send Message
+        </button>
+      </div>
+    </div>
   </div>
-  <div class="flex gap-2 w-full @[480px]:w-auto">
-  <button class="flex-1 @[480px]:flex-none min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-red-600 text-white text-sm font-bold shadow-sm active:scale-95 transition-all">
-  <span>Call Mom</span>
-  </button>
-  <button class="flex-1 @[480px]:flex-none min-w-[80px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 border border-red-200 bg-white text-red-600 text-sm font-bold hover:bg-red-50 transition-all">
-  <span>Dismiss</span>
-  </button>
-  </div>
-  </div>
-  </div>
+  <!-- Scrollable Content Wrapper -->
+  <div class="flex-1 overflow-y-auto w-full min-h-0">
+
+  <!-- Dashboard Section (Default) -->
+  <div id="section-dashboard" class="px-6 pb-6 pt-0 space-y-6 w-full">
   <!-- Patient Profile Header -->
-  <!-- Patient Profile Header -->
+   <br>
 <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="flex gap-6 items-center">
@@ -175,6 +244,10 @@
     <div class="flex gap-3">
       <button   id="view-profile-btn" class="flex-1 md:flex-none min-w-[120px] rounded-lg h-10 px-4 border border-[#cfdbe7] dark:border-slate-700 text-[#0d141b] dark:text-white text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
         View Profile
+      </button>
+      <button id="send-message-btn" class="flex-1 md:flex-none min-w-[120px] rounded-lg h-10 px-4 border border-primary text-primary text-sm font-bold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-base">send</span>
+        <span>Message</span>
       </button>
      <button id="full-history-btn" class="flex-1 md:flex-none min-w-[120px] rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
   Full History
@@ -224,105 +297,31 @@
   <div class="space-y-4">
   <div class="flex items-center justify-between">
   <h3 class="text-xl font-bold text-[#0d141b] dark:text-white">Today's Schedule</h3>
-  <div class="flex gap-2">
-  <button class="p-2 rounded-lg border border-[#cfdbe7] dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 transition-colors">
-  <span class="material-symbols-outlined text-sm">chevron_left</span>
-  </button>
-  <span class="flex items-center px-3 bg-white dark:bg-slate-800 border border-[#cfdbe7] dark:border-slate-700 rounded-lg text-sm font-bold">Monday, Oct 14</span>
-  <button class="p-2 rounded-lg border border-[#cfdbe7] dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 transition-colors">
-  <span class="material-symbols-outlined text-sm">chevron_right</span>
-  </button>
-  </div>
   </div>
   <!-- Timeline Feed -->
-  <div class="space-y-3 relative before:absolute before:left-8 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
-  <!-- Item: Taken -->
-  <div class="relative flex gap-6 items-start group">
-  <div class="z-10 mt-1 size-16 rounded-full bg-white dark:bg-slate-900 border-2 border-green-500 flex items-center justify-center shrink-0 shadow-sm">
-  <span class="material-symbols-outlined text-green-500">pill</span>
-  </div>
-  <div class="flex-1 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:border-primary/30 transition-all">
-  <div class="flex justify-between items-start">
-  <div>
-  <div class="flex items-center gap-2">
-  <p class="text-xs font-bold text-green-600 uppercase">Taken at 7:05 AM</p>
-  <span class="material-symbols-outlined text-[10px] text-green-600">verified</span>
-  </div>
-  <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">Atorvastatin</h4>
-  <p class="text-[#4c739a] text-sm">20mg • 1 tablet</p>
-  </div>
-  <span class="px-3 py-1 bg-green-50 dark:bg-green-950/30 text-green-600 text-xs font-bold rounded-full">Completed</span>
-  </div>
-  <div class="mt-2 flex items-center gap-2 text-xs text-[#4c739a]">
-  <span class="material-symbols-outlined text-sm">restaurant</span>
-  <span>Take with breakfast</span>
+  <div id="todays-schedule-list" class="space-y-3 relative before:absolute before:left-8 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+    <!-- Schedule items will be loaded here dynamically -->
+    <div class="text-center p-4 text-[#4c739a]">Loading schedule...</div>
   </div>
   </div>
+
+  <!-- Caretaker Notes -->
+  <div class="space-y-4">
+  <div class="flex items-center justify-between">
+  <h3 class="text-xl font-bold text-[#0d141b] dark:text-white flex items-center gap-2">
+    <span class="material-symbols-outlined">notes</span>
+    Caretaker Notes
+  </h3>
   </div>
-  <!-- Item: Missed -->
-  <div class="relative flex gap-6 items-start group">
-  <div class="z-10 mt-1 size-16 rounded-full bg-white dark:bg-slate-900 border-2 border-red-500 flex items-center justify-center shrink-0 shadow-sm">
-  <span class="material-symbols-outlined text-red-500">medication</span>
-  </div>
-  <div class="flex-1 bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/40 p-4 rounded-xl shadow-sm group-hover:border-red-300 transition-all">
-  <div class="flex justify-between items-start">
-  <div>
-  <div class="flex items-center gap-2">
-  <p class="text-xs font-bold text-red-600 uppercase">Missed at 8:00 AM</p>
-  <span class="material-symbols-outlined text-[10px] text-red-600">warning</span>
-  </div>
-  <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">Metformin</h4>
-  <p class="text-[#4c739a] text-sm">500mg • 1 tablet</p>
-  </div>
-  <span class="px-3 py-1 bg-red-50 dark:bg-red-950/30 text-red-600 text-xs font-bold rounded-full">Missed</span>
-  </div>
-  <div class="mt-3 flex gap-2">
-  <button class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg transition-all active:scale-95">Remind Patient</button>
-  <button class="px-3 py-1.5 border border-[#cfdbe7] dark:border-slate-700 text-[#4c739a] text-xs font-bold rounded-lg">Mark as Taken</button>
-  </div>
-  </div>
-  </div>
-  <!-- Item: Taken -->
-  <div class="relative flex gap-6 items-start group">
-  <div class="z-10 mt-1 size-16 rounded-full bg-white dark:bg-slate-900 border-2 border-green-500 flex items-center justify-center shrink-0 shadow-sm">
-  <span class="material-symbols-outlined text-green-500">vaccines</span>
-  </div>
-  <div class="flex-1 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:border-primary/30 transition-all">
-  <div class="flex justify-between items-start">
-  <div>
-  <div class="flex items-center gap-2">
-  <p class="text-xs font-bold text-green-600 uppercase">Taken at 10:15 AM</p>
-  </div>
-  <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">Vitamin D3</h4>
-  <p class="text-[#4c739a] text-sm">2000 IU • 1 capsule</p>
-  </div>
-  <span class="px-3 py-1 bg-green-50 dark:bg-green-950/30 text-green-600 text-xs font-bold rounded-full">Completed</span>
-  </div>
-  </div>
-  </div>
-  <!-- Item: Upcoming -->
-  <div class="relative flex gap-6 items-start group">
-  <div class="z-10 mt-1 size-16 rounded-full bg-white dark:bg-slate-900 border-2 border-primary flex items-center justify-center shrink-0 shadow-sm">
-  <span class="material-symbols-outlined text-primary">fluid</span>
-  </div>
-  <div class="flex-1 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:border-primary/30 transition-all">
-  <div class="flex justify-between items-start">
-  <div>
-  <div class="flex items-center gap-2">
-  <p class="text-xs font-bold text-primary uppercase">Upcoming at 1:00 PM</p>
-  </div>
-  <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">Cough Syrup</h4>
-  <p class="text-[#4c739a] text-sm">10ml • Oral solution</p>
-  </div>
-  <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">Due soon</span>
-  </div>
-  </div>
+  <div id="notes-list" class="flex flex-col gap-3">
+    <!-- Notes will be loaded here dynamically -->
+    <div class="text-center p-4 text-[#4c739a]">Loading notes...</div>
   </div>
   </div>
   </div>
   </div>
   <!-- Medicine History Section -->
-<div id="section-medicine-history" class="hidden p-6 max-w-6xl mx-auto w-full space-y-4">
+<div id="section-medicine-history" class="hidden px-6 pb-6 pt-0 w-full space-y-4">
   <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white">Medicine History</h2>
 
   <div id="medicine-history-list" class="flex flex-col gap-3">
@@ -330,9 +329,167 @@
   </div>
 </div>
 
+  <!-- Patient Profile Section -->
+<div id="section-profile" class="hidden px-6 pb-6 pt-0 w-full space-y-6">
+  <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white mb-6">Patient Profile</h2>
+
+  <!-- Profile Card -->
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
+    <div class="flex flex-col md:flex-row gap-6">
+      <div class="flex flex-col items-center">
+        <div id="profile-patient-photo" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 border-4 border-primary/20"></div>
+        <h3 id="profile-patient-name" class="text-xl font-bold text-[#0d141b] dark:text-white mt-4">Loading...</h3>
+        <p id="profile-patient-relation" class="text-sm text-[#4c739a] dark:text-slate-300">Loading...</p>
+      </div>
+
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Date of Birth</p>
+          <p id="profile-patient-dob" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Gender</p>
+          <p id="profile-patient-gender" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Blood Group</p>
+          <p id="profile-patient-blood" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Contact Number</p>
+          <p id="profile-patient-contact" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Height (cm)</p>
+          <p id="profile-patient-height" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div class="p-4 bg-background-light dark:bg-slate-800 rounded-lg">
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Weight (kg)</p>
+          <p id="profile-patient-weight" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Emergency Contacts Section -->
+<div id="section-emergency" class="hidden px-6 pb-6 pt-0 w-full space-y-6">
+  <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white mb-6">Emergency Contacts</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Patient Contact Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 bg-primary/10 rounded-lg">
+          <span class="material-symbols-outlined text-primary text-xl">person</span>
+        </div>
+        <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Patient Contact</h3>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Patient Name</p>
+          <p id="emergency-patient-name" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Phone Number</p>
+          <div class="flex items-center gap-2">
+            <p id="emergency-patient-phone" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+            <button id="call-patient-btn" class="p-2 hover:bg-primary/10 rounded-lg transition-colors">
+              <span class="material-symbols-outlined text-primary">call</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Contact Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-red-200 dark:border-red-900/30 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 bg-red-100 dark:bg-red-950/30 rounded-lg">
+          <span class="material-symbols-outlined text-red-600 text-xl">emergency</span>
+        </div>
+        <h3 class="text-lg font-bold text-red-600">Emergency Contact</h3>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Emergency Phone</p>
+          <div class="flex items-center gap-2">
+            <p id="emergency-contact-phone" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+            <button id="call-emergency-btn" class="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg transition-colors">
+              <span class="material-symbols-outlined text-red-600">call</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Contact Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 bg-primary/10 rounded-lg">
+          <span class="material-symbols-outlined text-primary text-xl">local_hospital</span>
+        </div>
+        <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Doctor Information</h3>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Doctor Name</p>
+          <p id="emergency-doctor-name" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-[#4c739a] uppercase mb-1">Hospital/Clinic</p>
+          <p id="emergency-hospital-name" class="text-lg font-semibold text-[#0d141b] dark:text-white">--</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Reports Section -->
+<div id="section-reports" class="hidden px-6 pb-6 pt-0 w-full space-y-6">
+  <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white mb-6">Reports & Analytics</h2>
+
+  <!-- Export Actions -->
+  <div class="flex gap-3 flex-wrap">
+    <button id="export-medicines-csv" class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+      <span class="material-symbols-outlined">download</span>
+      <span>Export Medicines CSV</span>
+    </button>
+  </div>
+
+  <!-- Missed Doses Report -->
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 bg-red-100 dark:bg-red-950/30 rounded-lg">
+        <span class="material-symbols-outlined text-red-600 text-xl">error</span>
+      </div>
+      <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Missed Doses Report</h3>
+    </div>
+
+    <div id="missed-doses-list" class="space-y-3">
+      <p class="text-sm text-[#4c739a] dark:text-slate-300">Loading missed doses...</p>
+    </div>
+  </div>
+
+  <!-- Medicine Summary -->
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 bg-primary/10 rounded-lg">
+        <span class="material-symbols-outlined text-primary text-xl">pill</span>
+      </div>
+      <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Current Medicines</h3>
+    </div>
+
+    <div id="medicine-report-list" class="space-y-3">
+      <p class="text-sm text-[#4c739a] dark:text-slate-300">Loading medicines...</p>
+    </div>
+  </div>
+</div>
+  </div>
+  <!-- End scrollable content wrapper -->
   </main>
-  <!-- Right Sidebar (Caregiver Notes) -->
-  <aside class="w-80 border-l border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hidden xl:flex flex-col p-6 gap-6 overflow-y-auto h-screen sticky top-0">
+  <!-- Right Sidebar (Caregiver Notes) - COMMENTED OUT -->
+  <!-- <aside class="w-80 border-l border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hidden xl:flex flex-col p-6 gap-6 overflow-y-auto h-screen sticky top-0">
   <div>
   <h4 class="text-[#0d141b] dark:text-white font-bold mb-4">Patient Calendar</h4>
   <div class="bg-background-light dark:bg-slate-800 rounded-xl p-4">
@@ -385,7 +542,7 @@
   </button>
   </div>
   </div>
-  </aside>
+  </aside> -->
   </div>
   <!-- Patient Profile Modal -->
 <div id="patient-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
@@ -411,28 +568,37 @@
   <script>
     // ====== Section Switching ======
 const sidebarLinks = document.querySelectorAll('aside nav a[data-section]');
-const allSections = document.querySelectorAll('main > div');
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
         const section = link.getAttribute('data-section');
 
-        // Hide all sections
-        allSections.forEach(sec => sec.classList.add('hidden'));
+        // Hide all sections at once
+        document.getElementById('section-dashboard')?.classList.add('hidden');
+        document.getElementById('section-medicine-history')?.classList.add('hidden');
+        document.getElementById('section-profile')?.classList.add('hidden');
+        document.getElementById('section-emergency')?.classList.add('hidden');
+        document.getElementById('section-reports')?.classList.add('hidden');
 
         // Remove active class from sidebar links
-        sidebarLinks.forEach(l => l.classList.remove('bg-primary/10', 'text-primary'));
-        sidebarLinks.forEach(l => l.classList.add('text-[#4c739a]'));
+        sidebarLinks.forEach(l => {
+            l.classList.remove('bg-primary/10', 'text-primary');
+            l.classList.add('text-[#4c739a]');
+        });
 
         // Add active styles to clicked link
         link.classList.add('bg-primary/10', 'text-primary');
+        link.classList.remove('text-[#4c739a]');
 
         // Show selected section
         if(section === 'dashboard') {
-            document.querySelector('#section-dashboard').classList.remove('hidden');
+            document.getElementById('section-dashboard').classList.remove('hidden');
+            const scrollContainer = document.querySelector('.overflow-y-auto');
+scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
+
         } else if(section === 'history') {
-            document.querySelector('#section-medicine-history').classList.remove('hidden');
+            document.getElementById('section-medicine-history').classList.remove('hidden');
 
             // Fetch medicines when showing the section
             fetch('caretaker.php?action=getPatientMedicines', {credentials: 'same-origin'})
@@ -447,9 +613,9 @@ sidebarLinks.forEach(link => {
                             <div class="flex justify-between items-center p-4 rounded-xl border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                                 <div class="flex flex-col">
                                     <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">${med.name}</h4>
-                                    <p class="text-[#4c739a] text-sm">${med.dosage} • ${med.schedule}</p>
+                                    <p class="text-[#4c739a] text-sm">${med.dosage || (med.dosage_value + (med.dosage_unit || ''))} • ${med.frequency || '-'}</p>
                                 </div>
-                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">${med.status}</span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">Active</span>
                             </div>
                         `;
                     });
@@ -458,6 +624,24 @@ sidebarLinks.forEach(link => {
                 }
             })
             .catch(err => console.error('Error fetching medicines:', err));
+        } else if(section === 'profile') {
+            document.getElementById('section-profile').classList.remove('hidden');
+            const scrollContainer = document.querySelector('.overflow-y-auto');
+scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
+
+            loadPatientProfile();
+        } else if(section === 'emergency') {
+            document.getElementById('section-emergency').classList.remove('hidden');
+            const scrollContainer = document.querySelector('.overflow-y-auto');
+scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
+
+            loadEmergencyContacts();
+        } else if(section === 'reports') {
+            document.getElementById('section-reports').classList.remove('hidden');
+            const scrollContainer = document.querySelector('.overflow-y-auto');
+scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
+
+            loadReports();
         }
     });
 });
@@ -478,8 +662,14 @@ sidebarLinks.forEach(link => {
 
                   // Set photo (default if not available)
                   const photoDiv = document.getElementById('caretaker-photo');
-                  photoDiv.innerHTML = ''; // remove the <span> icon
-                  photoDiv.style.backgroundImage = `url('${data.profile_photo || 'default-avatar.png'}')`;
+                  if (data.profile_photo) {
+                      photoDiv.innerHTML = ''; // remove the <span> icon
+                      photoDiv.style.backgroundImage = `url('${data.profile_photo}')`;
+                      photoDiv.style.backgroundSize = 'cover';
+                      photoDiv.style.backgroundPosition = 'center';
+                  } else {
+                      photoDiv.classList.add('bg-primary', 'text-white');
+                  }
                   photoDiv.style.backgroundSize = 'cover';
                   photoDiv.style.backgroundPosition = 'center';
               } else {
@@ -487,6 +677,9 @@ sidebarLinks.forEach(link => {
               }
           })
           .catch(err => console.error('Error fetching profile:', err));
+
+      // Load today's schedule
+      loadTodaysSchedule();
 
       // ====== 2️⃣ Search Functionality ======
       const searchInput = document.querySelector('input[placeholder="Search medicine or notes..."]');
@@ -539,7 +732,7 @@ sidebarLinks.forEach(link => {
               searchResultsContainer.innerHTML = results.map(item => {
                   const icon = item.type === 'medicine' ? 'pill' : 'description';
                   return `
-                      <div class="flex items-center gap-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-lg">
+                      <div class="search-result-item flex items-center gap-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-lg" data-type="${item.type}" data-title="${item.title}">
                           <span class="material-symbols-outlined text-sm text-primary">${icon}</span>
                           <div class="flex flex-col">
                               <p class="text-sm font-semibold text-[#0d141b] dark:text-white">${item.title}</p>
@@ -548,6 +741,33 @@ sidebarLinks.forEach(link => {
                       </div>
                   `;
               }).join('');
+              
+              // Add click handlers to results
+              document.querySelectorAll('.search-result-item').forEach(item => {
+                  item.addEventListener('click', () => {
+                      const type = item.getAttribute('data-type');
+                      const title = item.getAttribute('data-title');
+                      
+                      // Navigate to medicine history section and scroll to found medicine
+                      document.querySelector('[data-section="history"]').click();
+                      searchInput.value = '';
+                      searchResultsContainer.style.display = 'none';
+                      
+                      // Highlight the found medicine
+                      setTimeout(() => {
+                          const medicineItems = document.querySelectorAll('#medicine-history-list > div');
+                          medicineItems.forEach(med => {
+                              if (med.textContent.includes(title)) {
+                                  med.style.backgroundColor = '#fff3cd';
+                                  med.style.transition = 'background-color 0.3s ease';
+                                  setTimeout(() => {
+                                      med.style.backgroundColor = '';
+                                  }, 2000);
+                              }
+                          });
+                      }, 100);
+                  });
+              });
           }
           searchResultsContainer.style.display = 'block';
       }
@@ -558,8 +778,185 @@ sidebarLinks.forEach(link => {
               searchResultsContainer.style.display = 'none';
           }
       });
+
+      // ====== 3️⃣ Notifications Functionality ======
+      const notificationBtn = document.getElementById('notification-btn');
+      const notificationsDropdown = document.getElementById('notifications-dropdown');
+      const closeNotificationsBtn = document.getElementById('close-notifications');
+      const notificationsList = document.getElementById('notifications-list');
+
+      notificationBtn.addEventListener('click', () => {
+          notificationsDropdown.classList.toggle('hidden');
+          if (!notificationsDropdown.classList.contains('hidden')) {
+              loadNotifications();
+          }
+      });
+
+      closeNotificationsBtn.addEventListener('click', () => {
+          notificationsDropdown.classList.add('hidden');
+      });
+
+      // Close notifications when clicking outside
+      document.addEventListener('click', (e) => {
+          if (!notificationsDropdown.contains(e.target) && e.target !== notificationBtn && !notificationBtn.contains(e.target)) {
+              notificationsDropdown.classList.add('hidden');
+          }
+      });
+
+      function loadNotifications() {
+          fetch('caretaker.php?action=getMessages', {credentials: 'same-origin'})
+          .then(res => res.json())
+          .then(res => {
+              if (res.status === 'success') {
+                  renderNotifications(res.data);
+              } else {
+                  notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error loading messages</div>';
+              }
+          })
+          .catch(err => {
+              console.error('Error fetching notifications:', err);
+              notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error loading messages</div>';
+          });
+      }
+
+      function renderNotifications(messages) {
+          if (!messages || messages.length === 0) {
+              notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a] dark:text-slate-300 text-center">No messages</div>';
+              return;
+          }
+
+          notificationsList.innerHTML = messages.map(msg => {
+              const messageTime = new Date(msg.sent_at).toLocaleString();
+              const isUnread = msg.is_read !== 'read';
+              return `
+                  <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer" data-message-id="${msg.id}">
+                      <div class="flex items-start justify-between gap-3">
+                          <div class="flex-1">
+                              <p class="font-semibold text-[#0d141b] dark:text-white">${msg.patient_name || 'Patient'}</p>
+                              <p class="text-sm text-[#4c739a] dark:text-slate-300 mt-1">${msg.message}</p>
+                              <p class="text-xs text-[#4c739a] dark:text-slate-400 mt-2">${messageTime}</p>
+                          </div>
+                          ${isUnread ? '<span class="size-2 bg-primary rounded-full flex-shrink-0 mt-1"></span>' : ''}
+                      </div>
+                  </div>
+              `;
+          }).join('');
+
+          // Add click handlers to mark messages as read
+          document.querySelectorAll('#notifications-list > div').forEach(item => {
+              item.addEventListener('click', () => {
+                  const messageId = item.getAttribute('data-message-id');
+                  markMessageAsRead(messageId);
+              });
+          });
+      }
+
+      function markMessageAsRead(messageId) {
+          fetch('caretaker.php?action=markMessageAsRead&id=' + messageId, {credentials: 'same-origin'})
+          .then(res => res.json())
+          .then(res => {
+              if (res.status === 'success') {
+                  loadNotifications();
+              }
+          })
+          .catch(err => console.error('Error marking message as read:', err));
+      }
   });
-  // ====== 3️⃣ Fetch Assigned Patient Data ======
+  // ====== 4️⃣ Load Today's Schedule ======
+  function loadTodaysSchedule() {
+      fetch('caretaker.php?action=getTodaysSchedule', {credentials: 'same-origin'})
+      .then(res => res.json())
+      .then(res => {
+          const list = document.getElementById('todays-schedule-list');
+          list.innerHTML = '';
+          
+          if(res.status === 'success' && res.data.length) {
+              list.innerHTML = res.data.map(med => {
+                  const intakeTime = new Date(med.intake_datetime);
+                  const timeStr = intakeTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                  
+                  // Determine medicine form icon
+                  let medicineIcon = 'pill';
+                  if (med.medicine_type === 'liquid') {
+                      medicineIcon = 'water_drop';
+                  } else if (med.medicine_type === 'injection') {
+                      medicineIcon = 'syringe';
+                  } else if (med.medicine_type === 'pill') {
+                      medicineIcon = 'pill';
+                  }
+                  
+                  // Determine status
+                  let status = 'pending';
+                  let statusColor = 'primary';
+                  let statusIcon = 'pending';
+                  let statusBgColor = 'bg-primary/10';
+                  let borderColor = 'border-primary';
+                  let statusText = 'Upcoming';
+                  
+                  if (med.status === 'taken' || med.status === 'Taken') {
+                      status = 'taken';
+                      statusColor = 'green-600';
+                      statusIcon = 'pill';
+                      statusBgColor = 'bg-green-50 dark:bg-green-950/30';
+                      borderColor = 'border-green-500';
+                      statusText = `Taken at ${timeStr}`;
+                  } else if (med.status === 'missed' || med.status === 'Missed') {
+                      status = 'missed';
+                      statusColor = 'red-600';
+                      statusIcon = 'medication';
+                      statusBgColor = 'bg-red-50 dark:bg-red-950/10';
+                      borderColor = 'border-red-500';
+                      statusText = `Missed at ${timeStr}`;
+                  }
+                  
+                  return `
+                      <div class="relative flex gap-6 items-start group">
+                          <div class="z-10 mt-1 size-16 rounded-full bg-white dark:bg-slate-900 border-2 ${borderColor} flex items-center justify-center shrink-0 shadow-sm">
+                              <span class="material-symbols-outlined text-${statusColor === 'primary' ? 'primary' : statusColor}">${medicineIcon}</span>
+                          </div>
+                          <div class="flex-1 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:border-primary/30 transition-all">
+                              <div class="flex justify-between items-start">
+                                  <div>
+                                      <div class="flex items-center gap-2">
+                                          <p class="text-xs font-bold ${statusColor === 'primary' ? 'text-primary' : 'text-' + statusColor} uppercase">${statusText}</p>
+                                          ${status === 'taken' ? '<span class="material-symbols-outlined text-[10px] text-green-600">verified</span>' : status === 'missed' ? '<span class="material-symbols-outlined text-[10px] text-red-600">warning</span>' : ''}
+                                      </div>
+                                      <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">${med.name}</h4>
+                                      <p class="text-[#4c739a] text-sm">${med.dosage_value || '--'} ${med.dosage_unit || ''} • ${med.frequency || 'As needed'}</p>
+                                  </div>
+                                  <span class="px-3 py-1 ${statusBgColor} ${statusColor === 'primary' ? 'bg-primary/10 text-primary' : 'text-' + statusColor} text-xs font-bold rounded-full">${status === 'taken' ? 'Completed' : status === 'missed' ? 'Missed' : 'Due soon'}</span>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+              }).join('');
+          } else {
+              list.innerHTML = '<div class="text-center p-4 text-[#4c739a] dark:text-slate-300">No schedule for today</div>';
+          }
+      })
+      .catch(err => {
+          console.error('Error loading schedule:', err);
+          document.getElementById('todays-schedule-list').innerHTML = '<div class="text-center p-4 text-red-600">Error loading schedule</div>';
+      });
+  }
+
+  // ====== Profile Dropdown Toggle ======
+  const profileDropdownBtn = document.getElementById('profile-dropdown-btn');
+  const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+  
+  profileDropdownBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      profileDropdownMenu.classList.toggle('hidden');
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+      if (!profileDropdownBtn.contains(e.target) && !profileDropdownMenu.contains(e.target)) {
+          profileDropdownMenu.classList.add('hidden');
+      }
+  });
+
+  // ====== 5️⃣ Fetch Assigned Patient Data ======
 fetch('caretaker.php?action=getPatientProfile', {
     credentials: 'same-origin'
 })
@@ -576,9 +973,13 @@ fetch('caretaker.php?action=getPatientProfile', {
 
         // Photo
         const photoDiv = document.getElementById('patient-photo');
-        photoDiv.style.backgroundImage = `url('${patient.profile_photo || 'default-avatar.png'}')`;
-        photoDiv.style.backgroundSize = 'cover';
-        photoDiv.style.backgroundPosition = 'center';
+        if (patient.profile_photo) {
+            photoDiv.style.backgroundImage = `url('${patient.profile_photo}')`;
+            photoDiv.style.backgroundSize = 'cover';
+            photoDiv.style.backgroundPosition = 'center';
+        } else {
+            photoDiv.style.backgroundColor = '#e0e7ff';
+        }
     } else {
         console.error(res.message);
     }
@@ -606,9 +1007,13 @@ viewProfileBtn.addEventListener('click', () => {
             document.getElementById('modal-patient-weight').textContent = p.weight_kg;
 
             const photoDiv = document.getElementById('modal-patient-photo');
-            photoDiv.style.backgroundImage = `url('${p.profile_photo || 'default-avatar.png'}')`;
-            photoDiv.style.backgroundSize = 'cover';
-            photoDiv.style.backgroundPosition = 'center';
+            if (p.profile_photo) {
+                photoDiv.style.backgroundImage = `url('${p.profile_photo}')`;
+                photoDiv.style.backgroundSize = 'cover';
+                photoDiv.style.backgroundPosition = 'center';
+            } else {
+                photoDiv.style.backgroundColor = '#e0e7ff';
+            }
 
             patientModal.classList.remove('hidden'); // show modal
             patientModal.classList.add('flex');
@@ -647,54 +1052,345 @@ fullHistoryBtn.addEventListener('click', () => {
     })
     .catch(err => console.error(err));
 });
-// ====== Medicine History Section ======
-const historyLink = document.querySelector('[data-section="history"]');
-const medicineHistorySection = document.getElementById('section-medicine-history');
 
-
-historyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    // Hide other sections
-    document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
-
-    // Show medicine history section
-    medicineHistorySection.classList.remove('hidden');
-
-    // Fetch medicines for the assigned patient
-    fetch('caretaker.php?action=getPatientMedicines', { credentials: 'same-origin' })
-        .then(res => res.json())
-        .then(res => {
-            const list = document.getElementById('medicine-history-list');
-            list.innerHTML = ''; // clear previous data
-
-            if (res.status === 'success' && res.data.length) {
-                res.data.forEach(med => {
-                    const dosage = med.dosage || (med.dosage_value ? med.dosage_value + (med.dosage_unit || '') : '-');
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center p-4 rounded-xl border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm mb-2">
-                            <div class="flex flex-col">
-                                <h4 class="text-lg font-bold text-[#0d141b] dark:text-white">${med.name}</h4>
-                                <p class="text-[#4c739a] text-sm">
-                                    Dosage: ${dosage} • 
-                                    Type: ${med.medicine_type} • 
-                                    Frequency: ${med.frequency || '-'}
-                                </p>
-                                ${med.instructions ? `<p class="text-[#4c739a] text-sm italic mt-1">Notes: ${med.instructions}</p>` : ''}
-                            </div>
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
-                                Reminder: ${med.reminder_type || '-'}
-                            </span>
-                        </div>
-                    `;
-                });
-            } else {
-                list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No medicines found.</p>';
-            }
-        })
-        .catch(err => console.error('Error fetching medicines:', err));
+// ====== Send Message to Patient ======
+document.getElementById('send-message-btn')?.addEventListener('click', function() {
+    const modal = document.getElementById('send-message-modal');
+    modal.classList.remove('hidden');
+    
+    // Populate patient name
+    const patientName = document.getElementById('patient-name').textContent;
+    document.getElementById('message-patient-name').textContent = patientName;
+    document.getElementById('message-text').value = '';
 });
 
+document.getElementById('close-message-modal')?.addEventListener('click', function() {
+    document.getElementById('send-message-modal').classList.add('hidden');
+});
+
+document.getElementById('cancel-message-btn')?.addEventListener('click', function() {
+    document.getElementById('send-message-modal').classList.add('hidden');
+});
+
+document.getElementById('send-message-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+    }
+});
+
+document.getElementById('send-message-submit-btn')?.addEventListener('click', function() {
+    const message = document.getElementById('message-text').value.trim();
+    
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    // Get patient ID
+    fetch('caretaker.php?action=getPatientProfile', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === 'success') {
+            const patientId = res.data.patient_id;
+            const formData = new FormData();
+            formData.append('patient_id', patientId);
+            formData.append('message', message);
+            
+            fetch('caretaker.php?action=sendMessageToPatient', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    document.getElementById('send-message-modal').classList.add('hidden');
+                    alert('Message sent successfully!');
+                } else {
+                    alert('Error: ' + res.message);
+                }
+            })
+            .catch(err => console.error('Error sending message:', err));
+        }
+    })
+    .catch(err => console.error('Error getting patient:', err));
+});
+
+// ====== Load Patient Profile Data ======
+function loadPatientProfile() {
+    fetch('caretaker.php?action=getPatientProfile', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        if(res.status === 'success') {
+            const p = res.data;
+            document.getElementById('profile-patient-name').textContent = p.patient_name;
+            document.getElementById('profile-patient-relation').textContent = `Relation: ${p.relation}`;
+            document.getElementById('profile-patient-dob').textContent = p.dob || '--';
+            document.getElementById('profile-patient-gender').textContent = p.gender || '--';
+            document.getElementById('profile-patient-blood').textContent = p.blood_group || '--';
+            document.getElementById('profile-patient-contact').textContent = p.contact_number || '--';
+            document.getElementById('profile-patient-height').textContent = (p.height_cm || '--') + ' cm';
+            document.getElementById('profile-patient-weight').textContent = (p.weight_kg || '--') + ' kg';
+
+            const photoDiv = document.getElementById('profile-patient-photo');
+            if (p.profile_photo) {
+                photoDiv.style.backgroundImage = `url('${p.profile_photo}')`;
+                photoDiv.style.backgroundSize = 'cover';
+                photoDiv.style.backgroundPosition = 'center';
+            } else {
+                photoDiv.style.backgroundColor = '#e0e7ff';
+            }
+        }
+    })
+    .catch(err => console.error('Error loading profile:', err));
+}
+
+// ====== Load Emergency Contacts ======
+function loadEmergencyContacts() {
+    fetch('caretaker.php?action=getEmergencyContacts', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        if(res.status === 'success') {
+            const c = res.data;
+            document.getElementById('emergency-patient-name').textContent = c.patient_name || '--';
+            document.getElementById('emergency-patient-phone').textContent = c.contact_number || '--';
+            document.getElementById('emergency-contact-phone').textContent = c.emergency_contact || '--';
+            document.getElementById('emergency-doctor-name').textContent = c.doctor_name || '--';
+            document.getElementById('emergency-hospital-name').textContent = c.hospital_name || '--';
+
+            // Add click handlers for call buttons
+            document.getElementById('call-patient-btn').onclick = () => {
+                if(c.contact_number) window.location.href = `tel:${c.contact_number}`;
+            };
+            document.getElementById('call-emergency-btn').onclick = () => {
+                if(c.emergency_contact) window.location.href = `tel:${c.emergency_contact}`;
+            };
+        }
+    })
+    .catch(err => console.error('Error loading emergency contacts:', err));
+}
+
+// ====== Load Reports ======
+function loadReports() {
+    // Load missed doses
+    fetch('caretaker.php?action=getMissedDosesReport', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        const list = document.getElementById('missed-doses-list');
+        list.innerHTML = '';
+        if(res.status === 'success' && res.data.length) {
+            res.data.forEach(dose => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center p-4 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-950/10">
+                        <div class="flex flex-col">
+                            <h4 class="font-semibold text-[#0d141b] dark:text-white">${dose.name}</h4>
+                            <p class="text-sm text-[#4c739a] dark:text-slate-300">
+                                ${dose.dosage_value || '--'} ${dose.dosage_unit || ''} • ${dose.intake_datetime || 'No schedule'}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 bg-red-200 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-bold rounded-full">Missed</span>
+                    </div>
+                `;
+            });
+        } else {
+            list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No missed doses recorded.</p>';
+        }
+    })
+    .catch(err => console.error('Error loading missed doses:', err));
+
+    // Load medicines for report
+    fetch('caretaker.php?action=getPatientMedicines', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        const list = document.getElementById('medicine-report-list');
+        list.innerHTML = '';
+        if(res.status === 'success' && res.data.length) {
+            res.data.forEach(med => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center p-4 rounded-lg border border-[#cfdbe7] dark:border-slate-800 bg-background-light dark:bg-slate-800">
+                        <div class="flex flex-col">
+                            <h4 class="font-semibold text-[#0d141b] dark:text-white">${med.name}</h4>
+                            <p class="text-sm text-[#4c739a] dark:text-slate-300">
+                                ${med.dosage_value || '--'} ${med.dosage_unit || ''} • ${med.frequency || 'As needed'}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">Active</span>
+                    </div>
+                `;
+            });
+        } else {
+            list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No medicines found.</p>';
+        }
+    })
+    .catch(err => console.error('Error loading medicines:', err));
+}
+
+// ====== Export Medicines CSV ======
+document.getElementById('export-medicines-csv')?.addEventListener('click', () => {
+    window.location.href = 'caretaker.php?action=exportMedicinesCSV';
+});
+
+// ====== Add Note Modal ======
+// Find the Add Note button in the sidebar
+const addNoteButtons = document.querySelectorAll('button');
+let addNoteBtn = null;
+for (let btn of addNoteButtons) {
+    if (btn.textContent.includes('Add Note')) {
+        addNoteBtn = btn;
+        break;
+    }
+}
+
+if (addNoteBtn) {
+    addNoteBtn.addEventListener('click', openAddNoteModal);
+}
+
+function openAddNoteModal(e) {
+    e.preventDefault();
+    const modal = document.getElementById('add-note-modal');
+    modal.classList.remove('hidden');
+    
+    // Load medicines for the dropdown
+    fetch('caretaker.php?action=getPatientMedicines', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        const medicineSelect = document.getElementById('note-medicine-select');
+        medicineSelect.innerHTML = '<option value="">-- General Note --</option>';
+        if (res.status === 'success' && res.data.length) {
+            res.data.forEach(med => {
+                medicineSelect.innerHTML += `<option value="${med.id}">${med.name} (${med.dosage_value})</option>`;
+            });
+        }
+    })
+    .catch(err => console.error('Error loading medicines:', err));
+}
+
+function closeAddNoteModal() {
+    const modal = document.getElementById('add-note-modal');
+    modal.classList.add('hidden');
+    document.getElementById('note-message').value = '';
+    document.getElementById('note-medicine-select').value = '';
+}
+
+document.getElementById('close-note-modal')?.addEventListener('click', closeAddNoteModal);
+document.getElementById('cancel-note-btn')?.addEventListener('click', closeAddNoteModal);
+
+// Close modal when clicking outside
+document.getElementById('add-note-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAddNoteModal();
+    }
+});
+
+document.getElementById('save-note-btn')?.addEventListener('click', function() {
+    const message = document.getElementById('note-message').value.trim();
+    const medicineId = document.getElementById('note-medicine-select').value;
+    
+    if (!message) {
+        alert('Please enter a note message');
+        return;
+    }
+    
+    // Get patient ID from the page
+    const patientNameEl = document.getElementById('patient-name');
+    if (!patientNameEl) {
+        alert('Patient information not loaded');
+        return;
+    }
+    
+    // Get patient ID from caregivers table
+    fetch('caretaker.php?action=getPatientProfile', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === 'success') {
+            const patientId = res.data.patient_id;
+            const formData = new FormData();
+            formData.append('patient_id', patientId);
+            formData.append('note_type', medicineId ? 'medicine' : 'general');
+            formData.append('medicine_id', medicineId || null);
+            formData.append('message', message);
+            
+            fetch('caretaker.php?action=addNote', {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    closeAddNoteModal();
+                    loadNotes();
+                    alert('Note added successfully!');
+                } else {
+                    alert('Error adding note: ' + res.message);
+                }
+            })
+            .catch(err => console.error('Error adding note:', err));
+        }
+    })
+    .catch(err => console.error('Error getting patient:', err));
+});
+
+// ====== Load Notes ======
+function loadNotes() {
+    fetch('caretaker.php?action=getNotes', {credentials: 'same-origin'})
+    .then(res => res.json())
+    .then(res => {
+        const list = document.getElementById('notes-list');
+        list.innerHTML = '';
+        
+        if (res.status === 'success' && res.data.length) {
+            res.data.forEach(note => {
+                const date = new Date(note.created_at);
+                const dateStr = date.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+                const timeStr = date.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+                
+                const noteLabel = note.note_type === 'medicine' ? `<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full">${note.medicine_name || 'Medicine'}</span>` : '<span class="px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded-full">General</span>';
+                
+                list.innerHTML += `
+                    <div class="flex gap-4 p-4 rounded-lg border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-primary/30 transition-all">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                ${noteLabel}
+                                <span class="text-[10px] text-[#4c739a] dark:text-slate-400">${dateStr} ${timeStr}</span>
+                            </div>
+                            <p class="text-[#0d141b] dark:text-white text-sm">${note.message}</p>
+                        </div>
+                        <button onclick="deleteNote(${note.id})" class="text-[#4c739a] hover:text-red-600 transition-colors">
+                            <span class="material-symbols-outlined text-base">delete</span>
+                        </button>
+                    </div>
+                `;
+            });
+        } else {
+            list.innerHTML = '<div class="text-center p-4 text-[#4c739a] dark:text-slate-400">No notes yet. Add one to get started!</div>';
+        }
+    })
+    .catch(err => console.error('Error loading notes:', err));
+}
+
+function deleteNote(noteId) {
+    if (confirm('Are you sure you want to delete this note?')) {
+        const formData = new FormData();
+        formData.append('note_id', noteId);
+        
+        fetch('caretaker.php?action=deleteNote', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success') {
+                loadNotes();
+            }
+        })
+        .catch(err => console.error('Error deleting note:', err));
+    }
+}
+
+// Load notes on page load
+loadNotes();
   </script>
 
 

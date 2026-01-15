@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $patient_id = $_SESSION['user_id'];
 
 $stmt = $conn->prepare("
-    SELECT u.name, u.email, c.relation
+    SELECT u.id, u.name, u.email, c.relation
     FROM caregivers c
     JOIN users u ON c.caregiver_id = u.id
     WHERE c.patient_id = ?

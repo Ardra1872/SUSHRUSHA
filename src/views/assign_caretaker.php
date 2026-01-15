@@ -24,6 +24,43 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Get patient info
 $patient_id = $_SESSION['user_id'];
 $patient_name = $_SESSION['user_name'];
+// 🔐 CARETAKER LIMIT CHECK (Free vs Subscribed)
+
+// 1️⃣ Count existing caretakers for this patient
+$countStmt = $conn->prepare(
+    "SELECT COUNT(*) AS total FROM caregivers WHERE patient_id = ?"
+);
+$countStmt->bind_param("i", $patient_id);
+$countStmt->execute();
+$caretakerCount = (int)$countStmt->get_result()->fetch_assoc()['total'];
+$countStmt->close();
+
+// 2️⃣ Check subscription status
+$subStmt = $conn->prepare(
+    "SELECT is_subscribed FROM users WHERE id = ?"
+);
+$subStmt->bind_param("i", $patient_id);
+$subStmt->execute();
+$isSubscribed = (int)$subStmt->get_result()->fetch_assoc()['is_subscribed'];
+$subStmt->close();
+
+// 3️⃣ Enforce limit
+if ($caretakerCount >= 1 && !$isSubscribed) {
+    // If this is an AJAX request, return JSON
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+        echo json_encode([
+            "status" => "error",
+            "code" => "CARETAKER_LIMIT",
+            "message" => "Free plan allows only one caretaker"
+        ]);
+        exit;
+    }
+
+    // Otherwise fallback (normal form submit)
+    $_SESSION['error'] = "Free plan allows only one caretaker. Please upgrade.";
+    header("Location: dashboard.php");
+    exit();
+}
 
 // Get caretaker form input
 $caretaker_name  = trim($_POST['name']);

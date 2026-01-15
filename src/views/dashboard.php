@@ -23,6 +23,15 @@ $profilePhoto = !empty($profileData['profile_photo']) ? '../' . htmlspecialchars
 $userInitials = !empty($name) ? strtoupper(substr($name, 0, 1)) : 'U';
 $stmt->close();
 
+// Fetch disease / conditions info (for dashboard display)
+$stmt = $conn->prepare("SELECT conditions FROM medical_details WHERE patient_id = ? LIMIT 1");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$medicalResult = $stmt->get_result();
+$medicalData = $medicalResult->fetch_assoc();
+$diseaseInfo = !empty($medicalData['conditions']) ? $medicalData['conditions'] : null;
+$stmt->close();
+
 
 
 
@@ -144,36 +153,27 @@ tailwind.config = {
 
 <!-- TOPBAR -->
 
-<header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center">
+<header class="h-20 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between">
 
-  <!-- LEFT: Hamburger + Brand -->
-  <div class="flex items-center gap-4 min-w-[220px]">
+  <!-- LEFT: Hamburger + Greeting -->
+  <div class="flex items-center gap-4">
+    <button id="menuBtn" class="text-textSub md:hidden">
+      <span class="material-symbols-outlined text-3xl">menu</span>
+    </button>
 
- <button id="menuBtn" class="text-textSub md:hidden">
-  <span class="material-symbols-outlined text-3xl">menu</span>
-</button>
-
-
-    <div>
-      <div class="flex-1 text-center hidden md:block">
-  <p class="text-lg font-semibold">
-    <span id="greeting">Good Morning</span>,
-
-    <span class="text-primary dynamic-text">
-      <?= htmlspecialchars($name)  ?> |<br>
-    </span>
+    <div class="flex flex-col">
+      <p class="text-sm md:text-lg font-semibold leading-snug">
+        <span id="greeting">Good Morning</span>,
+        <span class="text-primary dynamic-text">
+          <?= htmlspecialchars($name) ?>
+        </span>
+      </p>
+      <span id="liveClock" class="text-xs md:text-sm text-gray-500 font-normal"></span>
     </div>
-
   </div>
 
-  <!-- CENTER: Greeting -->
-  
-    <span id="liveClock" class="ml-2 text-sm text-gray-500 font-normal"></span>
-  </p>
-</div>
-
   <!-- RIGHT: Search + Icons -->
-  <div class="flex items-center gap-4 min-w-[300px] justify-end">
+  <div class="flex items-center gap-4 min-w-[220px] md:min-w-[300px] justify-end">
 
     <!-- Search -->
    <div class="relative">
@@ -199,9 +199,8 @@ tailwind.config = {
 </div>
 
     <!-- Notifications -->
-    <button class="relative">
-      <!-- <span class="material-symbols-outlined text-textSub">notifications</span> -->
-      <!-- <span class="absolute top-0 right-0 size-2 bg-danger rounded-full"></span> -->
+    <button class="relative hidden md:inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100">
+      <span class="material-symbols-outlined text-textSub">notifications</span>
     </button>
     <div class="relative">
 
@@ -249,8 +248,8 @@ tailwind.config = {
       <h2 class="text-2xl font-bold mb-4"data-i18n="dashboard_overview">Dashboard Overview</h2>
       <p data-i18n="dashboard_overview_text">Here’s your health overview for today.</p>
 
-      <!-- STATS -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+      <!-- STATS + DISEASE -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
         <div class="bg-white p-6 rounded-2xl shadow-soft">
           <p class="text-sm text-textSub"data-i18n="adherence">Adherence</p>
           <h3 class="text-4xl font-display font-bold mt-2">92%</h3>
@@ -270,6 +269,19 @@ tailwind.config = {
           <p class="text-sm text-textSub"data-i18n="next_refill">Next Refill</p>
           <h3 class="text-4xl font-display font-bold mt-2">Oct 24</h3>
           <p class="text-xs text-textSub mt-2"dynamic-text>Atorvastatin</p>
+        </div>
+        <!-- Disease / Conditions card -->
+        <div class="bg-white p-6 rounded-2xl shadow-soft md:col-span-1">
+          <p class="text-sm text-textSub">Disease / Conditions</p>
+          <?php if (!empty($diseaseInfo)): ?>
+            <p class="mt-2 text-sm text-textMain break-words">
+              <?= nl2br(htmlspecialchars($diseaseInfo)) ?>
+            </p>
+          <?php else: ?>
+            <p class="mt-2 text-xs text-textSub">
+              No disease information added yet.
+            </p>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -299,51 +311,81 @@ tailwind.config = {
     </div>
 
 
- <!-- Assign Caretaker -->
-<div id="assigned" class="section hidden p-6 md:p-10 bg-surface-light rounded-3xl shadow-lg">
-  <h2 class="text-3xl font-extrabold mb-3 text-textMain" data-i18n="assign_caretaker">
-    Assign Caretaker
-  </h2>
-  <p class="text-textSub mb-6 text-sm md:text-base" data-i18n="assign_caretaker_text">
-    Add a trusted caretaker who can help manage your medicines.
-  </p>
-
-  <!-- Form -->
-  <form id="assignCaretakerForm" class="mb-8 space-y-5 bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100">
+<!-- Assign Caretaker -->
+<div id="assigned" class="section hidden p-6 md:p-10 bg-bg rounded-3xl">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
     <div>
-      <label class="block text-sm font-semibold mb-2 text-textMain" for="caretakerName" data-i18n="caretaker_name">
-        Name
-      </label>
-      <input type="text" id="caretakerName" name="name" required
-        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
+      <h2 class="text-3xl font-extrabold mb-1 text-textMain" data-i18n="assign_caretaker">
+        Assign Caretaker
+      </h2>
+      <p class="text-textSub text-sm md:text-base" data-i18n="assign_caretaker_text">
+        Add a trusted caretaker who can help manage your medicines and receive your alerts.
+      </p>
     </div>
-
-    <div>
-      <label class="block text-sm font-semibold mb-2 text-textMain" for="caretakerEmail" data-i18n="caretaker_email">
-        Email
-      </label>
-      <input type="email" id="caretakerEmail" name="email" required
-        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
+    <div class="inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-primary/5 text-primary text-xs md:text-sm">
+      <span class="material-symbols-outlined text-base md:text-lg">shield_person</span>
+      <span>Secure access · Only people you add can see your data</span>
     </div>
+  </div>
 
-    <div>
-      <label class="block text-sm font-semibold mb-2 text-textMain" for="relation" data-i18n="caretaker_relation">
-        Relation
-      </label>
-      <input type="text" id="relation" name="relation" required
-        placeholder="e.g., Father, Sister, Friend"
-        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary transition" data-i18n-placeholder="relation_placeholder">
+  <!-- Two-column layout: form + list -->
+  <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)] gap-6 items-start">
+    <!-- Form -->
+    <form id="assignCaretakerForm" class="space-y-5 bg-white p-5 md:p-6 rounded-2xl shadow-soft border border-gray-100">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-primary">person_add</span>
+        <h3 class="text-base font-semibold text-textMain">Add new caretaker</h3>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold mb-2 text-textMain uppercase tracking-wide" for="caretakerName" data-i18n="caretaker_name">
+            Name
+          </label>
+          <input type="text" id="caretakerName" name="name" required
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-2 text-textMain uppercase tracking-wide" for="caretakerEmail" data-i18n="caretaker_email">
+            Email
+          </label>
+          <input type="email" id="caretakerEmail" name="email" required
+            class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-2 text-textMain uppercase tracking-wide" for="relation" data-i18n="caretaker_relation">
+          Relation
+        </label>
+        <input type="text" id="relation" name="relation" required
+          placeholder="e.g., Father, Sister, Friend"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition"
+          data-i18n-placeholder="relation_placeholder">
+      </div>
+
+      <button type="submit"
+        class="w-full md:w-auto bg-primary text-white py-2.5 px-6 rounded-xl text-sm font-semibold hover:scale-[1.02] hover:shadow-lg transition transform"
+        data-i18n="assign_caretaker_btn">
+        Assign Caretaker
+      </button>
+    </form>
+
+    <!-- Assigned Caretakers List -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">groups</span>
+          <h3 class="text-base font-semibold text-textMain">Your caretakers</h3>
+        </div>
+        <span class="text-xs text-textSub">Send quick messages or alerts directly.</span>
+      </div>
+
+      <div id="caretakerList" class="space-y-4">
+        <!-- Dynamically filled by JS -->
+      </div>
     </div>
-
-    <button type="submit"
-      class="w-full md:w-auto bg-primary text-white py-3 px-6 rounded-xl font-bold hover:scale-105 hover:shadow-lg transition transform" data-i18n="assign_caretaker_btn">
-      Assign Caretaker
-    </button>
-  </form>
-
-  <!-- Assigned Caretakers List -->
-  <div id="caretakerList" class="space-y-4">
-    <!-- Dynamically filled by JS -->
   </div>
 </div>
 
@@ -793,17 +835,25 @@ async function loadCaretakers() {
     list.innerHTML = "";
   data.caretakers.forEach(cg => {
   const card = document.createElement("div");
-  card.className = "p-4 bg-white rounded-2xl shadow-soft border border-gray-200 flex items-center justify-between";
+  card.className = "p-5 bg-white rounded-2xl shadow-soft border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4";
 
   card.innerHTML = `
-    <div>
-      <h3 class="font-bold text-lg">${cg.name}</h3>
-      <p class="text-sm text-textSub">${cg.email}</p>
-      <p class="text-sm text-textSub capitalize">Relation: ${cg.relation}</p>
-      <input type="text" placeholder="Type message..." class="messageInput mt-1 p-1 border rounded w-full"/>
-      <button class="sendBtn mt-2 px-3 py-1 bg-blue-500 text-white rounded">Send</button>
+    <div class="flex items-start gap-3 flex-1">
+      <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div class="space-y-1 w-full">
+        <h3 class="font-bold text-base md:text-lg">${cg.name}</h3>
+        <p class="text-sm text-textSub">${cg.email}</p>
+        <p class="text-xs text-textSub uppercase tracking-wide">Relation: <span class="capitalize">${cg.relation}</span></p>
+        <div class="mt-3 flex flex-col sm:flex-row gap-2">
+          <input type="text" placeholder="Type message..." class="messageInput flex-1 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
+          <button class="sendBtn px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primaryDark transition">
+            Send
+          </button>
+        </div>
+      </div>
     </div>
-    <span class="material-symbols-outlined text-primary">person</span>
   `;
 
   list.appendChild(card);
@@ -813,19 +863,27 @@ async function loadCaretakers() {
 
   sendBtn.addEventListener("click", async () => {
     const message = messageInput.value.trim();
-    if (!message) return alert("Enter a message");
+    if (!message) {
+      showToast("Please enter a message", true);
+      return;
+    }
 
-    const res = await fetch("send_message.php?action=send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ caretaker_id: cg.id, message })
-    });
-    const data = await res.json();
-    if (data.status === "success") {
-      alert("Message sent!");
-      messageInput.value = "";
-    } else {
-      alert(data.msg);
+    try {
+      const res = await fetch("send_message.php?action=send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caretaker_id: cg.id, message })
+      });
+      const data = await res.json();
+      if (data.status === "success") {
+        showToast("Message sent to caretaker");
+        messageInput.value = "";
+      } else {
+        showToast(data.msg || "Failed to send message", true);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Server error while sending message", true);
     }
   });
 });
@@ -834,6 +892,31 @@ async function loadCaretakers() {
     console.error(err);
     list.innerHTML = "<p>Server error</p>";
   }
+}
+
+// Simple toast notification for patient actions (e.g., messages to caretaker)
+function showToast(message, isError = false) {
+  let toast = document.getElementById("globalToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "globalToast";
+    toast.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white transition transform translate-y-[-10px] opacity-0";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.remove("bg-green-500", "bg-red-500");
+  toast.classList.add(isError ? "bg-red-500" : "bg-green-500");
+
+  requestAnimationFrame(() => {
+    toast.classList.remove("translate-y-[-10px]", "opacity-0");
+    toast.classList.add("translate-y-0", "opacity-100");
+  });
+
+  setTimeout(() => {
+    toast.classList.remove("translate-y-0", "opacity-100");
+    toast.classList.add("translate-y-[-10px]", "opacity-0");
+  }, 2500);
 }
 
 
