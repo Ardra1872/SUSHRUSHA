@@ -675,8 +675,62 @@ generateIntervals();
   /* ===============================
      FORM SUBMISSION (🔥 IMPORTANT)
   =============================== */
+  
+  // Load available compartments
+  async function loadAvailableCompartments() {
+    try {
+      const res = await fetch("../helpers/get_compartment_status.php");
+      const data = await res.json();
+      
+      if (data.status === 'success') {
+        const compartmentSelect = document.getElementById('compartment_number');
+        const options = compartmentSelect.querySelectorAll('option');
+        
+        // Update options - disable occupied ones
+        options.forEach(opt => {
+          if (opt.value) {
+            const compartmentNum = parseInt(opt.value);
+            const isOccupied = data.occupied_compartments.includes(compartmentNum);
+            
+            if (isOccupied) {
+              opt.disabled = true;
+              opt.textContent = `Compartment ${compartmentNum} (Occupied)`;
+              opt.style.backgroundColor = '#fee2e2';
+              opt.style.color = '#991b1b';
+            } else {
+              opt.disabled = false;
+              opt.textContent = `Compartment ${compartmentNum} (Available)`;
+              opt.style.backgroundColor = '#f0fdf4';
+              opt.style.color = '#166534';
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error loading compartment status:', err);
+    }
+  }
+  
+  // Load compartments on page load
+  loadAvailableCompartments();
+  
+  // Reload compartments every 5 seconds to stay in sync
+  setInterval(loadAvailableCompartments, 5000);
+  
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
+    // Validate compartment is selected
+    const compartmentSelect = document.getElementById('compartment_number');
+    if (!compartmentSelect.value) {
+      showToast("Please select a compartment", "error");
+      return;
+    }
+    
+    if (compartmentSelect.options[compartmentSelect.selectedIndex].disabled) {
+      showToast("Selected compartment is occupied. Please choose another.", "error");
+      return;
+    }
 
     const formData = new FormData(form);
 
@@ -692,6 +746,11 @@ generateIntervals();
 
       if (data.status === "success") {
        showToast("Medicine added successfully", "success");
+       
+       // Reload compartments after successful addition
+       setTimeout(() => {
+         loadAvailableCompartments();
+       }, 500);
 
         form.reset();
       } else {
@@ -745,6 +804,26 @@ document.getElementById("requestMedForm").addEventListener("submit", async e => 
 });
 
 });
+
+// Auto-select compartment from URL parameter
+function initializeCompartmentFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const compartmentId = urlParams.get('compartment');
+  
+  if (compartmentId) {
+    const compartmentSelect = document.getElementById('compartment_number');
+    // Wait for compartment dropdown to be loaded
+    setTimeout(() => {
+      compartmentSelect.value = compartmentId;
+      // Scroll to compartment field
+      compartmentSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 500);
+  }
+}
+
+// Call on page load
+initializeCompartmentFromURL();
+
 function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
   const msg = document.getElementById("toastMessage");
