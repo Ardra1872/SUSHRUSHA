@@ -604,6 +604,16 @@ tailwind.config = {
             </button>
           </div>
         </div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-cyan-100">
+             <a href="../../public/simulation/index.php" target="_blank" class="block w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-xl text-center text-sm font-bold transition flex items-center justify-center gap-2">
+               <span class="material-symbols-outlined">model_training</span>
+               Launch Simulation
+             </a>
+             <p class="text-xs text-center text-gray-500 mt-1">Dev Tool: Test hardware alerts virtually</p>
+          </div>
+
       </div>
 
       <!-- ESP32 WiFi Connection Info -->

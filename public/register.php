@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../src/config/db.php';   
+require '../src/helpers/sendWelcomeEmail.php';
 
 // ---------- FORM SUBMISSION ----------
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -62,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ssss", $name, $role, $email, $hashed_password);
 
     if ($stmt->execute()) {
+        // Send Welcome Email
+        sendWelcomeEmail($email, $name);
+
         $_SESSION['success'] = "Registration successful! Please login.";
         header("Location: login.php");
         exit;

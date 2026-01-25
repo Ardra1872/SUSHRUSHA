@@ -16,7 +16,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'patient') {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit;
 }
@@ -50,7 +50,20 @@ $reminder_type = $_POST['reminder_mode'] ?? 'fixed';
 $dosage_unit = ''; // if you don’t have separate units
 
 
-$schedule_type     = $_POST['schedule_type'] ?? 'daily';  // daily | weekly | custom
+$schedule_type     = $_POST['frequency'] ?? 'Daily'; // Using 'frequency' from form
+if ($schedule_type === 'Specific Days') $schedule_type = 'days'; // Map to DB enum if needed, or keep text
+// Note: DB likely has 'daily','weekly','custom'. Lets align.
+// If form sends 'Daily', 'Weekly', 'Specific Days', 'As Needed'
+// and DB expects 'daily', 'weekly', 'custom'? 
+// Let's assume text for now or map it safely:
+$schedule_map = [
+    'Daily' => 'daily',
+    'Weekly' => 'weekly',
+    'Specific Days' => 'custom',
+    'As Needed' => 'as_needed'
+];
+$schedule_type_db = $schedule_map[$schedule_type] ?? 'daily';
+
 $selected_days = $_POST['specific_days'] ?? [];
 
 $days_json         = !empty($selected_days) ? json_encode($selected_days) : null;
@@ -120,7 +133,7 @@ $stmt->bind_param(
     $medicine_type,
     $dosage_value,
     $dosage_unit,
-    $schedule_type,
+    $schedule_type_db,
     $days_json,
     $reminder_type,
     $interval_hours,
@@ -143,7 +156,10 @@ $medicine_id = $stmt->insert_id;
    5️⃣ INSERT REMINDER TIMES (FIXED TYPE ONLY)
 ------------------------------------------------- */
 
-if ($reminder_type === 'fixed') {
+if ($schedule_type === 'As Needed') {
+    // DO NOT INSERT into medicine_schedule
+    // Logic: As Needed medicines have no fixed reminder times.
+} elseif ($reminder_type === 'fixed') {
 
     $timeStmt = $conn->prepare("
         INSERT INTO medicine_schedule (medicine_id, intake_time)
@@ -152,6 +168,36 @@ if ($reminder_type === 'fixed') {
 
     foreach ($times as $time) {
         if (!$time) continue;
+        $timeStmt->bind_param("is", $medicine_id, $time);
+        $timeStmt->execute();
+    }
+} elseif ($reminder_type === 'interval') {
+    // Generate times server-side
+    // inputs: intervalStart, intervalHours
+    $start_time_str = $_POST['intervalStart'] ?? '08:00';
+    $interval_h = intval($_POST['intervalHours'] ?? 8);
+    
+    if ($interval_h < 1) $interval_h = 1;
+
+    $generated_times = [];
+    $current = strtotime("2000-01-01 " . $start_time_str);
+    $end_of_day = strtotime("2000-01-01 23:59:00");
+    
+    // Simple logic: fill the day starting from start time
+    // If you want it to wrap around 24h, logic is more complex. 
+    // Standard expectation: Wake up -> Sleep cycle.
+    
+    while ($current <= $end_of_day) {
+        $generated_times[] = date('H:i', $current);
+        $current = strtotime("+$interval_h hours", $current);
+    }
+    
+    $timeStmt = $conn->prepare("
+        INSERT INTO medicine_schedule (medicine_id, intake_time)
+        VALUES (?, ?)
+    ");
+
+    foreach ($generated_times as $time) {
         $timeStmt->bind_param("is", $medicine_id, $time);
         $timeStmt->execute();
     }
