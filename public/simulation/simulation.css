@@ -1,0 +1,156 @@
+/* ===== Global ===== */
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at top, #f0f4ff, #dbe3f1);
+}
+
+/* ===== Canvas ===== */
+#canvas-container {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(145deg, #eef2f7, #d8dee9);
+}
+
+/* ===== UI Glass Panel ===== */
+#ui-layer {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 360px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    padding: 22px;
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ===== Headings ===== */
+#ui-layer h1 {
+    letter-spacing: -0.03em;
+}
+
+#ui-layer h2 {
+    color: #374151;
+}
+
+/* ===== Status Dots ===== */
+.status-dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.dot-green {
+    background-color: #10b981;
+    color: #10b981;
+}
+
+.dot-red {
+    background-color: #ef4444;
+    color: #ef4444;
+}
+
+.dot-gray {
+    background-color: #9ca3af;
+    color: #9ca3af;
+}
+
+/* ===== Slot Cards ===== */
+.slot-indicator {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: linear-gradient(145deg, #ffffff, #f3f4f6);
+
+    transition: all 0.25s ease;
+}
+
+.slot-indicator:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== Active Slot ===== */
+.slot-active {
+    border-color: #ef4444;
+    background: linear-gradient(145deg, #fff5f5, #fee2e2);
+    box-shadow:
+        0 0 0 2px rgba(239, 68, 68, 0.2),
+        0 10px 20px rgba(239, 68, 68, 0.15);
+    animation: pulse 1.2s infinite ease-in-out;
+}
+
+/* ===== Pulse Animation ===== */
+@keyframes pulse {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(239, 68, 68, 0.4),
+            0 10px 20px rgba(239, 68, 68, 0.15);
+    }
+    70% {
+        box-shadow:
+            0 0 0 8px rgba(239, 68, 68, 0),
+            0 10px 20px rgba(239, 68, 68, 0.15);
+    }
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(239, 68, 68, 0),
+            0 10px 20px rgba(239, 68, 68, 0.15);
+    }
+}
+
+/* ===== Buttons ===== */
+#ui-layer button {
+    transition: all 0.2s ease;
+}
+
+#ui-layer button:hover {
+    transform: translateY(-1px);
+}
+
+#ui-layer button:active {
+    transform: translateY(0);
+}
+
+/* ===== Instruction Box ===== */
+#ui-layer .bg-yellow-50 {
+    background: linear-gradient(145deg, #fffbea, #fef3c7);
+    border-radius: 10px;
+}
+
+/* ===== Log Console ===== */
+#log-console {
+    background: linear-gradient(180deg, #020617, #020617);
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px rgba(0, 255, 170, 0.15);
+    scrollbar-width: thin;
+}
+
+#log-console::-webkit-scrollbar {
+    width: 6px;
+}
+
+#log-console::-webkit-scrollbar-thumb {
+    background: #10b981;
+    border-radius: 6px;
+}

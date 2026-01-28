@@ -49,6 +49,7 @@ $sql = "
         ms.id AS schedule_id,
         ms.intake_time,
         m.name AS medicine_name,
+        m.compartment_number,
         m.days,
         m.schedule_type,
         d.status AS log_status,
@@ -85,9 +86,10 @@ if ($result) {
             // Normalize time to HH:MM
             $row['intake_time_formatted'] = date('H:i', strtotime($row['intake_time']));
             
-            // Assign a Slot ID based on schedule_id (Mod 4) for visual representation
-            // Slots 0, 1, 2, 3
-            $row['slot_id'] = $row['schedule_id'] % 4; 
+            // Assign a Slot ID based on real compartment (1-4 -> 0-3)
+            // If unknown, fallback to 0
+            $compNum = intval($row['compartment_number']);
+            $row['slot_id'] = ($compNum > 0) ? ($compNum - 1) : 0;
             
             $schedules[] = $row;
         }
