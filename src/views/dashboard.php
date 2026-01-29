@@ -32,8 +32,23 @@ $medicalData = $medicalResult->fetch_assoc();
 $diseaseInfo = !empty($medicalData['conditions']) ? $medicalData['conditions'] : null;
 $stmt->close();
 
-
-
+// ---------------------------------------------------------
+// FETCH BOX SLOTS DATA (1-4)
+// ---------------------------------------------------------
+$boxSlots = [1 => null, 2 => null, 3 => null, 4 => null];
+$stmt = $conn->prepare("SELECT name, compartment_number FROM medicines WHERE patient_id = ?");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$medResult = $stmt->get_result();
+while ($row = $medResult->fetch_assoc()) {
+    $cNum = intval($row['compartment_number']);
+    if ($cNum >= 1 && $cNum <= 4) {
+        // Default status to 'Scheduled' since 'status' column doesn't exist in medicines table
+        $row['status'] = 'Scheduled'; 
+        $boxSlots[$cNum] = $row;
+    }
+}
+$stmt->close();
 
 ?>
 <!DOCTYPE html>
@@ -130,6 +145,11 @@ tailwind.config = {
   <!-- Box Settings -->
   <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="boxSettings">
     <span class="material-symbols-outlined">devices</span> <span data-i18n="box_settings">Box Settings</span>
+  </a>
+
+  <!-- Medicine Logs -->
+  <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="logs">
+    <span class="material-symbols-outlined">history</span> <span>Medicine Logs</span>
   </a>
   <!-- <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="users">
     <span class="material-symbols-outlined">manage_accounts</span> Manage Users
@@ -299,8 +319,18 @@ tailwind.config = {
 
     </div>
 
-    <!-- My Schedule -->
+    <!-- My Schedule (Medicines) -->
     <div id="schedule" class="section hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-3xl font-bold mb-2">My Medicines</h2>
+          <p class="text-textSub">Manage your daily intake schedule</p>
+        </div>
+        <a href="export_medicines.php" class="bg-white border border-slate-200 text-textMain hover:bg-slate-50 px-5 py-3 rounded-xl font-semibold shadow-sm flex items-center gap-2 transition">
+          <span class="material-symbols-outlined">download</span>
+          Export CSV
+        </a>
+      </div>
       
     <div id="scheduleList" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 auto-rows-fr">
 
@@ -453,350 +483,156 @@ tailwind.config = {
 </div>
 
 <!-- Box Settings Section -->
-<div id="boxSettings" class="section hidden p-6 md:p-10 bg-white rounded-3xl shadow-soft border border-slate-100">
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
-    <div>
-      <h2 class="text-4xl font-extrabold mb-2 text-textMain bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">Smart Medicine Box</h2>
-      <p class="text-textSub text-sm md:text-base">Manage your connected medicine compartments and settings</p>
-    </div>
-    <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-50 to-teal-50 border border-cyan-200 text-cyan-700 text-xs md:text-sm font-medium">
-      <span class="material-symbols-outlined text-lg animate-pulse">router</span>
-      <span id="boxConnectionStatus">ESP32 Connected</span>
-    </div>
-  </div>
+<div id="boxSettings" class="section hidden p-6 bg-white rounded-3xl shadow-soft border border-slate-100">
+  <!-- Minimal Header -->
+  <h2 class="text-2xl font-bold text-textMain mb-6">Smart Medicine Box</h2>
 
-  <!-- Grid Layout -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Left: Box Visualization - REDESIGNED -->
-    <div class="lg:col-span-1">
-      <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 rounded-3xl p-8 shadow-2xl border border-slate-700/50 relative overflow-hidden">
-        <!-- Decorative background -->
-        <div class="absolute inset-0 opacity-10">
-          <div class="absolute top-0 right-0 w-40 h-40 bg-cyan-500 rounded-full blur-3xl"></div>
-          <div class="absolute bottom-0 left-0 w-40 h-40 bg-purple-500 rounded-full blur-3xl"></div>
+  <!-- STRICT MINIMALIST BOX SETTINGS [Refined] -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- LEFT COLUMN (Launch & Status & Settings) - Spans 4 cols -->
+    <div class="lg:col-span-4 space-y-6">
+      
+      <!-- 1. SYSTEM LAUNCH -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-textMain mb-4">System Launch</h3>
+        <a href="../../public/simulation/index.php" target="_blank" 
+           class="block w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl text-center shadow-lg transition-transform active:scale-95">
+           <span class="block text-xl font-bold">Start System</span>
+           <span class="block text-sm text-blue-100 mt-1 flex items-center justify-center gap-2">
+             <span class="size-2 rounded-full bg-blue-300"></span> System Idle
+           </span>
+        </a>
+      </div>
+
+      <!-- 2. ESP32 CONNECTION STATUS -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+           <div class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </div>
+           <div>
+             <h4 class="font-bold text-textMain text-sm">ESP32 Connected</h4>
+             <p class="text-xs text-textSub">Signal: Good</p>
+           </div>
         </div>
+        <span class="material-symbols-outlined text-green-500">wifi</span>
+      </div>
 
-        <!-- Box Title -->
-        <h3 class="text-white font-bold text-lg mb-6 flex items-center gap-2 relative z-10">
-          <span class="material-symbols-outlined text-cyan-400 text-2xl">medication</span>
-          <span>Medicine Box</span>
-        </h3>
-
-        <!-- 3D-Like Box Container with Isometric View -->
-        <div class="relative z-10 mb-8">
-          <!-- Box Shadow/Depth -->
-          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-black/50 rounded-2xl transform skew-y-3"></div>
-          
-          <!-- Main Box Grid -->
-          <div class="grid grid-cols-2 gap-3 p-4 bg-gradient-to-br from-slate-800/60 to-slate-900/60 rounded-2xl border border-slate-600/30 backdrop-blur-sm relative z-20">
-            <!-- Compartment 1 -->
-            <div class="compartment-slot group relative" data-compartment="1">
-              <div class="aspect-square bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 border border-blue-400/30 overflow-hidden relative">
-                <!-- Shine effect -->
-                <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                
-                <!-- LED indicator -->
-                <div class="absolute top-2 right-2 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/60"></div>
-                
-                <!-- Compartment content -->
-                <div class="relative z-10 text-center">
-                  <span class="text-white font-bold text-2xl block mb-1">1</span>
-                  <p class="text-xs text-blue-200 font-semibold">Slot</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Compartment 2 -->
-            <div class="compartment-slot group relative" data-compartment="2">
-              <div class="aspect-square bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 border border-purple-400/30 overflow-hidden relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="absolute top-2 right-2 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/60"></div>
-                <div class="relative z-10 text-center">
-                  <span class="text-white font-bold text-2xl block mb-1">2</span>
-                  <p class="text-xs text-purple-200 font-semibold">Slot</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Compartment 3 -->
-            <div class="compartment-slot group relative" data-compartment="3">
-              <div class="aspect-square bg-gradient-to-br from-pink-600 to-pink-800 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 border border-pink-400/30 overflow-hidden relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="absolute top-2 right-2 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/60"></div>
-                <div class="relative z-10 text-center">
-                  <span class="text-white font-bold text-2xl block mb-1">3</span>
-                  <p class="text-xs text-pink-200 font-semibold">Slot</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Compartment 4 -->
-            <div class="compartment-slot group relative" data-compartment="4">
-              <div class="aspect-square bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 border border-emerald-400/30 overflow-hidden relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="absolute top-2 right-2 w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/60"></div>
-                <div class="relative z-10 text-center">
-                  <span class="text-white font-bold text-2xl block mb-1">4</span>
-                  <p class="text-xs text-emerald-200 font-semibold">Slot</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Box Status Info -->
-        <div class="bg-slate-700/40 rounded-xl p-4 border border-slate-600/30 backdrop-blur-sm relative z-10">
-          <p class="text-slate-300 text-xs font-bold uppercase tracking-wide mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">info</span>
-            Status
-          </p>
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-slate-400 text-sm flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">battery_full</span>
-                Battery
-              </span>
-              <div class="flex items-center gap-2">
-                <div class="w-12 h-2 bg-slate-600/60 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-green-500 to-green-400 w-[75%]"></div>
-                </div>
-                <span class="text-slate-200 text-xs font-bold">75%</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-slate-400 text-sm flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">signal_cellular_alt</span>
-                Signal
-              </span>
-              <span class="text-cyan-400 text-xs font-bold">Strong</span>
-            </div>
-          </div>
+      <!-- 4. BASIC SETTINGS -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-textMain mb-4">Basic Settings</h3>
+        <div class="space-y-5">
+           <!-- Buzzer -->
+           <div class="flex items-center justify-between">
+             <span class="text-base font-medium text-textMain">Buzzer Sound</span>
+             <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+           </div>
+           
+           <!-- Reminder Window -->
+           <div class="flex items-center justify-between">
+             <span class="text-base font-medium text-textMain">Reminder Window</span>
+             <select class="form-select text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 bg-slate-50">
+               <option>15 mins</option>
+               <option selected>30 mins</option>
+               <option>1 hour</option>
+             </select>
+           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Right: Settings & Info -->
-    <div class="lg:col-span-2 space-y-6">
-      <!-- Device Connection Card -->
-      <div class="bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl p-6 border border-cyan-200">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-2xl text-cyan-600 bg-cyan-100 rounded-full p-2">devices</span>
-            <div>
-              <h3 class="text-lg font-bold text-textMain">Device Connection</h3>
-              <p class="text-xs text-textSub">Manage your smart box connection</p>
-            </div>
-          </div>
-          <span id="connectionBadge" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">Disconnected</span>
-        </div>
-        <div class="space-y-3">
-          <div class="bg-white p-4 rounded-xl border border-cyan-200">
-            <p class="text-sm text-textSub mb-2">Device ID</p>
-            <p class="font-mono text-sm text-textMain font-semibold">MED-BOX-2024-001</p>
-          </div>
-          <div class="flex gap-3">
-            <button class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-lg">router</span>
-              Connect ESP32
-            </button>
-            <button class="flex-1 bg-white border border-cyan-300 text-cyan-600 hover:bg-cyan-50 py-2 px-4 rounded-xl text-sm font-bold transition">
-              Forget Device
-            </button>
-          </div>
-        </div>
-          </div>
-          
-          <div class="mt-4 pt-4 border-t border-cyan-100">
-             <a href="../../public/simulation/index.php" target="_blank" class="block w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-xl text-center text-sm font-bold transition flex items-center justify-center gap-2">
-               <span class="material-symbols-outlined">model_training</span>
-               Launch Simulation
+    <!-- RIGHT COLUMN (Medicine Slots) - Spans 8 cols -->
+    <div class="lg:col-span-8">
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm h-full">
+         <div class="flex items-center justify-between mb-6">
+           <h3 class="text-2xl font-bold text-textMain">Medicine Slots</h3>
+         </div>
+         
+         <!-- SLOTS GRID -->
+         <div class="grid grid-cols-2 gap-6 h-full">
+           <?php for ($i = 1; $i <= 4; $i++): 
+              $slotData = $boxSlots[$i] ?? null;
+              $isEmpty = empty($slotData);
+           ?>
+             <a href="<?php echo $isEmpty ? 'add_medicine.html?slot='.$i : '#'; ?>" 
+                class="group relative aspect-[4/3] rounded-2xl border-2 <?php echo $isEmpty ? 'border-dashed border-slate-300 hover:border-blue-400 bg-slate-50' : 'border-slate-100 bg-blue-50/50 hover:border-blue-500'; ?> transition-all flex flex-col items-center justify-center text-center p-4">
+                
+                <!-- Physical Slot Number -->
+                <div class="absolute top-4 left-4 size-8 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-500 shadow-sm">
+                  <?php echo $i; ?>
+                </div>
+
+                <?php if ($isEmpty): ?>
+                  <span class="material-symbols-outlined text-4xl text-slate-300 mb-2 group-hover:text-blue-500 transition-colors">add_circle</span>
+                  <span class="text-slate-500 font-medium group-hover:text-blue-600">Empty Slot</span>
+                  <span class="text-xs text-slate-400 mt-1">Tap to add medicine</span>
+                <?php else: ?>
+                  <span class="material-symbols-outlined text-4xl text-blue-600 mb-2">pill</span>
+                  <h4 class="text-xl font-bold text-textMain mb-1"><?php echo htmlspecialchars($slotData['name']); ?></h4>
+                  
+                   <?php 
+                      // Simple status badge
+                      $status = $slotData['status'] ?? 'Scheduled';
+                      $badgeColor = match(strtolower($status)) {
+                          'taken' => 'bg-green-100 text-green-700',
+                          'missed' => 'bg-red-100 text-red-700',
+                          default => 'bg-blue-100 text-blue-700'
+                      };
+                   ?>
+                   <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider <?php echo $badgeColor; ?>">
+                     <?php echo htmlspecialchars($status); ?>
+                   </span>
+                <?php endif; ?>
+
              </a>
-             <p class="text-xs text-center text-gray-500 mt-1">Dev Tool: Test hardware alerts virtually</p>
-          </div>
-
-      </div>
-
-      <!-- ESP32 WiFi Connection Info -->
-      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="material-symbols-outlined text-2xl text-emerald-600 bg-emerald-100 rounded-full p-2">wifi</span>
-          <div>
-            <h3 class="text-lg font-bold text-textMain">ESP32 Connection Details</h3>
-            <p class="text-xs text-textSub">WiFi-based smart medicine box</p>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <div class="bg-white p-4 rounded-xl border border-emerald-200 space-y-2">
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-textSub">Connection Type:</span>
-              <span class="font-semibold text-textMain">WiFi (ESP32 Module)</span>
-            </div>
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-textSub">Network Protocol:</span>
-              <span class="font-semibold text-textMain">HTTP/REST API</span>
-            </div>
-            <div class="flex items-center justify-between text-sm">
-              
-            </div>
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-textSub">Range:</span>
-              <span class="font-semibold text-textMain">Up to 100m (in ideal conditions)</span>
-            </div>
-          </div>
-          <p class="text-xs text-emerald-700 bg-emerald-50 p-3 rounded-lg">
-            <strong>Note:</strong> The medicine box uses an ESP32 microcontroller connected to your WiFi network for real-time synchronization and remote monitoring. No Bluetooth pairing required - simply connect to the same WiFi network.
-          </p>
-        </div>
-      </div>
-
-      <!-- Compartment Assignment -->
-      <div class="bg-white rounded-2xl p-6 border border-slate-200">
-        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-          <span class="material-symbols-outlined text-2xl text-violet-600 bg-violet-100 rounded-full p-2">assignment</span>
-          <div>
-            <h3 class="text-lg font-bold text-textMain">Compartment Details</h3>
-            <p class="text-xs text-textSub">View and manage medicines in each slot</p>
-          </div>
-        </div>
-
-        <div id="compartmentsList" class="space-y-3">
-          <!-- Compartments will be loaded here dynamically -->
-          <div class="flex items-center justify-center py-8">
-            <p class="text-sm text-textSub animate-pulse">Loading compartments...</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings -->
-      <div class="bg-white rounded-2xl p-6 border border-slate-200">
-        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-          <span class="material-symbols-outlined text-2xl text-orange-600 bg-orange-100 rounded-full p-2">tune</span>
-          <div>
-            <h3 class="text-lg font-bold text-textMain">Settings</h3>
-            <p class="text-xs text-textSub">Customize your box behavior</p>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <!-- LED Brightness -->
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-orange-600">brightness_4</span>
-              <div>
-                <p class="text-sm font-semibold text-textMain">LED Brightness</p>
-                <p class="text-xs text-textSub">Adjust LED intensity</p>
-              </div>
-            </div>
-            <input type="range" min="10" max="100" value="75" class="w-24">
-          </div>
-
-          <!-- Sound Toggle -->
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-blue-600">volume_up</span>
-              <div>
-                <p class="text-sm font-semibold text-textMain">Sound Alerts</p>
-                <p class="text-xs text-textSub">Beep on medication time</p>
-              </div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          <!-- Vibration Toggle -->
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-green-600">vibration</span>
-              <div>
-                <p class="text-sm font-semibold text-textMain">Vibration</p>
-                <p class="text-xs text-textSub">Haptic feedback alerts</p>
-              </div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          <!-- Reminder Duration -->
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-purple-600">schedule</span>
-              <div>
-                <p class="text-sm font-semibold text-textMain">Alert Duration</p>
-                <p class="text-xs text-textSub">How long the box alerts</p>
-              </div>
-            </div>
-            <select class="px-3 py-1 rounded-lg border border-slate-300 text-sm font-medium text-textMain">
-              <option>30 sec</option>
-              <option selected>1 min</option>
-              <option>2 min</option>
-              <option>5 min</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Activity Log -->
-      <div class="bg-white rounded-2xl p-6 border border-slate-200">
-        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-2xl text-indigo-600 bg-indigo-100 rounded-full p-2">history</span>
-            <div>
-              <h3 class="text-lg font-bold text-textMain">Recent Activity</h3>
-              <p class="text-xs text-textSub">Last synced activities</p>
-            </div>
-          </div>
-          <span class="text-xs text-textSub font-medium">Last 5 events</span>
-        </div>
-
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 p-2 text-sm border-l-4 border-green-500 hover:bg-green-50 rounded transition">
-            <span class="material-symbols-outlined text-lg text-green-600">check_circle</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-textMain font-medium">Slot 1 Accessed</p>
-              <p class="text-xs text-textSub">Today, 8:30 AM</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 p-2 text-sm border-l-4 border-blue-500 hover:bg-blue-50 rounded transition">
-            <span class="material-symbols-outlined text-lg text-blue-600">sync</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-textMain font-medium">Device Synced</p>
-              <p class="text-xs text-textSub">Today, 7:15 AM</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 p-2 text-sm border-l-4 border-purple-500 hover:bg-purple-50 rounded transition">
-            <span class="material-symbols-outlined text-lg text-purple-600">notifications_active</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-textMain font-medium">Reminder Alert - Slot 2</p>
-              <p class="text-xs text-textSub">Yesterday, 2:00 PM</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 p-2 text-sm border-l-4 border-orange-500 hover:bg-orange-50 rounded transition">
-            <span class="material-symbols-outlined text-lg text-orange-600">battery_low</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-textMain font-medium">Low Battery Alert</p>
-              <p class="text-xs text-textSub">Jan 17, 3:45 PM</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 p-2 text-sm border-l-4 border-cyan-500 hover:bg-cyan-50 rounded transition">
-            <span class="material-symbols-outlined text-lg text-cyan-600">router</span>
-            <div class="flex-1 min-w-0">
-              <p class="text-textMain font-medium">ESP32 WiFi Connected</p>
-              <p class="text-xs text-textSub">Jan 15, 10:20 AM</p>
-            </div>
-          </div>
-        </div>
+           <?php endfor; ?>
+         </div>
       </div>
     </div>
+
   </div>
 </div>
+
+    <!-- MEDICINE LOGS SECTION -->
+    <div id="logs" class="section hidden p-6 md:p-10 bg-white rounded-3xl shadow-soft border border-slate-100">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-4xl font-extrabold mb-2 text-textMain bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Medicine Logs</h2>
+          <p class="text-textSub text-sm md:text-base">History of your taken and missed doses</p>
+        </div>
+        <button onclick="loadMedicineLogs()" class="p-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-slate-600" title="Refresh Logs">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-6 py-4 text-xs font-bold text-textSub uppercase tracking-wider">Medicine</th>
+                <th class="px-6 py-4 text-xs font-bold text-textSub uppercase tracking-wider">Dosage</th>
+                <th class="px-6 py-4 text-xs font-bold text-textSub uppercase tracking-wider">Time</th>
+                <th class="px-6 py-4 text-xs font-bold text-textSub uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody" class="divide-y divide-slate-100 text-sm">
+              <tr>
+                <td colspan="4" class="px-6 py-8 text-center text-textSub">
+                  Loading logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- Manage Users -->
     <div id="users" class="section hidden">
@@ -1068,7 +904,7 @@ async function loadSchedule() {
   container.innerHTML = "<p>Loading...</p>";
 
   try {
-    const res = await fetch("fetch_medicine.php");
+    const res = await fetch("fetch_medicine.php?t=" + Date.now());
     const data = await res.json();
 
     if (data.status !== "success") {
@@ -1187,14 +1023,14 @@ function deleteMedicine(id) {
 
       const data = await res.json();
       if (data.status === "success") {
-        showNotification('Medicine deleted successfully', 'success');
+        showToast('Medicine deleted successfully', false);
         loadSchedule();
       } else {
-        showNotification("Failed to delete medicine", 'error');
+        showToast("Failed to delete medicine", true);
       }
     } catch (err) {
       console.error(err);
-      showNotification("Server error", 'error');
+      showToast("Server error", 'error');
     }
   });
 }
@@ -1226,15 +1062,16 @@ async function loadTodaySchedule() {
     data.schedule.forEach(item => {
       let block = "";
 
-      if (item.status === "Taken") {
+      if (item.status === "Taken" || item.status === "Missed") {
+        const isMissed = item.status === "Missed";
         block = `
-          <div class="flex items-start gap-6">
-            <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
-              <span class="material-symbols-outlined text-success">check</span>
+          <div class="flex items-start gap-6 opacity-75">
+            <div class="w-12 h-12 rounded-full ${isMissed ? 'bg-red-50 text-red-500' : 'bg-success/10 text-success'} flex items-center justify-center">
+              <span class="material-symbols-outlined">${isMissed ? 'close' : 'check'}</span>
             </div>
             <div>
-              <p class="text-sm text-textSub">${formatTime(item.intake_time)}</p>
-              <h4 class="font-bold line-through">${item.name} ${item.dosage}</h4>
+              <p class="text-sm text-textSub">${formatTime(item.intake_time)} • <span class="font-bold ${isMissed ? 'text-red-500' : 'text-green-600'}">${item.status}</span></p>
+              <h4 class="font-bold line-through text-slate-500">${item.name} ${item.dosage}</h4>
             </div>
           </div>
         `;
@@ -1252,10 +1089,10 @@ async function loadTodaySchedule() {
                 ${item.name} ${item.dosage}
               </h4>
               <div class="flex gap-3 mt-4">
-                <button class="flex-1 bg-primary text-white py-2 rounded-xl font-bold">
+                <button onclick="markDose(${item.schedule_id}, 'TAKEN')" class="flex-1 bg-primary hover:bg-primaryDark transition text-white py-2 rounded-xl font-bold shadow-sm">
                   Mark Taken
                 </button>
-                <button class="flex-1 border py-2 rounded-xl">
+                <button onclick="markDose(${item.schedule_id}, 'MISSED')" class="flex-1 border border-slate-300 hover:bg-slate-50 transition py-2 rounded-xl font-semibold text-slate-600">
                   Skip
                 </button>
               </div>
@@ -1282,6 +1119,30 @@ function formatTime(timeStr) {
 }
 
 document.addEventListener("DOMContentLoaded", loadTodaySchedule);
+
+async function markDose(scheduleId, status) {
+  if (!confirm(`Are you sure you want to mark this as ${status.toLowerCase()}?`)) return;
+
+  try {
+    // Optimistic Update? No, let's wait for server to be safe
+    const res = await fetch("log_dose.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ schedule_id: scheduleId, status: status })
+    });
+
+    const data = await res.json();
+    if (data.status === "success") {
+      showToast(`Medicine marked as ${status.toLowerCase()}`);
+      loadTodaySchedule(); // refresh list
+    } else {
+      showToast(data.message || "Failed to update status", true);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Server connection failed", true);
+  }
+}
 
 /* =====================================================
    SEARCH
@@ -1316,21 +1177,43 @@ searchInput.addEventListener("input", () => {
 /* =====================================================
    CARETAKER
 ===================================================== */
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formData = new FormData(form);
+document.addEventListener("DOMContentLoaded", () => {
+  const assignForm = document.getElementById("assignCaretakerForm");
+  
+  if (assignForm) {
+    assignForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(assignForm);
 
-  try {
-    await fetch("assign_caretaker.php", {
-      method: "POST",
-      body: formData
+      try {
+        const res = await fetch("assign_caretaker.php", {
+          method: "POST",
+          body: formData
+        });
+        
+        // Handle potential JSON parsing error if PHP returns HTML warning/error
+        let data;
+        const text = await res.text();
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error("Invalid JSON:", text);
+            showToast("Server returned invalid response", true);
+            return;
+        }
+
+        if (data.status === 'success') {
+             showToast("Caretaker assigned successfully");
+             loadCaretakers();
+             assignForm.reset();
+        } else {
+             showToast(data.message || "Failed to assign caretaker", true);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error assigning caretaker", true);
+      }
     });
-
-    loadCaretakers();
-    form.reset();
-  } catch (err) {
-    console.error(err);
-    alert("Error assigning caretaker");
   }
 });
 async function loadCaretakers() {
@@ -1341,14 +1224,33 @@ async function loadCaretakers() {
     const res = await fetch("fetch_caretaker.php");
     const data = await res.json();
 
-    if (data.status !== "success" || !data.caretakers.length) {
+    const caretakers = data.caretakers || [];
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    if (caretakers.length >= 1) {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">lock</span> Upgrade to add more';
+        submitBtn.className = "w-full bg-slate-300 text-slate-500 py-3 rounded-xl font-bold cursor-not-allowed flex items-center justify-center gap-2";
+        submitBtn.title = "Upgrade to premium to add more caretakers";
+      }
+    } else {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Assign Caretaker';
+        submitBtn.className = "w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primaryDark transition shadow-lg shadow-primary/30";
+        submitBtn.removeAttribute('title');
+      }
+    }
+
+    if (caretakers.length === 0) {
       list.innerHTML = "<p>No caretakers assigned yet.</p>";
       return;
     }
 
     list.innerHTML = "";
-  data.caretakers.forEach(cg => {
-  const card = document.createElement("div");
+    caretakers.forEach(cg => {
+      const card = document.createElement("div");
   card.className = "p-5 bg-white rounded-2xl shadow-soft border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4";
 
   card.innerHTML = `
@@ -1368,6 +1270,9 @@ async function loadCaretakers() {
         </div>
       </div>
     </div>
+    <button onclick="removeCaretaker(${cg.id})" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition self-start" title="Remove Caretaker">
+       <span class="material-symbols-outlined">delete</span>
+    </button>
   `;
 
   list.appendChild(card);
@@ -1408,13 +1313,35 @@ async function loadCaretakers() {
   }
 }
 
+async function removeCaretaker(id) {
+    if (!confirm("Are you sure you want to remove this caretaker?")) return;
+
+    try {
+        const res = await fetch("remove_caretaker.php", { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+            showToast("Caretaker removed successfully", false);
+            loadCaretakers(); // Reloads list and re-enables Assign button
+        } else {
+            showToast("Failed to remove caretaker", true);
+        }
+    } catch (err) {
+        console.error(err);
+        showToast("Error removing caretaker", true);
+    }
+}
+
 // Simple toast notification for patient actions (e.g., messages to caretaker)
 function showToast(message, isError = false) {
   let toast = document.getElementById("globalToast");
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "globalToast";
-    toast.className = "fixed top-4 right-4 z-50 px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white transition transform translate-y-[-10px] opacity-0";
+    toast.className = "fixed top-4 right-4 z-[9999] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white transition transform translate-y-[-10px] opacity-0";
     document.body.appendChild(toast);
   }
 
@@ -1506,24 +1433,32 @@ async function loadAlerts() {
       const isRecent = (Date.now() - alertTime.getTime()) < 3600000;
       
       container.innerHTML += `
-        <div class="group relative p-6 md:p-7 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border-l-4 border-amber-500 shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01] overflow-hidden">
-          <!-- Background decoration -->
-          <div class="absolute top-0 right-0 w-24 h-24 bg-amber-100 opacity-10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-300"></div>
+        <div class="group relative bg-white p-6 rounded-2xl shadow-soft border border-slate-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+          <!-- Decorative accent -->
+          <div class="absolute left-0 top-6 bottom-6 w-1.5 bg-gradient-to-b from-primary to-blue-400 rounded-r-full"></div>
           
-          <div class="relative z-10">
-            <div class="flex items-start gap-4 mb-4">
-              <span class="material-symbols-outlined text-3xl text-amber-600 bg-amber-100 rounded-full p-2 flex-shrink-0">warning</span>
-              <div class="flex-1 min-w-0">
-                <p class="text-slate-800 font-semibold text-sm md:text-base leading-relaxed">${alert.message}</p>
+          <div class="pl-5 relative z-10">
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div class="flex items-center gap-3">
+                 <div class="p-2 bg-blue-50 text-primary rounded-xl">
+                    <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+                 </div>
+                 <h4 class="font-bold text-textMain text-sm uppercase tracking-wider">Admin Announcement</h4>
               </div>
-              ${isRecent ? '<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-200 text-amber-700 rounded-full text-xs font-bold flex-shrink-0 whitespace-nowrap">New</span>' : ''}
+              ${isRecent ? `
+              <span class="relative inline-flex h-6 items-center justify-center px-3 rounded-full bg-blue-600 text-[10px] font-bold text-white tracking-wide shadow-md shadow-blue-200">
+                NEW
+                <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20 animate-ping"></span>
+              </span>` : ''}
             </div>
-            <div class="flex items-center gap-4 pt-4 border-t border-amber-200">
-              <span class="text-xs text-slate-500 font-medium flex items-center gap-1">
-                <span class="material-symbols-outlined text-xs">schedule</span>
-                ${alertTime.toLocaleString()}
-              </span>
-              ${isRecent ? '<span class="text-xs text-amber-600 font-semibold">Just arrived</span>' : ''}
+
+            <p class="text-slate-700 text-base font-medium leading-relaxed mb-4">
+              ${alert.message}
+            </p>
+
+            <div class="flex items-center gap-2 text-xs text-textSub font-medium pt-3 border-t border-slate-100">
+              <span class="material-symbols-outlined text-base">schedule</span>
+              <span>${alertTime.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           </div>
         </div>
@@ -1651,53 +1586,82 @@ async function loadMedicineRequests() {
 
     data.requests.forEach(req => {
       let statusConfig = {
-        pending: { bg: 'from-yellow-50 to-amber-50', border: 'border-yellow-300', icon: 'schedule', badge: 'bg-yellow-100 text-yellow-800', label: 'Pending', bgIcon: 'bg-yellow-100' },
-        approved: { bg: 'from-green-50 to-emerald-50', border: 'border-green-300', icon: 'check_circle', badge: 'bg-green-100 text-green-800', label: 'Approved', bgIcon: 'bg-green-100' },
-        rejected: { bg: 'from-red-50 to-rose-50', border: 'border-red-300', icon: 'cancel', badge: 'bg-red-100 text-red-800', label: 'Rejected', bgIcon: 'bg-red-100' }
+        pending: { 
+          bg: 'bg-white', 
+          border: 'border-blue-500', 
+          accent: 'bg-blue-500',
+          badge: 'bg-blue-100 text-blue-700', 
+          label: 'Pending Review', 
+          iconColor: 'text-blue-600',
+          iconBg: 'bg-blue-50'
+        },
+        approved: { 
+          bg: 'bg-white', 
+          border: 'border-emerald-500', 
+          accent: 'bg-emerald-500',
+          badge: 'bg-emerald-100 text-emerald-700', 
+          label: 'Approved', 
+          iconColor: 'text-emerald-600',
+          iconBg: 'bg-emerald-50'
+        },
+        rejected: { 
+          bg: 'bg-white', 
+          border: 'border-rose-500', 
+          accent: 'bg-rose-500',
+          badge: 'bg-rose-100 text-rose-700', 
+          label: 'Rejected', 
+          iconColor: 'text-rose-600',
+          iconBg: 'bg-rose-50'
+        }
       };
       
-      let config = statusConfig[req.status] || statusConfig.pending;
+      let config = statusConfig[req.status.toLowerCase()] || statusConfig.pending;
       const requestDate = new Date(req.created_at);
       const daysAgo = Math.floor((Date.now() - requestDate.getTime()) / (1000 * 60 * 60 * 24));
       let timeText = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
 
       let html = `
-        <div class="group relative bg-gradient-to-br ${config.bg} p-6 rounded-2xl border-l-4 ${config.border} shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01] overflow-hidden">
-          <!-- Background decoration -->
-          <div class="absolute top-0 right-0 w-20 h-20 ${config.bgIcon} opacity-10 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-300"></div>
+        <div class="group relative bg-white p-6 rounded-2xl shadow-soft border border-slate-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <!-- Left Accent Strip -->
+          <div class="absolute left-0 top-0 bottom-0 w-1 ${config.accent}"></div>
           
-          <div class="relative z-10">
-            <div class="flex items-start justify-between gap-4 mb-4">
+          <div class="relative z-10 pl-2">
+            <div class="flex items-start justify-between gap-4 mb-3">
               <div class="flex items-start gap-4 flex-1">
-                <span class="material-symbols-outlined text-3xl text-violet-600 bg-violet-100 rounded-full p-2.5 flex-shrink-0">local_pharmacy</span>
-                <div class="flex-1 min-w-0">
-                  <h3 class="text-lg font-bold text-slate-800 truncate">${req.name}</h3>
-                  <p class="text-slate-600 text-sm mt-1 flex flex-wrap gap-3 mt-2">
-                    <span class="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600">
-                      <span class="material-symbols-outlined text-xs">medication</span>
+                <!-- Icon -->
+                <div class="p-3 rounded-2xl ${config.iconBg} ${config.iconColor} shadow-sm group-hover:scale-110 transition-transform duration-300">
+                   <span class="material-symbols-outlined text-2xl">local_pharmacy</span>
+                </div>
+                
+                <div class="flex-1 min-w-0 pt-1">
+                  <h3 class="text-lg font-bold text-slate-800 truncate tracking-tight">${req.name}</h3>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="inline-flex items-center gap-1 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md text-xs font-semibold text-slate-600">
+                      <span class="material-symbols-outlined text-[14px]">medication</span>
                       ${req.dosage}
                     </span>
-                    <span class="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600">
-                      <span class="material-symbols-outlined text-xs">category</span>
+                    <span class="inline-flex items-center gap-1 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md text-xs font-semibold text-slate-600">
+                      <span class="material-symbols-outlined text-[14px]">category</span>
                       ${req.form}
                     </span>
-                  </p>
+                  </div>
                 </div>
               </div>
-              <span class="px-3 py-1.5 ${config.badge} text-xs font-bold rounded-full flex-shrink-0 whitespace-nowrap shadow-sm">
+              
+              <!-- Badge -->
+              <span class="px-3 py-1 ${config.badge} text-[11px] uppercase tracking-wider font-bold rounded-full shadow-sm flex-shrink-0">
                 ${config.label}
               </span>
             </div>
             
-            <div class="flex items-center justify-between pt-4 border-t border-slate-300/40">
-              <div class="flex items-center gap-4">
-                <span class="text-xs text-slate-500 font-medium flex items-center gap-1">
-                  <span class="material-symbols-outlined text-xs">schedule</span>
-                  ${timeText}
-                </span>
+            <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs text-textSub font-medium">
+                <span class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+                <span>Requested ${timeText}</span>
               </div>
-              <button class="deleteBtn px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-bold transition-all duration-200 transform hover:scale-105 flex items-center gap-2 shadow-sm hover:shadow-md" data-id="${req.id}">
-                <span class="material-symbols-outlined text-sm">delete</span>
+              
+              <button class="deleteBtn text-xs font-bold text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1 group/btn" data-id="${req.id}">
+                <span class="material-symbols-outlined text-lg group-hover/btn:animate-pulse">delete</span>
                 Remove
               </button>
             </div>
@@ -2511,5 +2475,76 @@ document.head.appendChild(styleTag);
 </script>
 
 
+
+<script>
+async function loadMedicineLogs() {
+  const container = document.getElementById("logsTableBody");
+  container.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-textSub">Loading logs...</td></tr>';
+  
+  try {
+    const res = await fetch("fetch_medicine_logs.php");
+    const data = await res.json();
+    
+    if (data.status !== "success" || !data.logs.length) {
+      container.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-textSub">No logs found</td></tr>';
+      return;
+    }
+    
+    container.innerHTML = data.logs.map(log => {
+      let statusClass = "bg-slate-100 text-slate-700";
+      let icon = "schedule";
+      
+      if (log.status === 'TAKEN' || log.status === 'Taken') {
+        statusClass = "bg-green-100 text-green-700";
+        icon = "check_circle";
+      } else if (log.status === 'MISSED' || log.status === 'Missed') {
+        statusClass = "bg-red-100 text-red-700";
+        icon = "cancel";
+      } else if (log.status === 'SKIPPED' || log.status === 'Skipped') {
+        statusClass = "bg-yellow-100 text-yellow-700"; 
+        icon = "skip_next";
+      }
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center gap-3">
+              <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <span class="material-symbols-outlined text-lg">medication</span>
+              </span>
+              <span class="font-bold text-textMain">${log.medicine_name}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-textSub font-medium">
+            ${log.dosage}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-textSub font-medium">
+            ${log.formatted_time}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${statusClass}">
+              <span class="material-symbols-outlined text-sm">${icon}</span>
+              ${log.status}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<tr><td colspan="4" class="text-center text-red-500 py-4">Failed to load logs</td></tr>';
+  }
+}
+
+// Hook into navigation
+const prevSwitchLogs = switchSection;
+switchSection = function(sectionId) {
+    if (prevSwitchLogs) prevSwitchLogs(sectionId);
+    if (sectionId === 'logs') {
+        loadMedicineLogs();
+    }
+};
+</script>
 </body>
 </html>

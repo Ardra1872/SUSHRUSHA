@@ -12,31 +12,40 @@ if (!$patient_id) {
 
 $today = date('Y-m-d');
 $now = date('H:i:00'); // truncate seconds
-$one_hour_later = date('H:i:00', strtotime('+1 hour'));
 
-// SQL: fetch medicines scheduled today AND within next 1 hour
+// SQL: fetch medicines scheduled today from NOW onwards
 $sql = "
 SELECT 
+    ms.id AS schedule_id,
     m.id AS medicine_id,
     m.name,
     m.dosage_value AS dosage,
     ms.intake_time,
-    IFNULL(dl.status, 'Pending') AS status
+    IFNULL(
+        CASE 
+            WHEN dl.status = 'TAKEN' THEN 'Taken'
+            WHEN dl.status = 'MISSED' THEN 'Missed'
+            ELSE dl.status 
+        END, 
+    'Pending') AS status
 FROM medicines m
 JOIN medicine_schedule ms ON ms.medicine_id = m.id
 LEFT JOIN dose_logs dl 
-    ON dl.medicine_id = m.id
-    AND dl.patient_id = m.patient_id
-    AND DATE(dl.intake_datetime) = ?
+    ON dl.schedule_id = ms.id
+    AND DATE(dl.log_time) = ?
 WHERE m.patient_id = ?
   AND m.start_date <= ?
   AND (m.end_date IS NULL OR m.end_date = '0000-00-00' OR m.end_date >= ?)
-  AND TIME(ms.intake_time) BETWEEN ? AND ?
+  AND TIME(ms.intake_time) >= ? -- Show all upcoming for today
 ORDER BY ms.intake_time ASC
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssss", $today, $patient_id, $today, $today, $now, $one_hour_later);
+if (!$stmt) {
+    echo json_encode(['status' => 'error', 'message' => 'SQL Prepare Failed: ' . $conn->error]);
+    exit;
+}
+$stmt->bind_param("sssss", $today, $patient_id, $today, $today, $now);
 $stmt->execute();
 
 $result = $stmt->get_result();

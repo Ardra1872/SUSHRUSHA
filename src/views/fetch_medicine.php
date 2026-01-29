@@ -9,18 +9,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Status calculation handled in frontend
 $patient_id = $_SESSION['active_patient_id'] ?? $_SESSION['user_id'];
-$today = new DateTime();
-$end = new DateTime($row['end_date'] ?? $today->format('Y-m-d'));
-$diff = $today->diff($end)->days;
-
-if ($end < $today) {
-    $row['status'] = 'expired';
-} elseif ($diff <= 7) {
-    $row['status'] = 'expiring';
-} else {
-    $row['status'] = 'active';
-}
 
 // Fetch medicines
 $stmt = $conn->prepare("

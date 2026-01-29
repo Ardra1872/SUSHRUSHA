@@ -151,6 +151,11 @@ $_SESSION['user_id']    = $user_id;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_name']  = $name;
 $_SESSION['user_role']  = $role;
+$_SESSION['role']       = $role; // Fix for add_medicine.php check
+
+if ($role === 'patient') {
+    $_SESSION['active_patient_id'] = $user_id; // Fix for add_medicine.php patient check
+}
 
 if($role === 'patient'){
     header("Location: /Sushrusha/src/views/dashboard.php");
