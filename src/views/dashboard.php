@@ -33,6 +33,50 @@ $diseaseInfo = !empty($medicalData['conditions']) ? $medicalData['conditions'] :
 $stmt->close();
 
 // ---------------------------------------------------------
+// ADHERENCE UPDATE QUERY
+// ---------------------------------------------------------
+// 1. Count Total Medicines
+$countMedStmt = $conn->prepare("SELECT COUNT(*) as total_meds FROM medicines WHERE patient_id = ?");
+$countMedStmt->bind_param("i", $userId);
+$countMedStmt->execute();
+$medCountResult = $countMedStmt->get_result();
+$totalMeds = $medCountResult->fetch_assoc()['total_meds'];
+$countMedStmt->close();
+
+// 2. Calculate Adherence (Based on dose_logs)
+// We join with medicines table to ensure we only count logs for this patient's medicines
+// logs: status = 'TAKEN' or 'MISSED' (or 'SKIPPED' if you use that)
+$adherencePct = 0;
+$totalLogs = 0;
+$hasLogs = false;
+
+if ($totalMeds > 0) {
+    $logQuery = "
+        SELECT 
+            COUNT(*) as total_attempts,
+            SUM(CASE WHEN dl.status = 'TAKEN' THEN 1 ELSE 0 END) as taken_count
+        FROM dose_logs dl
+        JOIN medicine_schedule ms ON dl.schedule_id = ms.id
+        JOIN medicines m ON ms.medicine_id = m.id
+        WHERE m.patient_id = ?
+    ";
+    $logStmt = $conn->prepare($logQuery);
+    $logStmt->bind_param("i", $userId);
+    $logStmt->execute();
+    $logResult = $logStmt->get_result();
+    $logData = $logResult->fetch_assoc();
+    $logStmt->close();
+
+    $totalLogs = intval($logData['total_attempts']);
+    $takenCount = intval($logData['taken_count']);
+
+    if ($totalLogs > 0) {
+        $adherencePct = round(($takenCount / $totalLogs) * 100);
+        $hasLogs = true;
+    }
+}
+
+// ---------------------------------------------------------
 // FETCH BOX SLOTS DATA (1-4)
 // ---------------------------------------------------------
 $boxSlots = [1 => null, 2 => null, 3 => null, 4 => null];
@@ -49,6 +93,114 @@ while ($row = $medResult->fetch_assoc()) {
     }
 }
 $stmt->close();
+
+// ---------------------------------------------------------
+// 3. Calculate Missed Doses (This Week)
+// ---------------------------------------------------------
+$missedDosesCount = 0;
+$startOfWeek = date('Y-m-d', strtotime('monday this week'));
+$todayDate   = date('Y-m-d');
+$nowTime     = date('H:i:s');
+
+// Fetch all medicines and their fixed schedules for the patient
+$medsSql = "
+    SELECT 
+        m.id as med_id, m.name, m.start_date, m.end_date, m.schedule_type, m.days,
+        ms.id as schedule_id, ms.intake_time
+    FROM medicines m
+    JOIN medicine_schedule ms ON m.id = ms.medicine_id
+    WHERE m.patient_id = ?
+";
+$medsStmt = $conn->prepare($medsSql);
+$medsStmt->bind_param("i", $userId);
+$medsStmt->execute();
+$medsResult = $medsStmt->get_result();
+
+$allMeds = [];
+while ($row = $medsResult->fetch_assoc()) {
+    $allMeds[] = $row;
+}
+$medsStmt->close();
+
+// Fetch dose logs for this week
+$logsSql = "
+    SELECT schedule_id, status, DATE(log_time) as log_date
+    FROM dose_logs dl
+    JOIN medicine_schedule ms ON dl.schedule_id = ms.id
+    JOIN medicines m ON ms.medicine_id = m.id
+    WHERE m.patient_id = ? AND DATE(log_time) >= ?
+";
+$logsStmt = $conn->prepare($logsSql);
+$logsStmt->bind_param("is", $userId, $startOfWeek);
+$logsStmt->execute();
+$logsResult = $logsStmt->get_result();
+
+$logsMap = []; 
+while ($row = $logsResult->fetch_assoc()) {
+    $key = $row['schedule_id'] . '_' . $row['log_date'];
+    $logsMap[$key] = $row['status'];
+}
+$logsStmt->close();
+
+// Iterate days from Start of Week to Today to count misses
+$currentDate = $startOfWeek;
+while (strtotime($currentDate) <= strtotime($todayDate)) {
+    $dayNameShort = date('D', strtotime($currentDate)); // Mon, Tue...
+    $dayChar = substr($dayNameShort, 0, 1); // M, T, W... (Handling potential single-char storage)
+
+    foreach ($allMeds as $med) {
+        // 1. Check Date Range
+        if ($currentDate < $med['start_date']) continue;
+        if (!empty($med['end_date']) && $med['end_date'] !== '0000-00-00' && $currentDate > $med['end_date']) continue;
+        
+        // 2. Check Schedule Requirement
+        $isScheduled = false;
+        $sType = strtolower($med['schedule_type'] ?? 'daily');
+        
+        if ($sType === 'daily') {
+            $isScheduled = true;
+        } elseif ($sType === 'weekly') {
+            // Assume weekly = same day of week as start_date
+            if (date('N', strtotime($currentDate)) == date('N', strtotime($med['start_date']))) {
+                $isScheduled = true;
+            }
+        } elseif ($sType === 'custom' || $sType === 'specific days') {
+            $daysArr = json_decode($med['days'] ?? '[]', true);
+            if (is_array($daysArr)) {
+                // Match standard names OR single chars
+                if (in_array($dayNameShort, $daysArr) || in_array(date('l', strtotime($currentDate)), $daysArr)) {
+                     $isScheduled = true;
+                } elseif (in_array($dayChar, $daysArr)) {
+                    $isScheduled = true;
+                }
+            }
+        }
+        
+        if (!$isScheduled) continue;
+        
+        // 3. Check Status in Logs (PRIORITY)
+        $logKey = $med['schedule_id'] . '_' . $currentDate;
+        $status = $logsMap[$logKey] ?? null;
+        
+        if ($status === 'MISSED') {
+            $missedDosesCount++; // Explicit miss (even if future)
+            continue;
+        } elseif ($status === 'TAKEN') {
+            continue; // Taken, so not missed
+        }
+
+        // 4. Check Time (for implicit misses)
+        $sTime = $med['intake_time']; // HH:MM:SS
+        if ($currentDate === $todayDate && $sTime > $nowTime) {
+            continue; // Hasn't happened yet, and not explicitly logged
+        }
+        
+        // If we reached here: it's scheduled, time passed, and no log exists in map (or not TAKEN/MISSED)
+        $missedDosesCount++; // Implicit miss
+    }
+    
+    $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
+}
 
 ?>
 <!DOCTYPE html>
@@ -276,16 +428,38 @@ tailwind.config = {
       <!-- STATS + DISEASE -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
         <div class="bg-white p-6 rounded-2xl shadow-soft">
-          <p class="text-sm text-textSub"data-i18n="adherence">Adherence</p>
-          <h3 class="text-4xl font-display font-bold mt-2">92%</h3>
-          <div class="h-2 bg-slate-100 rounded-full mt-4">
-            <div class="h-2 bg-primary rounded-full w-[92%]"></div>
-          </div>
+          <p class="text-sm text-textSub" data-i18n="adherence">Adherence</p>
+          
+          <?php if ($totalMeds == 0): ?>
+            <!-- No Medicines Added -->
+            <h3 class="text-xl font-display font-bold mt-2 text-primary">Start Tracking</h3>
+            <p class="text-xs text-textSub mt-1">Add medicine to know your adherence</p>
+            <div class="mt-3">
+               <a href="add_medicine.html" class="text-xs font-semibold text-primary bg-primary/10 px-3 py-2 rounded-lg hover:bg-primary/20 transition">
+                 + Add Medicine
+               </a>
+            </div>
+
+          <?php elseif (!$hasLogs): ?>
+            <!-- Medicines exist, but no logs yet -->
+            <h3 class="text-4xl font-display font-bold mt-2 text-slate-300">--%</h3>
+            <p class="text-xs text-textSub mt-1">No logs recorded yet</p>
+            <div class="h-2 bg-slate-100 rounded-full mt-4">
+              <div class="h-2 bg-slate-300 rounded-full w-0"></div>
+            </div>
+
+          <?php else: ?>
+            <!-- Active Tracking -->
+            <h3 class="text-4xl font-display font-bold mt-2"><?= $adherencePct ?>%</h3>
+            <div class="h-2 bg-slate-100 rounded-full mt-4">
+              <div class="h-2 bg-primary rounded-full" style="width: <?= $adherencePct ?>%"></div>
+            </div>
+          <?php endif; ?>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-soft">
           <p class="text-sm text-textSub" data-i18n="missed_doses">Missed Doses</p>
-         <h3 class="text-4xl font-display font-bold mt-2 text-danger dynamic-text">1</h3>
+         <h3 class="text-4xl font-display font-bold mt-2 text-danger dynamic-text"><?= $missedDosesCount ?></h3>
           <p class="text-xs text-textSub mt-2 dynamic-text">This week</p>
 
         </div>

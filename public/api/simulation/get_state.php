@@ -52,6 +52,8 @@ $sql = "
         m.compartment_number,
         m.days,
         m.schedule_type,
+        m.start_date,
+        m.end_date,
         d.status AS log_status,
         d.log_time
     FROM medicine_schedule ms
@@ -80,6 +82,21 @@ if ($result) {
             if (!is_array($allowedDays) || !in_array($todayAbbr, $allowedDays)) {
                 $shouldInclude = false;
             }
+        }
+        
+        // Date Check Logic
+        $todayDate = date('Y-m-d');
+        $startDate = $row['start_date'];
+        $endDate = $row['end_date'];
+
+        // Check Start Date
+        if ($startDate && $todayDate < $startDate) {
+            $shouldInclude = false;
+        }
+
+        // Check End Date (if exists)
+        if ($endDate && $todayDate > $endDate) {
+            $shouldInclude = false;
         }
         
         if ($shouldInclude) {
