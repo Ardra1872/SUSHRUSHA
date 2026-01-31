@@ -338,7 +338,7 @@ tailwind.config = {
       <span class="material-symbols-outlined text-3xl">menu</span>
     </button>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col md:flex-row md:items-baseline md:gap-3">
       <p class="text-sm md:text-lg font-semibold leading-snug">
         <span id="greeting">Good Morning</span>,
         <span class="text-primary dynamic-text">
@@ -1135,46 +1135,58 @@ async function loadSchedule() {
     const remaining = Math.floor(total * 0.75); // just for demo
     const percent = Math.min(Math.max((remaining / total) * 100, 0), 100);
 
-   const card = document.createElement("div");
-card.className = "bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-3 hover:shadow-xl transition aspect-[1/1]";
-
-
-
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all group relative overflow-hidden flex flex-col justify-between";
 
     card.innerHTML = `
-      <div class="flex justify-between items-start">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl">
-            <span class="material-symbols-outlined">pill</span>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-textMain">${med.name}</h3>
-            <p class="text-textSub text-sm">${med.dosage_value || ""} • ${med.medicine_type || ""}</p>
-          </div>
+      <div class="mb-3">
+        <div class="flex justify-between items-start mb-3">
+            <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-2xl">pill</span>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-800 leading-tight line-clamp-1" title="${med.name}">${med.name}</h3>
+                <p class="text-slate-500 text-xs font-medium">${med.dosage_value || 'N/A'} • ${med.medicine_type || 'Pill'}</p>
+            </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBg} ${statusText}">
+                ${statusLabel}
+            </span>
         </div>
-        <span class="text-xs px-2 py-1 rounded-full ${statusBg} ${statusText}">${statusLabel}</span>
-      </div>
 
-      <div class="grid grid-cols-2 gap-3 text-sm text-textSub">
-        <div><span class="font-semibold">Start:</span> ${startDate}</div>
-        <div><span class="font-semibold">End:</span> ${endDate}</div>
-      </div>
-
-      <div>
-        <span class="text-xs text-textSub font-semibold">Inventory Status</span>
-        <div class="w-full h-2 bg-gray-200 rounded-full mt-1">
-          <div class="h-2 rounded-full bg-primary" style="width:${percent}%"></div>
+        <div class="bg-slate-50/50 rounded-lg p-3 border border-slate-100 mb-3 space-y-1.5">
+            <div class="flex justify-between text-xs">
+                <span class="text-slate-500 font-medium">Frequency</span>
+                <span class="text-slate-700 font-semibold">${med.schedule_type || 'Daily'}</span>
+            </div>
+            <div class="flex justify-between text-xs">
+                <span class="text-slate-500 font-medium">End</span>
+                <span class="text-slate-700 font-semibold">${endDate}</span>
+            </div>
         </div>
-        <div class="text-xs text-textSub mt-1">${remaining} / ${total} Pills</div>
+
+        <!-- Inventory Bar -->
+        <div class="mb-1">
+            <div class="flex justify-between text-[10px] mb-1">
+            <span class="text-slate-400 font-medium">Stock</span>
+            <span class="text-slate-600 font-bold">${remaining}/${total}</span>
+            </div>
+            <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+            </div>
+        </div>
       </div>
 
-      <div class="flex gap-2 mt-3">
-      <button class="bg-primary text-white px-4 py-2 rounded-xl"
-        onclick="viewMedicine(${med.id})">
-  View
-</button>
-
-        <button class="bg-red-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition" onclick="deleteMedicine(${med.id})">Delete</button>
+      <div class="flex gap-2 pt-3 border-t border-slate-100 mt-auto">
+        <button onclick="viewMedicine(${med.id})" 
+           class="flex-1 py-1.5 rounded-lg bg-slate-50 text-slate-600 font-medium hover:bg-white hover:text-primary hover:shadow-sm border border-slate-200 transition-all text-xs flex items-center justify-center gap-1.5">
+           <span class="material-symbols-outlined text-base">visibility</span> View
+        </button>
+        <button onclick="deleteMedicine(${med.id})" 
+           class="flex-1 py-1.5 rounded-lg bg-slate-50 text-slate-600 font-medium hover:bg-red-50 hover:text-red-500 hover:border-red-100 border border-slate-200 transition-all text-xs flex items-center justify-center gap-1.5">
+           <span class="material-symbols-outlined text-base">delete</span> Remove
+        </button>
       </div>
     `;
 
@@ -1289,7 +1301,8 @@ function formatTime(timeStr) {
   const [h, m] = timeStr.split(":");
   const date = new Date();
   date.setHours(h, m);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Returns: "Jan 1, 12:00 PM"
+  return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 document.addEventListener("DOMContentLoaded", loadTodaySchedule);

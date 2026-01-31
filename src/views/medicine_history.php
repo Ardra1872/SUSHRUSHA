@@ -44,8 +44,8 @@ $stmt2->execute();
 $medicines = $stmt2->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $profilePhoto = !empty($patient['profile_photo'])
-    ? '/Sushrusha/' . ltrim($patient['profile_photo'], '/')
-    : '/Sushrusha/uploads/profile/default-avatar.png';
+    ? '../' . ltrim($patient['profile_photo'], '/')
+    : '../uploads/profile/default-avatar.png';
 
 
     
@@ -167,7 +167,7 @@ $profilePhoto = !empty($patient['profile_photo'])
 
 <td class="px-4 py-3">
   <span class="px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs">
-    <?= $med['form'] ?>
+    <?= htmlspecialchars($med['medicine_type'] ?? 'Pill') ?>
   </span>
 </td>
 

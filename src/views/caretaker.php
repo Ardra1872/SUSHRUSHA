@@ -373,43 +373,111 @@ case 'getPatientMedicines':
         }
 
         // Get today's active medicines with their schedules
-        $stmt = $conn->prepare("
-            SELECT 
-                m.id,
-                m.name,
-                m.dosage,
-                ms.intake_time,
-                CONCAT(DATE(NOW()), ' ', COALESCE(ms.intake_time, '09:00:00')) AS intake_datetime,
-                COALESCE(dl.status, 'pending') AS status
-            FROM medicines m
-            LEFT JOIN medicine_schedule ms ON m.id = ms.medicine_id
-            LEFT JOIN dose_logs dl ON m.id = dl.medicine_id 
-                AND dl.patient_id = ? 
-                AND DATE(dl.intake_datetime) = CURDATE()
-            WHERE m.patient_id = ? 
-            AND (m.end_date IS NULL OR m.end_date >= CURDATE())
-            AND m.start_date <= CURDATE()
-            ORDER BY ms.intake_time ASC
-        ");
-        $stmt->bind_param("ii", $patientId, $patientId);
-        $stmt->execute();
-
-        $schedule = [];
-        $res = $stmt->get_result();
-
-        while ($row = $res->fetch_assoc()) {
-            // Parse dosage if needed
-            $dosageParts = explode(' ', $row['dosage'] ?? '');
-            $schedule[] = [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'dosage_value' => $dosageParts[0] ?? '--',
-                'dosage_unit' => isset($dosageParts[1]) ? $dosageParts[1] : '',
-                'frequency' => 'Daily',
-                'intake_datetime' => $row['intake_datetime'],
-                'intake_time' => $row['intake_time'],
-                'status' => strtolower($row['status'])
+        try {
+            date_default_timezone_set('Asia/Kolkata'); // Match system timezone
+            
+            $dayMap = [
+                'Mon' => 'M', 'Tue' => 'T', 'Wed' => 'W', 'Thu' => 'Th', 'Fri' => 'F', 'Sat' => 'S', 'Sun' => 'Su'
             ];
+            $todayAbbr = $dayMap[date('D')];
+            $todayDate = date('Y-m-d');
+            $nowTime = date('H:i:s');
+
+            $stmt = $conn->prepare("
+                SELECT 
+                    m.id,
+                    m.name,
+                    m.dosage_value,
+                    m.dosage_unit,
+                    m.medicine_type,
+                    m.days,
+                    m.schedule_type,
+                    m.start_date,
+                    m.end_date,
+                    ms.id AS schedule_id,
+                    ms.intake_time,
+                    CONCAT('$todayDate', ' ', COALESCE(ms.intake_time, '09:00:00')) AS intake_datetime,
+                    COALESCE(dl.status, 'pending') AS status
+                FROM medicines m
+                LEFT JOIN medicine_schedule ms ON m.id = ms.medicine_id
+                LEFT JOIN dose_logs dl ON ms.id = dl.schedule_id 
+                    AND DATE(dl.log_time) = ?
+                WHERE m.patient_id = ? 
+                ORDER BY ms.intake_time ASC
+            ");
+            
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+
+            // Bind params: todayDate (for log), patientId (for medicines)
+            $stmt->bind_param("si", $todayDate, $patientId);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+
+            $schedule = [];
+            $res = $stmt->get_result();
+
+            while ($row = $res->fetch_assoc()) {
+                // Filter by Day & Date Logic (Robust)
+                $schedType = strtolower($row['schedule_type']);
+                $daysJson = $row['days'];
+                $startDate = $row['start_date'];
+                $endDate = $row['end_date'];
+                
+                // 1. Date Range Check
+                if ($startDate && $todayDate < $startDate) continue;
+                if ($endDate && $endDate !== '0000-00-00' && $todayDate > $endDate) continue;
+
+                // 2. Specific Days Check
+                if ($schedType === 'custom' || $schedType === 'days' || $schedType === 'specific days') {
+                     $allowedDays = json_decode($daysJson, true);
+                     // Fallback for string format or bad JSON
+                     if (!is_array($allowedDays)) {
+                         // Remove brackets, quotes, spaces
+                         $clean = str_replace(['[', ']', '"', "'"], '', $daysJson); 
+                         $allowedDays = explode(',', $clean);
+                     }
+                     
+                     // Check if today matches any format (Full: Mon, Short: M)
+                     $todayFull = date('D'); // Mon
+                     $isMatch = false;
+                     if (is_array($allowedDays)) {
+                        // Trim each day just in case
+                        $allowedDays = array_map('trim', $allowedDays);
+                        
+                        if (in_array($todayAbbr, $allowedDays)) $isMatch = true;
+                        if (in_array($todayFull, $allowedDays)) $isMatch = true; 
+                     }
+                     
+                     if (!$isMatch) continue;
+                }
+                
+                // 3. Status Calculation (Implicit Missed)
+                $status = strtolower($row['status']);
+                if ($status === 'pending') {
+                    if ($row['intake_time'] < $nowTime) {
+                         $status = 'missed';
+                    }
+                }
+
+                $schedule[] = [
+                    'id' => $row['id'],
+                    'name' => $row['name'],
+                    'dosage_value' => $row['dosage_value'] ?? '--',
+                    'dosage_unit' => $row['dosage_unit'] ?? '',
+                    'frequency' => 'Daily',
+                    'medicine_type' => $row['medicine_type'] ?? 'pill',
+                    'intake_datetime' => $row['intake_datetime'],
+                    'intake_time' => $row['intake_time'],
+                    'status' => $status
+                ];
+            }
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            exit;
         }
 
         echo json_encode([
@@ -639,6 +707,192 @@ case 'getPatientMedicines':
                 'message' => 'Failed to send message'
             ]);
         }
+        break;
+
+    /* ===============================
+       GET EMERGENCY CONTACTS
+    =============================== */
+    case 'getEmergencyContacts':
+        // Get the assigned patient
+        $stmt = $conn->prepare("SELECT patient_id FROM caregivers WHERE caregiver_id = ? LIMIT 1");
+        $stmt->bind_param("i", $caretakerId);
+        $stmt->execute();
+        $patientRes = $stmt->get_result()->fetch_assoc();
+        $patientId = $patientRes['patient_id'] ?? null;
+
+        if (!$patientId) {
+            echo json_encode(['status' => 'error', 'message' => 'No patient assigned']);
+            exit;
+        }
+
+        // Fetch patient details and their emergency contacts
+        // Assuming emergency contacts are in the users table or a separate table.
+        // Based on previous code, let's fetch basic patient info + emergency contact info from users table
+        
+        $stmt = $conn->prepare("
+            SELECT 
+                u.name AS patient_name,
+                u.phone AS contact_number,
+                u.emergency_contact,
+                u.doctor_name,
+                u.hospital_name
+            FROM users u
+            WHERE u.id = ?
+        ");
+        $stmt->bind_param("i", $patientId);
+        $stmt->execute();
+        $data = $stmt->get_result()->fetch_assoc();
+
+        echo json_encode(['status' => 'success', 'data' => $data]);
+        break;
+
+    /* ===============================
+       SEND MESSAGE TO EMERGENCY CONTACT
+    =============================== */
+    case 'sendMessageToEmergencyContact':
+        $patientId = $_POST['patient_id'] ?? null;
+        $message = $_POST['message'] ?? '';
+        $contactNumber = $_POST['contact_number'] ?? '';
+
+        if (!$patientId || !$message || !$contactNumber) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+            exit;
+        }
+
+        // In a real app, this would send an SMS or Email.
+        // For now, we'll simulate success and maybe log it to a table if needed.
+        // We can treat it as a "general" note or just return success.
+        
+        // Let's log it as a specific note type so it's recorded
+        $stmt = $conn->prepare("
+            INSERT INTO caretaker_notes (patient_id, caretaker_id, note_type, message)
+            VALUES (?, ?, 'emergency_msg', ?)
+        ");
+        $logMessage = "Sent to EC ($contactNumber): $message";
+        $stmt->bind_param("iis", $patientId, $caretakerId, $logMessage);
+        
+        if($stmt->execute()) {
+             echo json_encode(['status' => 'success', 'message' => 'Message sent successfully']);
+        } else {
+             echo json_encode(['status' => 'error', 'message' => 'Failed to send message']);
+        }
+        break;
+
+    /* ===============================
+       GET PATIENT PRESCRIPTIONS
+    =============================== */
+    case 'getPatientPrescriptions':
+        // Get the assigned patient
+        $stmt = $conn->prepare("
+            SELECT patient_id FROM caregivers 
+            WHERE caregiver_id = ? LIMIT 1
+        ");
+        $stmt->bind_param("i", $caretakerId);
+        $stmt->execute();
+        $patientRes = $stmt->get_result()->fetch_assoc();
+        $patientId = $patientRes['patient_id'] ?? null;
+
+        if (!$patientId) {
+            echo json_encode(['status' => 'success', 'data' => []]);
+            exit;
+        }
+
+        $stmt = $conn->prepare("
+            SELECT 
+                id,
+                doctor_name,
+                hospital_name,
+                disease_name,
+                prescription_date,
+                created_at
+            FROM prescriptions
+            WHERE patient_id = ?
+            ORDER BY prescription_date DESC
+        ");
+        $stmt->bind_param("i", $patientId);
+        $stmt->execute();
+        $prescriptions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        echo json_encode([
+            'status' => 'success',
+            'data' => $prescriptions
+        ]);
+        break;
+
+    /* ===============================
+       GET PRESCRIPTION DETAILS
+    =============================== */
+    case 'getPrescriptionDetails':
+        $prescriptionId = $_GET['id'] ?? null;
+        
+        if (!$prescriptionId) {
+            echo json_encode(['status' => 'error', 'message' => 'Prescription ID required']);
+            exit;
+        }
+
+        // Get the assigned patient
+        $stmt = $conn->prepare("SELECT patient_id FROM caregivers WHERE caregiver_id = ? LIMIT 1");
+        $stmt->bind_param("i", $caretakerId);
+        $stmt->execute();
+        $patientRes = $stmt->get_result()->fetch_assoc();
+        $patientId = $patientRes['patient_id'] ?? null;
+
+        if (!$patientId) {
+            echo json_encode(['status' => 'error', 'message' => 'No patient assigned']);
+            exit;
+        }
+
+        // Fetch prescription details ensuring it belongs to the patient
+        $stmt = $conn->prepare("
+            SELECT 
+                id,
+                doctor_name,
+                hospital_name,
+                disease_name,
+                disease_description,
+                notes,
+                prescription_date,
+                created_at
+            FROM prescriptions
+            WHERE id = ? AND patient_id = ?
+        ");
+        $stmt->bind_param("ii", $prescriptionId, $patientId);
+        $stmt->execute();
+        $prescription = $stmt->get_result()->fetch_assoc();
+
+        if (!$prescription) {
+            echo json_encode(['status' => 'error', 'message' => 'Prescription not found']);
+            exit;
+        }
+
+        // Fetch Medicines
+        $stmt = $conn->prepare("
+            SELECT id, medicine_name, dosage, frequency, duration, instructions
+            FROM prescription_medicines
+            WHERE prescription_id = ?
+        ");
+        $stmt->bind_param("i", $prescriptionId);
+        $stmt->execute();
+        $medicines = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // Fetch Tests
+        $stmt = $conn->prepare("
+            SELECT id, test_name, test_type, test_description, recommended_date, status
+            FROM prescription_tests
+            WHERE prescription_id = ?
+        ");
+        $stmt->bind_param("i", $prescriptionId);
+        $stmt->execute();
+        $tests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        echo json_encode([
+            'status' => 'success',
+            'data' => [
+                'prescription' => $prescription,
+                'medicines' => $medicines,
+                'tests' => $tests
+            ]
+        ]);
         break;
 
     default:

@@ -102,8 +102,14 @@ function checkAlerts() {
     const nowStr = STATE.currentTime; // HH:MM
 
     STATE.schedules.forEach(sched => {
-        // Only check if not already logged
-        if (sched.log_status) return;
+        // If logged (externally or internally)
+        if (sched.log_status) {
+            // Ensure we stop any running alert if it was active
+            if (STATE.activeAlerts[sched.schedule_id]) {
+                stopAlert(sched.schedule_id);
+            }
+            return;
+        }
 
         // If time matches
         if (sched.intake_time_formatted === nowStr) {
