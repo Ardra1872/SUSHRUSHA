@@ -323,6 +323,18 @@ case 'user_distribution':
     ]);
     exit;
     // ---------------------------
+    // Total Missed Doses Count
+    // ---------------------------
+    case 'total_missed_doses':
+        $result = $conn->query("SELECT COUNT(*) AS total FROM dose_logs WHERE status='MISSED'");
+        $count = $result->fetch_assoc()['total'] ?? 0;
+        echo json_encode([
+            'status' => 'success',
+            'total_missed' => $count
+        ]);
+        exit;
+
+    // ---------------------------
 // Medicine Requests Over Time (last 7 days)
 // ---------------------------
 case 'medicine_requests_over_time':

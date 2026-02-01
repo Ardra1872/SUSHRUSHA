@@ -24,13 +24,47 @@ $userInitials = !empty($name) ? strtoupper(substr($name, 0, 1)) : 'U';
 $stmt->close();
 
 // Fetch disease / conditions info (for dashboard display)
-$stmt = $conn->prepare("SELECT conditions FROM medical_details WHERE patient_id = ? LIMIT 1");
+// $stmt = $conn->prepare("SELECT conditions FROM medical_details WHERE patient_id = ? LIMIT 1");
+// $stmt->bind_param("i", $userId);
+// $stmt->execute();
+// $medicalResult = $stmt->get_result();
+// $medicalData = $medicalResult->fetch_assoc();
+// $diseaseInfo = !empty($medicalData['conditions']) ? $medicalData['conditions'] : null;
+// $stmt->close();
+
+// NEW: Fetch Diseases from Prescriptions
+$prescriptionDiseases = [];
+$stmt = $conn->prepare("SELECT DISTINCT disease_name FROM prescriptions WHERE patient_id = ? ORDER BY prescription_date DESC");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
-$medicalResult = $stmt->get_result();
-$medicalData = $medicalResult->fetch_assoc();
-$diseaseInfo = !empty($medicalData['conditions']) ? $medicalData['conditions'] : null;
+$diseaseResult = $stmt->get_result();
+while ($row = $diseaseResult->fetch_assoc()) {
+    if (!empty($row['disease_name'])) {
+        $prescriptionDiseases[] = $row['disease_name'];
+    }
+}
 $stmt->close();
+
+// NEW: Fetch Assigned Caretaker
+$caretakerName = "Not Assigned";
+$caretakerRelation = null;
+$stmt = $conn->prepare("
+    SELECT u.name, c.relation
+    FROM caregivers c
+    JOIN users u ON c.caregiver_id = u.id
+    WHERE c.patient_id = ?
+    LIMIT 1
+");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$caretakerResult = $stmt->get_result();
+if ($caretakerRow = $caretakerResult->fetch_assoc()) {
+    $caretakerName = $caretakerRow['name'];
+    $caretakerRelation = $caretakerRow['relation'];
+}
+$stmt->close();
+
+
 
 // ---------------------------------------------------------
 // ADHERENCE UPDATE QUERY
@@ -465,20 +499,28 @@ tailwind.config = {
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-soft">
-          <p class="text-sm text-textSub"data-i18n="next_refill">Next Refill</p>
-          <h3 class="text-4xl font-display font-bold mt-2">Oct 24</h3>
-          <p class="text-xs text-textSub mt-2"dynamic-text>Atorvastatin</p>
+          <p class="text-sm text-textSub" data-i18n="assigned_caretaker">Assigned Caretaker</p>
+          <h3 class="text-2xl font-display font-bold mt-3 truncate" title="<?= htmlspecialchars($caretakerName) ?>"><?= htmlspecialchars($caretakerName) ?></h3>
+          <p class="text-xs text-textSub mt-2 dynamic-text"><?= isset($caretakerRelation) ? 'Relation: ' . htmlspecialchars($caretakerRelation) : 'No caretaker linked' ?></p>
         </div>
         <!-- Disease / Conditions card -->
         <div class="bg-white p-6 rounded-2xl shadow-soft md:col-span-1">
           <p class="text-sm text-textSub">Disease / Conditions</p>
-          <?php if (!empty($diseaseInfo)): ?>
-            <p class="mt-2 text-sm text-textMain break-words">
-              <?= nl2br(htmlspecialchars($diseaseInfo)) ?>
-            </p>
+          <?php if (!empty($prescriptionDiseases)): ?>
+            <?php $diseaseCount = count($prescriptionDiseases); ?>
+            <div onclick="<?= $diseaseCount > 1 ? 'openDiseaseModal()' : '' ?>" class="<?= $diseaseCount > 1 ? 'cursor-pointer hover:bg-slate-50 transition p-2 -m-2 rounded-lg' : '' ?>">
+                <p class="mt-2 text-sm text-textMain font-semibold truncate">
+                    <?= htmlspecialchars($prescriptionDiseases[0]) ?>
+                </p>
+                <?php if ($diseaseCount > 1): ?>
+                    <p class="text-xs text-primary font-medium mt-1 flex items-center gap-1">
+                        +<?= $diseaseCount - 1 ?> more <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                    </p>
+                <?php endif; ?>
+            </div>
           <?php else: ?>
             <p class="mt-2 text-xs text-textSub">
-              No disease information added yet.
+              No diseases recorded.
             </p>
           <?php endif; ?>
         </div>
@@ -2741,6 +2783,41 @@ switchSection = function(sectionId) {
         loadMedicineLogs();
     }
 };
+</script>
+
+<!-- Disease List Modal -->
+<div id="diseaseModal" class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative mx-4 animate-[fadeIn_0.2s_ease-out]">
+    <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+        <h3 class="text-lg font-bold text-textMain">Conditions</h3>
+        <button onclick="closeDiseaseModal()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition">
+            <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+    </div>
+    <ul class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        <?php if (!empty($prescriptionDiseases)): ?>
+            <?php foreach ($prescriptionDiseases as $disease): ?>
+                <li class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <span class="material-symbols-outlined text-primary text-xl mt-0.5">medication</span>
+                    <span class="text-sm font-medium text-textMain leading-tight"><?= htmlspecialchars($disease) ?></span>
+                </li>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </ul>
+  </div>
+</div>
+
+<script>
+function openDiseaseModal() {
+    document.getElementById('diseaseModal').classList.remove('hidden');
+}
+function closeDiseaseModal() {
+    document.getElementById('diseaseModal').classList.add('hidden');
+}
+// Close on outside click
+document.getElementById('diseaseModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDiseaseModal();
+});
 </script>
 </body>
 </html>

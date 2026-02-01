@@ -1,59 +1,66 @@
-
 <!DOCTYPE html>
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Sushrusha Admin Dashboard</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<!-- Material Symbols -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="../../public/assets/translations.js"></script>
-<script src="../../public/assets/language-selector.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style>
-/* Highlight style */
-.highlight {
-    background-color: #fde68a; /* yellow highlight */
-    color: #000;
-}
-</style>
-<!-- Theme Config -->
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                        "surface-light": "#ffffff",
-                        "surface-dark": "#1e293b",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"],
-                        "sans": ["Inter", "sans-serif"],
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "2xl": "1rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<style type="text/tailwindcss">
-        @layer utilities {
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Sushrusha Admin Dashboard</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet" />
+  <!-- Material Symbols -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../../public/assets/translations.js"></script>
+  <script src="../../public/assets/language-selector.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    /* Highlight style */
+    .highlight {
+      background-color: #fde68a;
+      /* yellow highlight */
+      color: #000;
+    }
+  </style>
+  <!-- Theme Config -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+            "surface-light": "#ffffff",
+            "surface-dark": "#1e293b",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"],
+            "sans": ["Inter", "sans-serif"],
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
                 font-size: 24px;
@@ -83,356 +90,332 @@
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 font-display transition-colors duration-200">
-<div class="flex h-screen w-full overflow-hidden">
-<!-- Side Navigation Bar -->
-<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 flex flex-col transition-colors duration-200 z-20 hidden md:flex">
-<div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
-<div class="flex items-center gap-2 text-primary">
-<span class="material-symbols-outlined fill text-3xl">medication_liquid</span>
-<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Sushrusha</span>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto py-6 px-3 flex flex-col gap-6">
-<!-- Main Nav -->
-<div class="flex flex-col gap-1">
-<p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Platform</p>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary group transition-all" href="#">
-<span class="material-symbols-outlined fill text-[22px]">dashboard</span>
-<span class="text-sm font-medium">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all" href="#users">
-<span class="material-symbols-outlined text-[22px]">group</span>
-<span class="text-sm font-medium">Users</span>
-</a>
 
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all" href="#medReq">
-<span class="material-symbols-outlined text-[22px]">article</span>
-<span class="text-sm font-medium">Medicine Requests</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all" href="#">
-<span class="material-symbols-outlined text-[22px]">monitoring</span>
-<span class="text-sm font-medium">Analytics</span>
-</a>
-</div>
-<!-- Secondary Nav -->
-<div class="flex flex-col gap-1">
-<p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Management</p>
-<a onclick="openBroadcasts()" 
-   class="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all">
-  <span class="material-symbols-outlined text-[22px]">notifications_active</span>
-  <span class="text-sm font-medium">Broadcasts</span>
-</a>
+<body
+  class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 font-display transition-colors duration-200">
+  <div class="flex h-screen w-full overflow-hidden">
+    <!-- Side Navigation Bar -->
+    <aside
+      class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 flex flex-col transition-colors duration-200 z-20 hidden md:flex">
+      <div class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2 text-primary">
+          <span class="material-symbols-outlined fill text-3xl">medication_liquid</span>
+          <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Sushrusha</span>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto py-6 px-3 flex flex-col gap-6">
+        <!-- Main Nav -->
+        <div class="flex flex-col gap-1">
+          <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Platform</p>
+          <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary group transition-all"
+            href="#">
+            <span class="material-symbols-outlined fill text-[22px]">dashboard</span>
+            <span class="text-sm font-medium">Dashboard</span>
+          </a>
+          <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
+            href="#users">
+            <span class="material-symbols-outlined text-[22px]">group</span>
+            <span class="text-sm font-medium">Users</span>
+          </a>
 
-
-</div>
-</div>
-
-</aside>
-<!-- Main Content Wrapper -->
-<main class="flex-1 flex flex-col h-full overflow-hidden relative">
-<!-- Top Header -->
-<header class="h-16 flex items-center justify-between px-6 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
-<!-- Mobile Menu Button -->
-<button class="md:hidden p-2 text-slate-600 dark:text-slate-300">
-<span class="material-symbols-outlined">menu</span>
-</button>
-<!-- Liveclock -->
- <span id="liveClock" class="ml-2 text-sm text-gray-500 font-normal"></span>
-<!-- Right Actions -->
-
-<div class="relative">
-  <!-- Profile Button -->
-  <button id="profileBtn" class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoDoZ-bpH4vak8vDO1t_SkQK8nkXWy3FWZc-f36ePuXp1doGJAkHwYIAgA-hpun7OT6P_nv2FmH4H2GYgMdSGTQaKt9Vqls2FZFtIvjKrirNkXuP7hm_OjWWjl_wiqy6a7WfYVlz0CGND9flSx3zR4N-CBYU6y_2069C3UxQzyDsWZOsx2UWL0RyPgPMDSYTa5TqOsAjYaBkEq6e30BsyvB_6yQkRd9u8bOltBUoRa9UcRGS_ig-JPFD3vUm9Jsa3WMWYSqvmncRE" 
-         alt="Profile" 
-         class="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700">
-  </button>
-
-  <!-- Dropdown Menu -->
-<div id="profileDropdown" class="hidden absolute right-0 mt-2 w-44 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50">
-    <button id="editProfileBtn" class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-        Edit Profile
-    </button>
-    <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
-        Logout
-    </button>
-</div>
+          <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
+            href="#medReq">
+            <span class="material-symbols-outlined text-[22px]">article</span>
+            <span class="text-sm font-medium">Medicine Requests</span>
+          </a>
+          <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all"
+            href="#">
+            <span class="material-symbols-outlined text-[22px]">monitoring</span>
+            <span class="text-sm font-medium">Analytics</span>
+          </a>
+        </div>
+        <!-- Secondary Nav -->
+        <div class="flex flex-col gap-1">
+          <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Management</p>
+          <a onclick="openBroadcasts()"
+            class="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all">
+            <span class="material-symbols-outlined text-[22px]">notifications_active</span>
+            <span class="text-sm font-medium">Broadcasts</span>
+          </a>
 
 
-</header>
-<!-- Scrollable Content -->
-<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
-<div class="max-w-7xl mx-auto flex flex-col gap-8">
-<!-- Page Heading -->
-<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-<div>
-<h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome back, Admin</h1>
-<p class="text-slate-500 dark:text-slate-400 mt-1">Here is your system overview for today. You have <span class="font-medium text-primary cursor-pointer hover:underline">3 new alerts</span>.</p>
-</div>
-<div class="flex items-center gap-2 text-sm text-slate-500 bg-white dark:bg-slate-800 px-3 py-1 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
-<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                            System Operational
-                        </div>
-</div>
-<!-- Draggable Grid Layout (Simulated) -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-<!-- Metric Card 1 -->
-<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
-<span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
-<div class="flex items-center gap-4 mb-4">
-<div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-<span class="material-symbols-outlined">diversity_1</span>
-</div>
-<p class="text-sm font-medium text-slate-500 dark:text-slate-400">
-  Active Patients
-</p>
-</div>
-<div class="flex items-baseline gap-2">
-<h3 id="patientCount" class="text-3xl font-bold text-slate-900 dark:text-white">
-  --
-</h3>
+        </div>
+      </div>
+
+    </aside>
+    <!-- Main Content Wrapper -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+      <!-- Top Header -->
+      <header
+        class="h-16 flex items-center justify-between px-6 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden p-2 text-slate-600 dark:text-slate-300">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <!-- Liveclock -->
+        <span id="liveClock" class="ml-2 text-sm text-gray-500 font-normal"></span>
+        <!-- Right Actions -->
+
+        <div class="relative">
+          <!-- Profile Button -->
+          <button id="profileBtn"
+            class="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <img
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoDoZ-bpH4vak8vDO1t_SkQK8nkXWy3FWZc-f36ePuXp1doGJAkHwYIAgA-hpun7OT6P_nv2FmH4H2GYgMdSGTQaKt9Vqls2FZFtIvjKrirNkXuP7hm_OjWWjl_wiqy6a7WfYVlz0CGND9flSx3zR4N-CBYU6y_2069C3UxQzyDsWZOsx2UWL0RyPgPMDSYTa5TqOsAjYaBkEq6e30BsyvB_6yQkRd9u8bOltBUoRa9UcRGS_ig-JPFD3vUm9Jsa3WMWYSqvmncRE"
+              alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700">
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="profileDropdown"
+            class="hidden absolute right-0 mt-2 w-44 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50">
+            <button id="editProfileBtn"
+              class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+              Edit Profile
+            </button>
+            <button onclick="logout()"
+              class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+              Logout
+            </button>
+          </div>
 
 
-<span class="text-sm font-medium text-green-600 flex items-center">
-<span class="material-symbols-outlined text-[16px]">trending_up</span>
-                                    5%
-                                </span>
-</div>
-<p class="text-xs text-slate-400 mt-2">vs. last month</p>
-</div>
-<!-- Metric Card 2 -->
-<!-- <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
+      </header>
+      <!-- Scrollable Content -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+        <div class="max-w-7xl mx-auto flex flex-col gap-8">
+          <!-- Page Heading -->
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome back, Admin</h1>
+              <p class="text-slate-500 dark:text-slate-400 mt-1">Here is your system overview for today. You have <span
+                  class="font-medium text-primary cursor-pointer hover:underline">3 new alerts</span>.</p>
+            </div>
+            <div
+              class="flex items-center gap-2 text-sm text-slate-500 bg-white dark:bg-slate-800 px-3 py-1 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              System Operational
+            </div>
+          </div>
+          <!-- Draggable Grid Layout (Simulated) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Metric Card 1 -->
+            <div
+              class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
+              <span
+                class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                  <span class="material-symbols-outlined">diversity_1</span>
+                </div>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  Active Patients
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <h3 id="patientCount" class="text-3xl font-bold text-slate-900 dark:text-white">
+                  --
+                </h3>
+
+
+                <span class="text-sm font-medium text-green-600 flex items-center">
+                  <!-- <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                  5%
+                </span> -->
+              </div>
+              <p class="text-xs text-slate-400 mt-2">Active Patients</p>
+            </div>
+            <!-- Metric Card 2 -->
+            <!-- <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
 <span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
 <div class="flex items-center gap-4 mb-4">
 <div class="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
-<span class="material-symbols-outlined">medication_liquid</span>
-</div>
-<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Avg Adherence</p>
-</div>
-<div class="flex items-baseline gap-2">
-<h3 class="text-3xl font-bold text-slate-900 dark:text-white">85%</h3>
-<span class="text-sm font-medium text-green-600 flex items-center">
-<span class="material-symbols-outlined text-[16px]">trending_up</span>
-                                    2%
-                                </span>
-</div>
-<p class="text-xs text-slate-400 mt-2">Daily average</p>
 </div> -->
-<!-- Metric Card 3 -->
-<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
-<span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
-<div class="flex items-center gap-4 mb-4">
-<div class="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-<span class="material-symbols-outlined">medical_services</span>
-</div>
-<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Caretakers</p>
-</div>
-<div class="flex items-baseline gap-2">
-<h3 id="caretakerCount" class="text-3xl font-bold text-slate-900 dark:text-white"></h3>
-<span class="text-sm font-medium text-green-600 flex items-center">
-<span class="material-symbols-outlined text-[16px]">trending_up</span>
-                                    12%
-                                </span>
-</div>
-<p class="text-xs text-slate-400 mt-2">Active accounts</p>
-</div>
-<!-- Metric Card 4 -->
-<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
-<span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
-<div class="flex items-center gap-4 mb-4">
-<div class="p-3 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400">
-<span class="material-symbols-outlined">warning</span>
-</div>
-<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Missed Doses</p>
-</div>
-<div class="flex items-baseline gap-2">
-<h3 class="text-3xl font-bold text-slate-900 dark:text-white">124</h3>
-<span class="text-sm font-medium text-red-500 flex items-center">
-<span class="material-symbols-outlined text-[16px]">trending_up</span>
-                                    8%
-                                </span>
-</div>
-<p class="text-xs text-slate-400 mt-2">Critical attention needed</p>
-</div>
-</div>
-<!-- Complex Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-<!-- Main Line Chart -->
-<div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
-<div class="flex justify-between items-center mb-6">
-<div>
-<h3 class="text-lg font-bold text-slate-900 dark:text-white">
-Medicine Requests Over Time
-</h3>
-<p class="text-sm text-slate-500">
-Requests submitted by users (last 7 days)
-</p>
+            <!-- Metric Card 3 -->
+            <div
+              class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
+              <span
+                class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                  <span class="material-symbols-outlined">medical_services</span>
+                </div>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Caretakers</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <h3 id="caretakerCount" class="text-3xl font-bold text-slate-900 dark:text-white"></h3>
+                <span class="text-sm font-medium text-green-600 flex items-center">
+                  <!-- <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                  12%
+                </span> -->
+              </div>
+              <p class="text-xs text-slate-400 mt-2">Active accounts</p>
+            </div>
+            <!-- Metric Card 4 -->
+            <div
+              class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
+              <span
+                class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="p-3 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400">
+                  <span class="material-symbols-outlined">warning</span>
+                </div>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Missed Doses</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <h3 id="missedDosesCount" class="text-3xl font-bold text-slate-900 dark:text-white">--</h3>
+                <span class="text-sm font-medium text-red-500 flex items-center">
+                  <!-- <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                  8%
+                </span> -->
+              </div>
+              <p class="text-xs text-slate-400 mt-2">Critical attention needed</p>
+            </div>
+          </div>
+          <!-- Complex Charts Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Line Chart -->
+            <div
+              class="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative group">
+              <div class="flex justify-between items-center mb-6">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+                    Medicine Requests Over Time
+                  </h3>
+                  <p class="text-sm text-slate-500">
+                    Requests submitted by users (last 7 days)
+                  </p>
 
-</div>
-<div class="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-<button class="px-3 py-1 text-xs font-medium bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded shadow-sm">
-7 Days
-</button>
-<button class="px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white">
-30 Days
-</button>
-
-
-</div>
-</div>
-<span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
-<!-- CSS Chart Simulation -->
-<div class="h-64 w-full flex items-end justify-between gap-2 px-2 pb-2 relative">
-<!-- Background Grid Lines -->
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
-<div class="border-b border-slate-100 dark:border-slate-800 border-dashed w-full h-px"></div>
-<div class="border-b border-slate-100 dark:border-slate-800 border-dashed w-full h-px"></div>
-<div class="border-b border-slate-100 dark:border-slate-800 border-dashed w-full h-px"></div>
-<div class="border-b border-slate-100 dark:border-slate-800 border-dashed w-full h-px"></div>
-<div class="border-b border-slate-200 dark:border-slate-700 w-full h-px"></div>
-</div>
-<!-- SVG Line Path -->
-<svg class="absolute inset-0 w-full h-full pb-8" preserveaspectratio="none">
-<defs>
-<lineargradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
-<stop offset="0%" style="stop-color:#137fec; stop-opacity:0.2"></stop>
-<stop offset="100%" style="stop-color:#137fec; stop-opacity:0"></stop>
-</lineargradient>
-</defs>
-<path class="text-primary" d="M0,150 C50,140 100,60 150,80 C200,100 250,40 300,50 C350,60 400,20 450,30 C500,40 550,10 600,20 L600,200 L0,200 Z" fill="url(#gradient)"></path>
-<path d="M0,150 C50,140 100,60 150,80 C200,100 250,40 300,50 C350,60 400,20 450,30 C500,40 550,10 600,20" fill="none" stroke="#137fec" stroke-width="3" vector-effect="non-scaling-stroke"></path>
-</svg>
-<!-- X Axis Labels -->
-<div class="absolute bottom-0 w-full flex justify-between text-xs text-slate-400 px-2">
-<span>Mon</span>
-<span>Tue</span>
-<span>Wed</span>
-<span>Thu</span>
-<span>Fri</span>
-<span>Sat</span>
-<span>Sun</span>
-</div>
-</div>
-</div>
-<!-- Donut Chart -->
-<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative group flex flex-col">
-
-  <div class="mb-4">
-    <h3 class="text-lg font-bold text-slate-900 dark:text-white">User Distribution</h3>
-    <p class="text-sm text-slate-500">Patients vs Caretakers</p>
-  </div>
-
-  <span class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">
-    drag_indicator
-  </span>
-
-  <div class="flex-1 flex items-center justify-center relative">
-
-    <!-- Donut -->
-    <div
-      id="userDonut"
-      class="w-48 h-48 rounded-full relative"
-      style="background: conic-gradient(#137fec 0% 0%, #e2e8f0 0% 100%);"
-    >
-      <div class="absolute inset-4 bg-white dark:bg-slate-800 rounded-full flex flex-col items-center justify-center">
-        <span
-          id="totalUsers"
-          class="text-3xl font-bold text-slate-900 dark:text-white"
-        >
-          --
-        </span>
-        <span class="text-xs text-slate-500">Total Users</span>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="flex justify-center gap-6 mt-6">
-
-    <div class="flex items-center gap-2">
-      <span class="w-3 h-3 rounded-full bg-primary"></span>
-      <span
-        id="patientLabel"
-        class="text-sm text-slate-600 dark:text-slate-300"
-      >
-        Patients (--)
-      </span>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <span class="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-600"></span>
-      <span
-        id="caretakerLabel"
-        class="text-sm text-slate-600 dark:text-slate-300"
-      >
-        Caretakers (--)
-      </span>
-    </div>
-
-  </div>
-
-</div>
-</div>
-<!-- Medicine Requests -->
-<div id ="medReq"class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-  <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-    <h3 class="text-lg font-bold text-slate-900 dark:text-white">
-      Medicine Requests
-    </h3>
-    <p class="text-sm text-slate-500">
-      Pending medicine approval requests from users
-    </p>
-  </div>
-
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-xs">
-        <tr>
-          <th class="p-4 text-left">Medicine</th>
-          <th class="p-4">Dosage</th>
-          <th class="p-4">Form</th>
-          <th class="p-4">Requested By</th>
-          <th class="p-4 text-right">Action</th>
-        </tr>
-      </thead>
-      <tbody id="medicineRequestsTable"
-        class="divide-y divide-slate-100 dark:divide-slate-800">
-        <!-- populated by JS -->
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Quick Actions -->
-<div>
-<h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h2>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<button id="addUserBtn" class="flex flex-col gap-3 p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark hover:border-primary hover:shadow-md transition-all text-left group">
-  <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-    <span class="material-symbols-outlined">person_add</span>
-  </div>
-  <div>
-    <h3 class="font-bold text-slate-900 dark:text-white">Add Patient</h3>
-    <p class="text-sm text-slate-500 mt-1">Register a new patient profile</p>
-  </div>
-</button>
+                </div>
+                <div class="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                  <button
+                    class="px-3 py-1 text-xs font-medium bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded shadow-sm">
+                    7 Days
+                  </button>
+                  <button
+                    class="px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                    30 Days
+                  </button>
 
 
-<button
-  onclick="openBroadcastModal()"
-  class="flex flex-col gap-3 p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark hover:border-primary hover:shadow-md transition-all text-left group"
->
-  <div class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-    <span class="material-symbols-outlined">broadcast_on_personal</span>
-  </div>
+                </div>
+              </div>
+              <span
+                class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+              <!-- Chart.js Canvas -->
+              <div class="h-64 w-full relative">
+                <canvas id="requestChart"></canvas>
+              </div>
+            </div>
+            <!-- Donut Chart -->
+            <div
+              class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative group flex flex-col">
 
-  <div>
-    <h3 class="font-bold text-slate-900 dark:text-white">Broadcast Alert</h3>
-    <p class="text-sm text-slate-500 mt-1">Send system-wide notification</p>
-  </div>
-</button>
-<!-- 
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">User Distribution</h3>
+                <p class="text-sm text-slate-500">Patients vs Caretakers</p>
+              </div>
+
+              <span
+                class="material-symbols-outlined absolute top-4 right-4 text-slate-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">
+                drag_indicator
+              </span>
+
+              <div class="flex-1 flex items-center justify-center relative">
+
+                <!-- Donut -->
+                <div id="userDonut" class="w-48 h-48 rounded-full relative"
+                  style="background: conic-gradient(#137fec 0% 0%, #e2e8f0 0% 100%);">
+                  <div
+                    class="absolute inset-4 bg-white dark:bg-slate-800 rounded-full flex flex-col items-center justify-center">
+                    <span id="totalUsers" class="text-3xl font-bold text-slate-900 dark:text-white">
+                      --
+                    </span>
+                    <span class="text-xs text-slate-500">Total Users</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="flex justify-center gap-6 mt-6">
+
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-primary"></span>
+                  <span id="patientLabel" class="text-sm text-slate-600 dark:text-slate-300">
+                    Patients (--)
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-600"></span>
+                  <span id="caretakerLabel" class="text-sm text-slate-600 dark:text-slate-300">
+                    Caretakers (--)
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <!-- Medicine Requests -->
+          <div id="medReq"
+            class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+                Medicine Requests
+              </h3>
+              <p class="text-sm text-slate-500">
+                Pending medicine approval requests from users
+              </p>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-xs">
+                  <tr>
+                    <th class="p-4 text-left">Medicine</th>
+                    <th class="p-4">Dosage</th>
+                    <th class="p-4">Form</th>
+                    <th class="p-4">Requested By</th>
+                    <th class="p-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="medicineRequestsTable" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <!-- populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button id="addUserBtn"
+                class="flex flex-col gap-3 p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark hover:border-primary hover:shadow-md transition-all text-left group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined">person_add</span>
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">Add Patient</h3>
+                  <p class="text-sm text-slate-500 mt-1">Register a new patient profile</p>
+                </div>
+              </button>
+
+
+              <button onclick="openBroadcastModal()"
+                class="flex flex-col gap-3 p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark hover:border-primary hover:shadow-md transition-all text-left group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined">broadcast_on_personal</span>
+                </div>
+
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">Broadcast Alert</h3>
+                  <p class="text-sm text-slate-500 mt-1">Send system-wide notification</p>
+                </div>
+              </button>
+              <!-- 
 <button class="flex flex-col gap-3 p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark hover:border-primary hover:shadow-md transition-all text-left group">
 <div class="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined">flag</span>
@@ -442,246 +425,261 @@ Requests submitted by users (last 7 days)
 <p class="text-sm text-slate-500 mt-1">Check flagged accounts &amp; reports</p>
 </div>
 </button> -->
-</div>
-</div>
-<!-- Recent Users Table -->
-<div id = "users"class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-<div class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-<div>
-<h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Registrations</h3>
-<p class="text-sm text-slate-500">New users added to the system today</p>
-</div>
-<div class="flex gap-2">
-    <input
-        type="text"
-        id="userSearchInput"
-        placeholder="Search users..."
-        class="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-    />
-    <button id="exportCSVBtn" class="px-3 py-1.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-600 shadow-sm shadow-blue-500/30">
-        Export CSV
-    </button>
-</div>
+            </div>
+          </div>
+          <!-- Recent Users Table -->
+          <div id="users"
+            class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div
+              class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Registrations</h3>
+                <p class="text-sm text-slate-500">New users added to the system today</p>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" id="userSearchInput" placeholder="Search users..."
+                  class="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                <button id="exportCSVBtn"
+                  class="px-3 py-1.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-600 shadow-sm shadow-blue-500/30">
+                  Export CSV
+                </button>
+              </div>
 
-</div>
-<div class="overflow-x-auto">
-<div class="overflow-x-auto">
-  <table class="w-full text-left border-collapse">
-    <thead>
-      <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
-        <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">ID</th>
-        <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Name</th>
-        <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Role</th>
-        <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Emergency Contact</th>
-        <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700 text-right">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="usersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-      <!-- Populated dynamically -->
-    </tbody>
-  </table> <!-- <-- CLOSE TABLE HERE -->
-</div>
-
-
-</div>
-<div class="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
-
-</div>
-</div>
+            </div>
+            <div class="overflow-x-auto">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr
+                      class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
+                      <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">ID</th>
+                      <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Name</th>
+                      <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Role</th>
+                      <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700">Emergency Contact
+                      </th>
+                      <th class="p-4 font-semibold border-b border-slate-200 dark:border-slate-700 text-right">Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table> <!-- <-- CLOSE TABLE HERE -->
+              </div>
 
 
-<!-- Footer -->
-<footer class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 pb-8 mt-4 border-t border-slate-200 dark:border-slate-800 pt-8">
-<p>© 2026 Sushrusha Health Systems. All rights reserved.</p>
-<div class="flex gap-4">
-<a class="hover:text-primary" href="#">Privacy Policy</a>
-<a class="hover:text-primary" href="#">Terms of Service</a>
-<a class="hover:text-primary" href="#">Support</a>
-</div>
-</footer>
-</div>
-</div>
-</main>
-</div>
-<!-- Add User Modal -->
-<div id="addUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-96 p-6 relative shadow-lg">
-    <button onclick="closeAddUserModal()" class="absolute top-3 right-3 text-slate-500 hover:text-red-500">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Add New User</h3>
-    <form id="addUserForm" class="flex flex-col gap-3">
-      <input type="text" name="name" placeholder="Full Name" required
-        class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      <input type="email" name="email" placeholder="Email" required
-        class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      <input type="password" name="password" placeholder="Password" required
-        class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      <select name="role" class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-        <option value="patient" selected>Patient</option>
-        <option value="caretaker">Caretaker</option>
-      </select>
-      <button type="submit" class="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">Add User</button>
-    </form>
-  </div>
-</div>
-<!-- Toast Notifications Container -->
-<div id="toastContainer" class="fixed top-5 right-5 flex flex-col gap-3 z-50"></div>
-<!-- Confirmation Modal -->
-<div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-80 p-6 shadow-lg text-center">
-    <p id="confirmMessage" class="text-slate-900 dark:text-white mb-4">Are you sure?</p>
-    <div class="flex justify-center gap-4">
-      <button id="confirmYes" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Yes</button>
-      <button id="confirmNo" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">No</button>
-    </div>
-  </div>
-</div>
-<!-- Broadcast Modal -->
-<div id="broadcastModal"
-  class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
 
-  <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md shadow-xl border border-slate-200 dark:border-slate-700">
+            </div>
+          </div>
 
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-        <span class="material-symbols-outlined">campaign</span>
+
+          <!-- Footer -->
+          <footer
+            class="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 pb-8 mt-4 border-t border-slate-200 dark:border-slate-800 pt-8">
+            <p>© 2026 Sushrusha Health Systems. All rights reserved.</p>
+            <div class="flex gap-4">
+              <a class="hover:text-primary" href="#">Privacy Policy</a>
+              <a class="hover:text-primary" href="#">Terms of Service</a>
+              <a class="hover:text-primary" href="#">Support</a>
+            </div>
+          </footer>
+        </div>
       </div>
-      <h2 class="text-lg font-bold text-slate-900 dark:text-white">
-        Send Broadcast
-      </h2>
-    </div>
-
-    <textarea
-      id="broadcastMessage"
-      rows="4"
-      placeholder="Type your message..."
-      class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
-    ></textarea>
-
-    <div class="flex justify-end gap-3 mt-5">
-      <button
-        onclick="closeBroadcastModal()"
-        class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-        Cancel
-      </button>
-
-      <button
-        onclick="sendBroadcast()"
-        class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium">
-        Send
-      </button>
-    </div>
-
+    </main>
   </div>
-</div>
-<!-- Broadcast List Modal -->
-<div id="broadcastListModal"
-  class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-96 p-6 relative shadow-lg">
+      <button onclick="closeAddUserModal()" class="absolute top-3 right-3 text-slate-500 hover:text-red-500">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Add New User</h3>
+      <form id="addUserForm" class="flex flex-col gap-3">
+        <input type="text" name="name" placeholder="Full Name" required
+          class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        <input type="email" name="email" placeholder="Email" required
+          class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        <input type="password" name="password" placeholder="Password" required
+          class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        <select name="role"
+          class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+          <option value="patient" selected>Patient</option>
+          <option value="caretaker">Caretaker</option>
+        </select>
+        <button type="submit"
+          class="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">Add User</button>
+      </form>
+    </div>
+  </div>
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 flex flex-col gap-3 z-50"></div>
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-80 p-6 shadow-lg text-center">
+      <p id="confirmMessage" class="text-slate-900 dark:text-white mb-4">Are you sure?</p>
+      <div class="flex justify-center gap-4">
+        <button id="confirmYes" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Yes</button>
+        <button id="confirmNo" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">No</button>
+      </div>
+    </div>
+  </div>
+  <!-- Broadcast Modal -->
+  <div id="broadcastModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
 
-  <div class="bg-white dark:bg-slate-800 rounded-xl w-full max-w-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col">
+    <div
+      class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md shadow-xl border border-slate-200 dark:border-slate-700">
 
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
-          <span class="material-symbols-outlined">notifications_active</span>
+      <div class="flex items-center gap-3 mb-4">
+        <div
+          class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <span class="material-symbols-outlined">campaign</span>
         </div>
         <h2 class="text-lg font-bold text-slate-900 dark:text-white">
-          Broadcast Alerts
+          Send Broadcast
         </h2>
       </div>
 
-      <button onclick="closeBroadcastListModal()" class="text-slate-500 hover:text-red-500">
+      <textarea id="broadcastMessage" rows="4" placeholder="Type your message..."
+        class="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+
+      <div class="flex justify-end gap-3 mt-5">
+        <button onclick="closeBroadcastModal()"
+          class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+          Cancel
+        </button>
+
+        <button onclick="sendBroadcast()"
+          class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium">
+          Send
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- Broadcast List Modal -->
+  <div id="broadcastListModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+
+    <div
+      class="bg-white dark:bg-slate-800 rounded-xl w-full max-w-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined">notifications_active</span>
+          </div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">
+            Broadcast Alerts
+          </h2>
+        </div>
+
+        <button onclick="closeBroadcastListModal()" class="text-slate-500 hover:text-red-500">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- List -->
+      <div id="broadcastList" class="space-y-3 overflow-y-auto max-h-[60vh] pr-1">
+        <!-- Filled by JS -->
+      </div>
+
+    </div>
+  </div>
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-full max-w-md p-6 relative shadow-lg">
+      <button onclick="closeEditProfileModal()" class="absolute top-3 right-3 text-slate-500 hover:text-red-500">
         <span class="material-symbols-outlined">close</span>
       </button>
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Edit Profile</h3>
+
+      <form id="editProfileForm" class="flex flex-col gap-4" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="edit_profile">
+        <!-- Name -->
+        <div class="flex flex-col gap-1">
+          <label for="editName" class="text-sm text-slate-600 dark:text-slate-300">Full Name</label>
+          <input type="text" id="editName" name="name" required
+            class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1">
+          <label for="editPassword" class="text-sm text-slate-600 dark:text-slate-300">New Password</label>
+          <input type="password" id="editPassword" name="password" placeholder="Leave blank to keep current"
+            class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        </div>
+
+        <!-- Profile Picture -->
+        <div class="flex flex-col gap-1">
+          <label for="editProfilePic" class="text-sm text-slate-600 dark:text-slate-300">Profile Picture</label>
+          <input type="file" id="editProfilePic" name="profile_photo" accept="image/*"
+            class="px-3 py-1 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+        </div>
+
+        <!-- Preview -->
+        <div id="profilePreviewContainer" class="flex justify-center mt-2">
+          <img id="profilePreview" src="" alt="Preview" class="w-24 h-24 rounded-full object-cover hidden">
+        </div>
+
+        <button type="submit"
+          class="mt-3 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">
+          Save Changes
+        </button>
+      </form>
     </div>
-
-    <!-- List -->
-    <div id="broadcastList" class="space-y-3 overflow-y-auto max-h-[60vh] pr-1">
-      <!-- Filled by JS -->
-    </div>
-
   </div>
-</div>
-<!-- Edit Profile Modal -->
-<div id="editProfileModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-surface-light dark:bg-surface-dark rounded-xl w-full max-w-md p-6 relative shadow-lg">
-    <button onclick="closeEditProfileModal()" class="absolute top-3 right-3 text-slate-500 hover:text-red-500">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Edit Profile</h3>
 
-    <form id="editProfileForm" class="flex flex-col gap-4" enctype="multipart/form-data">
-          <input type="hidden" name="action" value="edit_profile">
-      <!-- Name -->
-      <div class="flex flex-col gap-1">
-        <label for="editName" class="text-sm text-slate-600 dark:text-slate-300">Full Name</label>
-        <input type="text" id="editName" name="name" required 
-               class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      </div>
-
-      <!-- Password -->
-      <div class="flex flex-col gap-1">
-        <label for="editPassword" class="text-sm text-slate-600 dark:text-slate-300">New Password</label>
-        <input type="password" id="editPassword" name="password" placeholder="Leave blank to keep current" 
-               class="px-3 py-2 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      </div>
-
-      <!-- Profile Picture -->
-      <div class="flex flex-col gap-1">
-        <label for="editProfilePic" class="text-sm text-slate-600 dark:text-slate-300">Profile Picture</label>
-        <input type="file" id="editProfilePic" name="profile_photo" accept="image/*"
-               class="px-3 py-1 border rounded-lg text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
-      </div>
-
-      <!-- Preview -->
-      <div id="profilePreviewContainer" class="flex justify-center mt-2">
-        <img id="profilePreview" src="" alt="Preview" class="w-24 h-24 rounded-full object-cover hidden">
-      </div>
-
-      <button type="submit" class="mt-3 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">
-        Save Changes
-      </button>
-    </form>
-  </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    loadMedicineRequests();
-    loadUsers(); // load users dynamically
-     loadPatientCount();
-     loadCaretakerCount();
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      loadMedicineRequests();
+      loadUsers(); // load users dynamically
+      loadPatientCount();
+      loadCaretakerCount();
       loadUserDistribution();
-});
+      loadRequestsChart();
+      loadMissedDoses();
+    });
 
-async function loadMedicineRequests() {
-    try {
+    async function loadMissedDoses() {
+      try {
+        const res = await fetch("admin.php?action=total_missed_doses");
+        const data = await res.json();
+        if (data.status === 'success') {
+          document.getElementById('missedDosesCount').innerText = data.total_missed;
+        }
+      } catch (err) {
+        console.error("Error loading missed doses:", err);
+      }
+    }
+
+    async function loadMedicineRequests() {
+      try {
         const res = await fetch("admin.php?action=medicine_requests");
         const data = await res.json();
-         
+
         const table = document.getElementById("medicineRequestsTable");
         table.innerHTML = "";
 
         // Check if data is valid
         if (!data || data.status !== "success" || !Array.isArray(data.requests) || data.requests.length === 0) {
-            table.innerHTML = `
+          table.innerHTML = `
               <tr>
                 <td colspan="5" class="p-4 text-center text-slate-500">
                   No pending requests
                 </td>
               </tr>`;
-            return;
+          return;
         }
 
         // Populate table
         data.requests.forEach(req => {
-            const dosage = req.dosage || "N/A";
-            const form = req.form || "N/A";
-            const requester = req.requester || "Unknown";
+          const dosage = req.dosage || "N/A";
+          const form = req.form || "N/A";
+          const requester = req.requester || "Unknown";
 
-            table.innerHTML += `
+          table.innerHTML += `
               <tr>
                 <td class="p-4">${req.name}</td>
                 <td class="p-4">${dosage}</td>
@@ -702,7 +700,7 @@ async function loadMedicineRequests() {
               </tr>`;
         });
 
-    } catch (err) {
+      } catch (err) {
         console.error("Error loading medicine requests:", err);
         const table = document.getElementById("medicineRequestsTable");
         table.innerHTML = `
@@ -711,49 +709,49 @@ async function loadMedicineRequests() {
               Failed to load medicine requests
             </td>
           </tr>`;
+      }
     }
-}
 
-async function approveRequest(id) {
-   const proceed = await showConfirm("Are you sure you want to approve this medicine?");
-if(!proceed) return;
+    async function approveRequest(id) {
+      const proceed = await showConfirm("Are you sure you want to approve this medicine?");
+      if (!proceed) return;
 
-    try {
+      try {
         const res = await fetch("admin.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `action=approve_medicine&id=${id}`
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=approve_medicine&id=${id}`
         });
         const data = await res.json();
         showToast(data.message || "Approved", "success");
         loadMedicineRequests();
-    } catch (err) {
+      } catch (err) {
         console.error("Error approving request:", err);
-       showToast(data.message || "Approved", "success");
+        showToast(data.message || "Approved", "success");
+      }
     }
-}
 
-async function rejectRequest(id) {
-   const proceed = await showConfirm("Are you sure you want to reject this request?");
-if(!proceed) return;
+    async function rejectRequest(id) {
+      const proceed = await showConfirm("Are you sure you want to reject this request?");
+      if (!proceed) return;
 
-    try {
+      try {
         const res = await fetch("admin.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `action=reject_medicine&id=${id}`
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=reject_medicine&id=${id}`
         });
         const data = await res.json();
-       showToast(data.message || "Approved", "success");
+        showToast(data.message || "Approved", "success");
         loadMedicineRequests();
-    } catch (err) {
+      } catch (err) {
         console.error("Error rejecting request:", err);
-       showToast(data.message || "Approved", "success");
+        showToast(data.message || "Approved", "success");
+      }
     }
-}
 
-async function loadUsers() {
-    try {
+    async function loadUsers() {
+      try {
         const res = await fetch("admin.php?action=fetch_users");
         const data = await res.json();
 
@@ -761,17 +759,17 @@ async function loadUsers() {
         tbody.innerHTML = "";
 
         if (!data || data.status !== "success" || !Array.isArray(data.users) || data.users.length === 0) {
-            tbody.innerHTML = `
+          tbody.innerHTML = `
                 <tr>
                     <td colspan="5" class="p-4 text-center text-slate-500">No users found</td>
                 </tr>`;
-            return;
+          return;
         }
 
-       data.users
-    .filter(user => user.role !== 'admin') // <-- exclude admins
-    .forEach(user => {
-        tbody.innerHTML += `
+        data.users
+          .filter(user => user.role !== 'admin') // <-- exclude admins
+          .forEach(user => {
+            tbody.innerHTML += `
             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <td class="p-4">${user.id}</td>
                 <td class="p-4">${user.name}</td>
@@ -782,156 +780,156 @@ async function loadUsers() {
                     <button onclick="deleteUser(${user.id})" class="px-3 py-1 text-xs bg-red-600 text-white rounded">Delete</button>
                 </td>
             </tr>`;
-    });
+          });
 
 
-    } catch (err) {
+      } catch (err) {
         console.error("Error loading users:", err);
+      }
     }
-}
 
-// View user profile
-function viewUser(id){
-    window.location.href = `view_user.php?id=${id}`; // create this page to show profile
-}
+    // View user profile
+    function viewUser(id) {
+      window.location.href = `view_user.php?id=${id}`; // create this page to show profile
+    }
 
-// Delete user
-async function deleteUser(id){
- const proceed = await showConfirm("Are you sure you want to delete this user?");
-if(!proceed) return;
-    try {
+    // Delete user
+    async function deleteUser(id) {
+      const proceed = await showConfirm("Are you sure you want to delete this user?");
+      if (!proceed) return;
+      try {
         const res = await fetch("admin.php", {
-            method: "POST",
-            headers: {"Content-Type":"application/x-www-form-urlencoded"},
-            body: `action=delete_user&id=${id}`
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=delete_user&id=${id}`
         });
         const data = await res.json();
         showToast(data.message || "Approved", "success");
         loadUsers(); // refresh table
-    } catch(err) {
+      } catch (err) {
         console.error("Error deleting user:", err);
-     showToast(data.message || "Approved", "success");
+        showToast(data.message || "Approved", "success");
+      }
     }
-}
-document.getElementById('userSearchInput').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const tbody = document.getElementById("usersTableBody");
+    document.getElementById('userSearchInput').addEventListener('input', function () {
+      const query = this.value.toLowerCase();
+      const tbody = document.getElementById("usersTableBody");
 
-    Array.from(tbody.getElementsByTagName("tr")).forEach(row => {
+      Array.from(tbody.getElementsByTagName("tr")).forEach(row => {
         const name = row.cells[1]?.textContent.toLowerCase() || "";
         const role = row.cells[2]?.textContent.toLowerCase() || "";
         const contact = row.cells[3]?.textContent.toLowerCase() || "";
 
-        if(name.includes(query) || role.includes(query) || contact.includes(query)) {
-            row.style.display = "";
+        if (name.includes(query) || role.includes(query) || contact.includes(query)) {
+          row.style.display = "";
         } else {
-            row.style.display = "none";
+          row.style.display = "none";
         }
-    });
-});
-document.getElementById('exportCSVBtn').addEventListener('click', function() {
-    const rows = document.querySelectorAll("#usersTableBody tr:not([style*='display: none'])");
-    if(rows.length === 0){
-       showToast(data.message || "Approved", "success");
-        return;
-    }
-
-    let csvContent = "ID,Name,Role,Emergency Contact\n"; // headers
-
-    rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        const rowData = Array.from(cols).slice(0,4).map(td => `"${td.textContent.trim()}"`).join(",");
-        csvContent += rowData + "\n";
-    });
-
-    // Create a downloadable blob
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "users_export.csv");
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-});
-const addUserBtn = document.getElementById("addUserBtn");
-const addUserModal = document.getElementById("addUserModal");
-const addUserForm = document.getElementById("addUserForm");
-
-// Open modal
-addUserBtn.addEventListener("click", () => {
-    addUserModal.classList.remove("hidden");
-    addUserModal.classList.add("flex");
-});
-
-
-  // Close modal
-  function closeAddUserModal() {
-    addUserModal.classList.add("hidden");
-    addUserModal.classList.remove("flex");
-    addUserForm.reset();
-  }
-
-  // Submit form via AJAX
-  addUserForm.addEventListener("submit", async function(e){
-    e.preventDefault();
-    const formData = new FormData(addUserForm);
-    formData.append("action", "add_user");
-
-    try {
-      const res = await fetch("admin.php", {
-        method: "POST",
-        body: new URLSearchParams(formData)
       });
-      const data = await res.json();
-     showToast(data.message || "Approved", "success");
-      if(data.status === "success"){
-        closeAddUserModal();
-        loadUsers(); // refresh table
+    });
+    document.getElementById('exportCSVBtn').addEventListener('click', function () {
+      const rows = document.querySelectorAll("#usersTableBody tr:not([style*='display: none'])");
+      if (rows.length === 0) {
+        showToast(data.message || "Approved", "success");
+        return;
       }
-    } catch(err){
-      console.error("Error adding user:", err);
-      showToast(data.message || "Approved", "success");
+
+      let csvContent = "ID,Name,Role,Emergency Contact\n"; // headers
+
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        const rowData = Array.from(cols).slice(0, 4).map(td => `"${td.textContent.trim()}"`).join(",");
+        csvContent += rowData + "\n";
+      });
+
+      // Create a downloadable blob
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "users_export.csv");
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+    const addUserBtn = document.getElementById("addUserBtn");
+    const addUserModal = document.getElementById("addUserModal");
+    const addUserForm = document.getElementById("addUserForm");
+
+    // Open modal
+    addUserBtn.addEventListener("click", () => {
+      addUserModal.classList.remove("hidden");
+      addUserModal.classList.add("flex");
+    });
+
+
+    // Close modal
+    function closeAddUserModal() {
+      addUserModal.classList.add("hidden");
+      addUserModal.classList.remove("flex");
+      addUserForm.reset();
     }
-  });
 
-  function showToast(message, type = "info", duration = 3000) {
-    const container = document.getElementById("toastContainer");
+    // Submit form via AJAX
+    addUserForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(addUserForm);
+      formData.append("action", "add_user");
 
-    // Colors based on type
-    const colors = {
+      try {
+        const res = await fetch("admin.php", {
+          method: "POST",
+          body: new URLSearchParams(formData)
+        });
+        const data = await res.json();
+        showToast(data.message || "Approved", "success");
+        if (data.status === "success") {
+          closeAddUserModal();
+          loadUsers(); // refresh table
+        }
+      } catch (err) {
+        console.error("Error adding user:", err);
+        showToast(data.message || "Approved", "success");
+      }
+    });
+
+    function showToast(message, type = "info", duration = 3000) {
+      const container = document.getElementById("toastContainer");
+
+      // Colors based on type
+      const colors = {
         success: "bg-green-600 text-white",
         error: "bg-red-600 text-white",
         info: "bg-blue-600 text-white",
         warning: "bg-amber-600 text-white",
-    };
+      };
 
-    const toast = document.createElement("div");
-    toast.className = `px-4 py-2 rounded shadow-lg ${colors[type] || colors.info} animate-slideIn`;
-    toast.textContent = message;
+      const toast = document.createElement("div");
+      toast.className = `px-4 py-2 rounded shadow-lg ${colors[type] || colors.info} animate-slideIn`;
+      toast.textContent = message;
 
-    container.appendChild(toast);
+      container.appendChild(toast);
 
-    // Remove after duration
-    setTimeout(() => {
+      // Remove after duration
+      setTimeout(() => {
         toast.classList.add("opacity-0", "transition-opacity", "duration-500");
         toast.addEventListener("transitionend", () => toast.remove());
-    }, duration);
-}
+      }, duration);
+    }
 
-// Optional: Tailwind animation
-const style = document.createElement("style");
-style.textContent = `
+    // Optional: Tailwind animation
+    const style = document.createElement("style");
+    style.textContent = `
 @keyframes slideIn {
   0% { transform: translateX(100%); opacity: 0; }
   100% { transform: translateX(0); opacity: 1; }
 }
 .animate-slideIn { animation: slideIn 0.3s ease-out; }
 `;
-document.head.appendChild(style);
-function showConfirm(message) {
-    return new Promise((resolve) => {
+    document.head.appendChild(style);
+    function showConfirm(message) {
+      return new Promise((resolve) => {
         const modal = document.getElementById("confirmModal");
         const msgEl = document.getElementById("confirmMessage");
         const yesBtn = document.getElementById("confirmYes");
@@ -942,75 +940,75 @@ function showConfirm(message) {
         modal.classList.add("flex");
 
         yesBtn.onclick = () => {
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
-            resolve(true);
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          resolve(true);
         };
         noBtn.onclick = () => {
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
-            resolve(false);
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          resolve(false);
         };
-    });
-}
-function openBroadcastModal(){
-  const modal = document.getElementById('broadcastModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-function closeBroadcastModal() {
-    document.getElementById("broadcastModal").classList.remove("flex");
-    document.getElementById("broadcastModal").classList.add("hidden");
-}
+      });
+    }
+    function openBroadcastModal() {
+      const modal = document.getElementById('broadcastModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    function closeBroadcastModal() {
+      document.getElementById("broadcastModal").classList.remove("flex");
+      document.getElementById("broadcastModal").classList.add("hidden");
+    }
 
-function closeBroadcastListModal(){
-  const modal = document.getElementById('broadcastListModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-async function sendBroadcast(){
-  const msg = document.getElementById('broadcastMessage').value.trim();
-  if(!msg){
-    showToast("Message cannot be empty", "error");
-    return;
-  }
+    function closeBroadcastListModal() {
+      const modal = document.getElementById('broadcastListModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+    async function sendBroadcast() {
+      const msg = document.getElementById('broadcastMessage').value.trim();
+      if (!msg) {
+        showToast("Message cannot be empty", "error");
+        return;
+      }
 
-  const res = await fetch("admin.php",{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:`action=add_broadcast&message=${encodeURIComponent(msg)}`
-  });
+      const res = await fetch("admin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=add_broadcast&message=${encodeURIComponent(msg)}`
+      });
 
-  const data = await res.json();
-  showToast(data.message, data.status);
+      const data = await res.json();
+      showToast(data.message, data.status);
 
-  document.getElementById('broadcastMessage').value = '';
-  closeBroadcastModal();
+      document.getElementById('broadcastMessage').value = '';
+      closeBroadcastModal();
 
-  // ✅ FIX
-  openBroadcasts();
-}
+      // ✅ FIX
+      openBroadcasts();
+    }
 
 
-async function openBroadcasts() {
-  document.getElementById("broadcastListModal").classList.remove("hidden");
-  document.getElementById("broadcastListModal").classList.add("flex");
+    async function openBroadcasts() {
+      document.getElementById("broadcastListModal").classList.remove("hidden");
+      document.getElementById("broadcastListModal").classList.add("flex");
 
-  const list = document.getElementById("broadcastList");
-  list.innerHTML = `<p class="text-sm text-slate-500">Loading...</p>`;
+      const list = document.getElementById("broadcastList");
+      list.innerHTML = `<p class="text-sm text-slate-500">Loading...</p>`;
 
-  const res = await fetch("admin.php?action=fetch_broadcasts");
-  const data = await res.json();
+      const res = await fetch("admin.php?action=fetch_broadcasts");
+      const data = await res.json();
 
-  list.innerHTML = "";
+      list.innerHTML = "";
 
-  if (!data.broadcasts || data.broadcasts.length === 0) {
-    list.innerHTML = `<p class="text-sm text-slate-500">No broadcasts yet</p>`;
-    return;
-  }
+      if (!data.broadcasts || data.broadcasts.length === 0) {
+        list.innerHTML = `<p class="text-sm text-slate-500">No broadcasts yet</p>`;
+        return;
+      }
 
-  data.broadcasts.forEach(b => {
-    list.innerHTML += `
+      data.broadcasts.forEach(b => {
+        list.innerHTML += `
       <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex justify-between gap-4">
 
         <div class="flex-1">
@@ -1040,35 +1038,35 @@ async function openBroadcasts() {
 
       </div>
     `;
-  });
-}
+      });
+    }
 
-async function loadPatientCount() {
-    try {
+    async function loadPatientCount() {
+      try {
         const res = await fetch("admin.php?action=patient_count");
         const data = await res.json();
 
         if (data.status === 'success') {
-            document.getElementById('patientCount').innerText = data.total_patients;
+          document.getElementById('patientCount').innerText = data.total_patients;
         }
-    } catch (err) {
+      } catch (err) {
         console.error("Failed to load patient count", err);
+      }
     }
-}
-async function loadCaretakerCount() {
-    try {
+    async function loadCaretakerCount() {
+      try {
         const res = await fetch("admin.php?action=caretaker_count");
         const data = await res.json();
 
         if (data.status === 'success') {
-            document.getElementById('caretakerCount').innerText = data.total_caretaker;
+          document.getElementById('caretakerCount').innerText = data.total_caretaker;
         }
-    } catch (err) {
+      } catch (err) {
         console.error("Failed to load patient count", err);
+      }
     }
-}
-async function loadUserDistribution() {
-    try {
+    async function loadUserDistribution() {
+      try {
         const res = await fetch("admin.php?action=user_distribution");
         const data = await res.json();
 
@@ -1083,169 +1081,251 @@ async function loadUserDistribution() {
 
         // Update donut
         document.getElementById('userDonut').style.background =
-            `conic-gradient(#137fec 0% ${patientPercent}%, #e2e8f0 ${patientPercent}% 100%)`;
+          `conic-gradient(#137fec 0% ${patientPercent}%, #e2e8f0 ${patientPercent}% 100%)`;
 
         // Update center number
         document.getElementById('totalUsers').innerText = total;
 
         // Update labels
         document.getElementById('patientLabel').innerText =
-            `Patients (${patientPercent}%)`;
+          `Patients (${patientPercent}%)`;
 
         document.getElementById('caretakerLabel').innerText =
-            `Caretakers (${caretakerPercent}%)`;
+          `Caretakers (${caretakerPercent}%)`;
 
-    } catch (err) {
+      } catch (err) {
         console.error("Failed to load user distribution", err);
+      }
     }
-}
-function updateClock() {
-    const clock = document.getElementById("liveClock");
-    const now = new Date();
+    function updateClock() {
+      const clock = document.getElementById("liveClock");
+      const now = new Date();
 
-    // Get date parts
-    const day = now.getDate();
-    const month = now.toLocaleString('default', { month: 'long' }); // Full month name
-    const year = now.getFullYear();
+      // Get date parts
+      const day = now.getDate();
+      const month = now.toLocaleString('default', { month: 'long' }); // Full month name
+      const year = now.getFullYear();
 
-    // Get time parts
-    let hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; // convert 0 to 12 for 12 AM
+      // Get time parts
+      let hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12; // convert 0 to 12 for 12 AM
 
-    const formattedTime = 
+      const formattedTime =
         `${day} ${month} ${year} | ` +
-        `${hours.toString().padStart(2,'0')}:` +
-        `${minutes.toString().padStart(2,'0')}:` +
-        `${seconds.toString().padStart(2,'0')} ${ampm}`;
+        `${hours.toString().padStart(2, '0')}:` +
+        `${minutes.toString().padStart(2, '0')}:` +
+        `${seconds.toString().padStart(2, '0')} ${ampm}`;
 
-    clock.textContent = formattedTime;
-}
+      clock.textContent = formattedTime;
+    }
 
-// Update immediately and every second
-updateClock();
-setInterval(updateClock, 1000);
-// Toggle dropdown
-const profileBtn = document.getElementById('profileBtn');
-const profileDropdown = document.getElementById('profileDropdown');
+    // Update immediately and every second
+    updateClock();
+    setInterval(updateClock, 1000);
+    // Toggle dropdown
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
 
-profileBtn.addEventListener('click', () => {
-  profileDropdown.classList.toggle('hidden');
-});
-
-// Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-  if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-    profileDropdown.classList.add('hidden');
-  }
-});
-
-// Logout function
-function logout() {
-  window.location.href = '../../public/logout.php';
-}
-// Open/Close modal
-function openEditProfileModal() {
-  // Pre-fill current name and picture
-  document.getElementById('editName').value = "Admin User"; // Replace with actual name from session
-  const currentPic = document.querySelector('#profileBtn img').src;
-  const preview = document.getElementById('profilePreview');
-  preview.src = currentPic;
-  preview.classList.remove('hidden');
-
-  document.getElementById('editProfileModal').classList.remove('hidden');
-}
-
-function closeEditProfileModal() {
-  document.getElementById('editProfileModal').classList.add('hidden');
-}
-
-// Profile picture preview
-const profileInput = document.getElementById('editProfilePic');
-profileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const preview = document.getElementById('profilePreview');
-    preview.src = reader.result;
-    preview.classList.remove('hidden');
-  };
-  reader.readAsDataURL(file);
-});
-document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.target);
-
-  try {
-    const res = await fetch('admin.php', {
-      method: 'POST',
-      body: formData
+    profileBtn.addEventListener('click', () => {
+      profileDropdown.classList.toggle('hidden');
     });
 
-    const data = await res.json();
-    if (data.status === 'success') {
-      showToast('Profile updated successfully', 'success');
-      // Update avatar in header
-      document.querySelector('#profileBtn img').src = data.new_profile_photo || document.querySelector('#profileBtn img').src;
-      closeEditProfileModal();
-    } else {
-      showToast(data.message || 'Failed to update profile', 'error');
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.add('hidden');
+      }
+    });
+
+    // Logout function
+    function logout() {
+      window.location.href = '../../public/logout.php';
     }
-  } catch (err) {
-    console.error(err);
-    showToast('Error updating profile', 'error');
-  }
-});
-document.getElementById("editProfileBtn").addEventListener("click", () => {
+    // Open/Close modal
+    function openEditProfileModal() {
+      // Pre-fill current name and picture
+      document.getElementById('editName').value = "Admin User"; // Replace with actual name from session
+      const currentPic = document.querySelector('#profileBtn img').src;
+      const preview = document.getElementById('profilePreview');
+      preview.src = currentPic;
+      preview.classList.remove('hidden');
+
+      document.getElementById('editProfileModal').classList.remove('hidden');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').classList.add('hidden');
+    }
+
+    // Profile picture preview
+    const profileInput = document.getElementById('editProfilePic');
+    profileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const preview = document.getElementById('profilePreview');
+        preview.src = reader.result;
+        preview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+
+      try {
+        const res = await fetch('admin.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast('Profile updated successfully', 'success');
+          // Update avatar in header
+          document.querySelector('#profileBtn img').src = data.new_profile_photo || document.querySelector('#profileBtn img').src;
+          closeEditProfileModal();
+        } else {
+          showToast(data.message || 'Failed to update profile', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Error updating profile', 'error');
+      }
+    });
+    document.getElementById("editProfileBtn").addEventListener("click", () => {
       document.getElementById("editProfileModal").classList.remove("hidden");
-  });
+    });
 
-  // Close modal function
-  function closeEditProfileModal() {
+    // Close modal function
+    function closeEditProfileModal() {
       document.getElementById("editProfileModal").classList.add("hidden");
-  }
-  async function editBroadcast(id){
-  const msgEl = document.getElementById(`msg-${id}`);
-  const oldMsg = msgEl.innerText;
+    }
+    async function editBroadcast(id) {
+      const msgEl = document.getElementById(`msg-${id}`);
+      const oldMsg = msgEl.innerText;
 
-  const newMsg = prompt("Edit broadcast message:", oldMsg);
-  if(!newMsg || newMsg.trim() === oldMsg) return;
+      const newMsg = prompt("Edit broadcast message:", oldMsg);
+      if (!newMsg || newMsg.trim() === oldMsg) return;
 
-  const res = await fetch("admin.php",{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:`action=edit_broadcast&id=${id}&message=${encodeURIComponent(newMsg)}`
-  });
+      const res = await fetch("admin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=edit_broadcast&id=${id}&message=${encodeURIComponent(newMsg)}`
+      });
 
-  const data = await res.json();
-  showToast(data.message, data.status);
+      const data = await res.json();
+      showToast(data.message, data.status);
 
-  if(data.status === 'success'){
-    msgEl.innerText = newMsg;
-  }
-}
-async function deleteBroadcast(id){
-  if(!confirm("Delete this broadcast?")) return;
+      if (data.status === 'success') {
+        msgEl.innerText = newMsg;
+      }
+    }
+    async function deleteBroadcast(id) {
+      if (!confirm("Delete this broadcast?")) return;
 
-  const res = await fetch("admin.php",{
-    method:"POST",
-    headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:`action=delete_broadcast&id=${id}`
-  });
+      const res = await fetch("admin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=delete_broadcast&id=${id}`
+      });
 
-  const data = await res.json();
-  showToast(data.message, data.status);
+      const data = await res.json();
+      showToast(data.message, data.status);
 
-  if(data.status === 'success'){
-    openBroadcasts(); // reload list
-  }
-}
+      if (data.status === 'success') {
+        openBroadcasts(); // reload list
+      }
+    }
 
 
-</script>
 
-</body></html>
+    // Load Line Chart
+    async function loadRequestsChart() {
+      try {
+        const res = await fetch("admin.php?action=medicine_requests_over_time");
+        const data = await res.json();
+
+        if (data.status !== 'success') return;
+
+        const ctx = document.getElementById('requestChart').getContext('2d');
+
+        // Destroy existing chart if it exists to prevent "Canvas is already in use" error
+        const existingChart = Chart.getChart("requestChart");
+        if (existingChart) {
+          existingChart.destroy();
+        }
+
+        // Gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(19, 127, 236, 0.2)');
+        gradient.addColorStop(1, 'rgba(19, 127, 236, 0)');
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Medicine Requests',
+              data: data.data,
+              backgroundColor: gradient,
+              borderColor: '#137fec',
+              borderWidth: 2,
+              pointBackgroundColor: '#ffffff',
+              pointBorderColor: '#137fec',
+              pointRadius: 4,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1e293b',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: { family: 'Inter', size: 13 },
+                bodyFont: { family: 'Inter', size: 13 }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: {
+                  font: { family: 'Inter', size: 11 },
+                  color: '#94a3b8'
+                }
+              },
+              y: {
+                grid: {
+                  color: '#e2e8f0',
+                  borderDash: [5, 5]
+                },
+                ticks: {
+                  stepSize: 1,
+                  font: { family: 'Inter', size: 11 },
+                  color: '#94a3b8'
+                },
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+      } catch (err) {
+        console.error("Error loading chart:", err);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
