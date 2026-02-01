@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../config/db.php';
+require '../helpers/sendOtp.php';
 
 header('Content-Type: application/json');
 
@@ -120,6 +121,45 @@ switch ($action) {
 
         $patient = $stmt->get_result()->fetch_assoc();
 
+        if ($patient) {
+            // Calculate Adherence Score
+            $patientId = $patient['patient_id'];
+            $adherencePct = 0;
+
+            // 1. Check if patient has medicines
+            $countMedStmt = $conn->prepare("SELECT COUNT(*) as total_meds FROM medicines WHERE patient_id = ?");
+            $countMedStmt->bind_param("i", $patientId);
+            $countMedStmt->execute();
+            $totalMeds = $countMedStmt->get_result()->fetch_assoc()['total_meds'];
+            $countMedStmt->close();
+
+            // 2. Calculate based on logs if meds exist
+            if ($totalMeds > 0) {
+                $logStmt = $conn->prepare("
+                    SELECT 
+                        COUNT(*) as total_attempts,
+                        SUM(CASE WHEN dl.status = 'TAKEN' THEN 1 ELSE 0 END) as taken_count
+                    FROM dose_logs dl
+                    JOIN medicine_schedule ms ON dl.schedule_id = ms.id
+                    JOIN medicines m ON ms.medicine_id = m.id
+                    WHERE m.patient_id = ?
+                ");
+                $logStmt->bind_param("i", $patientId);
+                $logStmt->execute();
+                $logData = $logStmt->get_result()->fetch_assoc();
+                $logStmt->close();
+
+                $totalLogs = intval($logData['total_attempts']);
+                $takenCount = intval($logData['taken_count']);
+
+                if ($totalLogs > 0) {
+                    $adherencePct = round(($takenCount / $totalLogs) * 100);
+                }
+            }
+            
+            $patient['adherence_score'] = $adherencePct;
+        }
+
         echo json_encode(
             $patient
                 ? ['status' => 'success', 'data' => $patient]
@@ -198,13 +238,11 @@ case 'getPatientMedicines':
                 u.name          AS patient_name,
                 u.contact_number,
                 u.emergency_contact,
-                md.doctor_name,
-                md.hospital_name
+                (SELECT doctor_name FROM prescriptions WHERE patient_id = u.id ORDER BY prescription_date DESC, id DESC LIMIT 1) AS doctor_name,
+                (SELECT hospital_name FROM prescriptions WHERE patient_id = u.id ORDER BY prescription_date DESC, id DESC LIMIT 1) AS hospital_name
             FROM caregivers c
             JOIN users u 
                 ON u.id = c.patient_id
-            LEFT JOIN medical_details md 
-                ON md.patient_id = u.id
             WHERE c.caregiver_id = ?
             LIMIT 1
         ");
@@ -252,14 +290,15 @@ case 'getPatientMedicines':
                 m.name,
                 m.dosage_value,
                 m.dosage_unit,
-                dl.intake_datetime,
+                dl.log_time AS intake_datetime,
                 dl.status
             FROM medicines m
-            LEFT JOIN dose_logs dl ON m.id = dl.medicine_id AND dl.patient_id = ?
-            WHERE m.patient_id = ? AND dl.status = 'Missed'
-            ORDER BY dl.intake_datetime DESC
+            JOIN medicine_schedule ms ON m.id = ms.medicine_id
+            JOIN dose_logs dl ON ms.id = dl.schedule_id
+            WHERE m.patient_id = ? AND (dl.status = 'Missed' OR dl.status = 'missed')
+            ORDER BY dl.log_time DESC
         ");
-        $stmt->bind_param("ii", $patientId, $patientId);
+        $stmt->bind_param("i", $patientId);
         $stmt->execute();
         $res = $stmt->get_result();
 
@@ -566,13 +605,17 @@ case 'getPatientMedicines':
             exit;
         }
 
+        if ($medicineId === '' || $medicineId === 'null') {
+            $medicineId = null;
+        }
+
         $stmt = $conn->prepare("
             INSERT INTO caretaker_notes (patient_id, caretaker_id, medicine_id, note_type, message)
             VALUES (?, ?, ?, ?, ?)
         ");
         
         $stmt->bind_param(
-            "iiiis",
+            "iiiss",
             $patientId,
             $caretakerId,
             $medicineId,
@@ -893,6 +936,88 @@ case 'getPatientMedicines':
                 'tests' => $tests
             ]
         ]);
+        break;
+
+    /* ===============================
+       CHANGE PASSWORD FLOW
+    =============================== */
+    case 'requestPasswordChangeOTP':
+        // 1. Get user email
+        $stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->bind_param("i", $caretakerId);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
+
+        if (!$user) {
+            echo json_encode(['status' => 'error', 'message' => 'User not found']);
+            exit;
+        }
+
+        $email = $user['email'];
+
+        // 2. Generate OTP
+        $otp = strval(rand(100000, 999999));
+        // $expiry calculation removed to use DB time
+
+        // 3. Update DB
+        $stmt = $conn->prepare("UPDATE users SET reset_code = ?, reset_expiry = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE id = ?");
+        $stmt->bind_param("si", $otp, $caretakerId);
+        
+        if ($stmt->execute()) {
+            // 4. Send Email
+            if (sendOTP($email, $otp)) {
+                echo json_encode(['status' => 'success', 'message' => 'OTP sent to your registered email']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to send OTP email']);
+            }
+        } else {
+             echo json_encode(['status' => 'error', 'message' => 'Database error']);
+        }
+        break;
+
+    case 'verifyPasswordChangeOTP':
+        $otp = $_POST['otp'] ?? '';
+        
+        $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND reset_code = ? AND reset_expiry > NOW()");
+        $stmt->bind_param("is", $caretakerId, $otp);
+        $stmt->execute();
+        
+        if ($stmt->get_result()->num_rows > 0) {
+            echo json_encode(['status' => 'success', 'message' => 'OTP verified']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid or expired OTP']);
+        }
+        break;
+
+    case 'changePassword':
+        $otp = $_POST['otp'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+
+        if (strlen($newPassword) < 8) {
+            echo json_encode(['status' => 'error', 'message' => 'Password must be at least 8 characters']);
+            exit;
+        }
+
+        // Verify OTP again to be safe
+        $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND reset_code = ? AND reset_expiry > NOW()");
+        $stmt->bind_param("is", $caretakerId, $otp);
+        $stmt->execute();
+
+        if ($stmt->get_result()->num_rows > 0) {
+            // Update Password
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            
+            $stmt = $conn->prepare("UPDATE users SET password = ?, reset_code = NULL, reset_expiry = NULL WHERE id = ?");
+            $stmt->bind_param("si", $hash, $caretakerId);
+            
+            if ($stmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Password updated successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to update password']);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid session or OTP expired']);
+        }
         break;
 
     default:

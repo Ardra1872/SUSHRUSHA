@@ -96,40 +96,50 @@
               <span class="material-symbols-outlined">description</span>
               <p class="text-sm font-medium">Reports</p>
             </a>
+
+            <a data-section="notes"
+              class="flex items-center gap-3 px-3 py-2 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              href="#">
+              <span class="material-symbols-outlined">notes</span>
+              <p class="text-sm font-medium">Notes</p>
+            </a>
           </nav>
 
         </div>
         <div class="flex flex-col gap-4">
-          <button
-            class="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold w-full">
-            <span class="material-symbols-outlined text-sm">add</span>
-            <span>Add Note</span>
-          </button>
-          <div class="pt-4 border-t border-[#cfdbe7] dark:border-slate-800 relative">
-            <button id="profile-dropdown-btn"
-              class="flex items-center gap-3 px-2 py-2 w-full hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-              <div id="caretaker-photo"
-                class="bg-primary text-white flex items-center justify-center aspect-square rounded-full size-8">
-                <span class="material-symbols-outlined text-xl">medical_services</span>
+          <div class="flex flex-col gap-4">
+            <!-- Add Note button moved to Notes section -->
+            <div class="pt-4 border-t border-[#cfdbe7] dark:border-slate-800 relative">
+              <button id="profile-dropdown-btn"
+                class="flex items-center gap-3 px-2 py-2 w-full hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <div id="caretaker-photo"
+                  class="bg-primary text-white flex items-center justify-center aspect-square rounded-full size-8">
+                  <span class="material-symbols-outlined text-xl">medical_services</span>
+                </div>
+                <div class="flex-1 overflow-hidden text-left">
+                  <p id="caretaker-name" class="text-[#0d141b] dark:text-white text-xs font-bold truncate">Loading...
+                  </p>
+                  <p id="caretaker-role" class="text-[#4c739a] text-[10px] truncate">Loading...</p>
+                </div>
+                <span class="material-symbols-outlined text-[#4c739a] text-sm">expand_more</span>
+              </button>
+              <!-- Profile Dropdown Menu -->
+              <div id="profile-dropdown-menu"
+                class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-800 border border-[#cfdbe7] dark:border-slate-700 rounded-lg shadow-lg z-50 overflow-hidden">
+                <button id="change-password-btn"
+                  class="flex items-center gap-3 px-4 py-3 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium transition-colors w-full text-left">
+                  <span class="material-symbols-outlined text-base">lock_reset</span>
+                  <span>Change Password</span>
+                </button>
+                <a href="../../public/logout.php"
+                  class="flex items-center gap-3 px-4 py-3 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium transition-colors w-full rounded-lg">
+                  <span class="material-symbols-outlined text-base">logout</span>
+                  <span>Logout</span>
+                </a>
               </div>
-              <div class="flex-1 overflow-hidden text-left">
-                <p id="caretaker-name" class="text-[#0d141b] dark:text-white text-xs font-bold truncate">Loading...</p>
-                <p id="caretaker-role" class="text-[#4c739a] text-[10px] truncate">Loading...</p>
-              </div>
-              <span class="material-symbols-outlined text-[#4c739a] text-sm">expand_more</span>
-            </button>
-            <!-- Profile Dropdown Menu -->
-            <div id="profile-dropdown-menu"
-              class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-800 border border-[#cfdbe7] dark:border-slate-700 rounded-lg shadow-lg z-50">
-              <a href="../../public/logout.php"
-                class="flex items-center gap-3 px-4 py-3 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium transition-colors w-full rounded-lg">
-                <span class="material-symbols-outlined text-base">logout</span>
-                <span>Logout</span>
-              </a>
             </div>
           </div>
         </div>
-      </div>
     </aside>
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col w-full min-h-0">
@@ -144,8 +154,9 @@
         <div class="flex items-center gap-4">
           <label class="hidden md:flex items-center bg-background-light dark:bg-slate-800 rounded-lg px-3 h-10 w-64">
             <span class="material-symbols-outlined text-[#4c739a] mr-2">search</span>
-            <input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-[#4c739a]"
-              placeholder="Search medicine or notes..." type="text" />
+            <input id="search-input"
+              class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-[#4c739a]"
+              placeholder="Search medicines or notes..." type="text" />
           </label>
           <button id="notification-btn"
             class="relative p-2 text-[#4c739a] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
@@ -287,6 +298,23 @@
           </div>
         </div>
       </div>
+      <!-- Change Password Modal -->
+      <div id="password-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md">
+          <div class="flex items-center justify-between p-6 border-b border-[#cfdbe7] dark:border-slate-800">
+            <h2 class="text-xl font-bold text-[#0d141b] dark:text-white flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">lock_reset</span>
+              Change Password
+            </h2>
+            <button id="close-password-modal" class="text-[#4c739a] hover:text-[#0d141b] dark:hover:text-white">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="p-6 space-y-4" id="password-modal-content">
+            <!-- Steps will be injected here -->
+          </div>
+        </div>
+      </div>
       <!-- Send Message Modal -->
       <div id="send-message-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md">
@@ -356,10 +384,7 @@
                       <span class="material-symbols-outlined text-sm">monitoring</span>
                       Adherence Score: <span id="patient-adherence" class="font-bold text-green-600">--</span>
                     </p>
-                    <p class="text-[#4c739a] text-sm flex items-center gap-1">
-                      <span class="material-symbols-outlined text-sm">schedule</span>
-                      Last synced: <span id="patient-synced" class="font-medium">--</span>
-                    </p>
+
                   </div>
                 </div>
               </div>
@@ -435,16 +460,39 @@
             </div>
           </div>
 
-          <!-- Caretaker Notes -->
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-[#0d141b] dark:text-white flex items-center gap-2">
-                <span class="material-symbols-outlined">notes</span>
-                Caretaker Notes
-              </h3>
+          <!-- Caretaker Notes moved to section-notes -->
+        </div>
+
+        <!-- Notes Section -->
+        <div id="section-notes" class="hidden px-6 pb-6 pt-6 w-full space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-[#0d141b] dark:text-white">Caregiver Notes</h2>
+            <button id="add-note-btn-main"
+              class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors">
+              <span class="material-symbols-outlined text-sm">add</span>
+              <span>Add Note</span>
+            </button>
+          </div>
+
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 relative">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4c739a]">search</span>
+              <input id="notes-search" type="text" placeholder="Search notes..."
+                class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
             </div>
+            <div class="w-full md:w-64">
+              <select id="notes-filter-medicine"
+                class="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-[#cfdbe7] dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option value="">All Medicines</option>
+                <!-- Populate via JS -->
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="bg-white dark:bg-slate-900 rounded-xl border border-[#cfdbe7] dark:border-slate-800 p-6 min-h-[60vh]">
             <div id="notes-list" class="flex flex-col gap-3">
-              <!-- Notes will be loaded here dynamically -->
               <div class="text-center p-4 text-[#4c739a]">Loading notes...</div>
             </div>
           </div>
@@ -693,8 +741,11 @@
               <h3 class="text-lg font-bold text-[#0d141b] dark:text-white">Current Medicines</h3>
             </div>
 
-            <div id="medicine-report-list" class="space-y-3">
-              <p class="text-sm text-[#4c739a] dark:text-slate-300">Loading medicines...</p>
+            <div id="medicine-report-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                class="col-span-full text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                <p class="text-[#4c739a] dark:text-slate-300">Loading medicines...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -800,6 +851,7 @@
         document.getElementById('section-profile')?.classList.add('hidden');
         document.getElementById('section-emergency')?.classList.add('hidden');
         document.getElementById('section-reports')?.classList.add('hidden');
+        document.getElementById('section-notes')?.classList.add('hidden');
 
         // Remove active class from sidebar links
         sidebarLinks.forEach(l => {
@@ -917,6 +969,11 @@
           scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
 
           loadReports();
+        } else if (section === 'notes') {
+          document.getElementById('section-notes').classList.remove('hidden');
+          const scrollContainer = document.querySelector('.overflow-y-auto');
+          scrollContainer?.scrollTo({ top: 0, behavior: 'instant' });
+          loadNotes();
         }
       });
     });
@@ -956,103 +1013,8 @@
       // Load today's schedule
       loadTodaysSchedule();
 
-      // ====== 2️⃣ Search Functionality ======
-      const searchInput = document.querySelector('input[placeholder="Search medicine or notes..."]');
+      // Legacy search functionality removed
 
-      // Wrap input in a relative container for absolute dropdown positioning
-      const searchWrapper = document.createElement('div');
-      searchWrapper.className = 'relative w-full';
-      searchInput.parentNode.replaceWith(searchWrapper);
-      searchWrapper.appendChild(searchInput);
-
-      const searchResultsContainer = document.createElement('div');
-      searchResultsContainer.className = "absolute top-full left-0 w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50 hidden";
-      searchWrapper.appendChild(searchResultsContainer);
-
-      let debounceTimeout;
-
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim();
-        clearTimeout(debounceTimeout);
-
-        if (!query) {
-          searchResultsContainer.innerHTML = '';
-          searchResultsContainer.style.display = 'none';
-          return;
-        }
-
-        debounceTimeout = setTimeout(() => {
-          fetch(`caretaker.php?action=search&q=${encodeURIComponent(query)}`, {
-            credentials: 'same-origin'
-          })
-
-            .then(res => res.json())
-            .then(res => {
-              if (res.status === 'success') {
-                renderResults(res.results);
-              } else {
-                console.error(res.message);
-                searchResultsContainer.innerHTML = '';
-                searchResultsContainer.style.display = 'none';
-              }
-            })
-            .catch(err => console.error(err));
-        }, 300); // debounce 300ms
-      });
-
-      function renderResults(results) {
-        if (!results.length) {
-          searchResultsContainer.innerHTML = '<p class="text-sm p-2 text-[#4c739a] dark:text-slate-300">No results found</p>';
-        } else {
-          searchResultsContainer.innerHTML = results.map(item => {
-            const icon = item.type === 'medicine' ? 'pill' : 'description';
-            return `
-                      <div class="search-result-item flex items-center gap-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-lg" data-type="${item.type}" data-title="${item.title}">
-                          <span class="material-symbols-outlined text-sm text-primary">${icon}</span>
-                          <div class="flex flex-col">
-                              <p class="text-sm font-semibold text-[#0d141b] dark:text-white">${item.title}</p>
-                              <p class="text-xs text-[#4c739a] dark:text-slate-300">${item.detail}</p>
-                          </div>
-                      </div>
-                  `;
-          }).join('');
-
-          // Add click handlers to results
-          document.querySelectorAll('.search-result-item').forEach(item => {
-            item.addEventListener('click', () => {
-              const type = item.getAttribute('data-type');
-              const title = item.getAttribute('data-title');
-
-              // Navigate to medicine history section and scroll to found medicine
-              document.querySelector('[data-section="history"]').click();
-              searchInput.value = '';
-              searchResultsContainer.style.display = 'none';
-
-              // Highlight the found medicine
-              setTimeout(() => {
-                const medicineItems = document.querySelectorAll('#medicine-history-list > div');
-                medicineItems.forEach(med => {
-                  if (med.textContent.includes(title)) {
-                    med.style.backgroundColor = '#fff3cd';
-                    med.style.transition = 'background-color 0.3s ease';
-                    setTimeout(() => {
-                      med.style.backgroundColor = '';
-                    }, 2000);
-                  }
-                });
-              }, 100);
-            });
-          });
-        }
-        searchResultsContainer.style.display = 'block';
-      }
-
-      // Hide search results when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!searchResultsContainer.contains(e.target) && e.target !== searchInput) {
-          searchResultsContainer.style.display = 'none';
-        }
-      });
 
       // ====== 3️⃣ Notifications Functionality ======
       const notificationBtn = document.getElementById('notification-btn');
@@ -1078,64 +1040,7 @@
         }
       });
 
-      function loadNotifications() {
-        fetch('caretaker.php?action=getMessages', { credentials: 'same-origin' })
-          .then(res => res.json())
-          .then(res => {
-            if (res.status === 'success') {
-              renderNotifications(res.data);
-            } else {
-              notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error loading messages</div>';
-            }
-          })
-          .catch(err => {
-            console.error('Error fetching notifications:', err);
-            notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error loading messages</div>';
-          });
-      }
 
-      function renderNotifications(messages) {
-        if (!messages || messages.length === 0) {
-          notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a] dark:text-slate-300 text-center">No messages</div>';
-          return;
-        }
-
-        notificationsList.innerHTML = messages.map(msg => {
-          const messageTime = new Date(msg.sent_at).toLocaleString();
-          const isUnread = msg.is_read !== 'read';
-          return `
-                  <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer" data-message-id="${msg.id}">
-                      <div class="flex items-start justify-between gap-3">
-                          <div class="flex-1">
-                              <p class="font-semibold text-[#0d141b] dark:text-white">${msg.patient_name || 'Patient'}</p>
-                              <p class="text-sm text-[#4c739a] dark:text-slate-300 mt-1">${msg.message}</p>
-                              <p class="text-xs text-[#4c739a] dark:text-slate-400 mt-2">${messageTime}</p>
-                          </div>
-                          ${isUnread ? '<span class="size-2 bg-primary rounded-full flex-shrink-0 mt-1"></span>' : ''}
-                      </div>
-                  </div>
-              `;
-        }).join('');
-
-        // Add click handlers to mark messages as read
-        document.querySelectorAll('#notifications-list > div').forEach(item => {
-          item.addEventListener('click', () => {
-            const messageId = item.getAttribute('data-message-id');
-            markMessageAsRead(messageId);
-          });
-        });
-      }
-
-      function markMessageAsRead(messageId) {
-        fetch('caretaker.php?action=markMessageAsRead&id=' + messageId, { credentials: 'same-origin' })
-          .then(res => res.json())
-          .then(res => {
-            if (res.status === 'success') {
-              loadNotifications();
-            }
-          })
-          .catch(err => console.error('Error marking message as read:', err));
-      }
     });
     // ====== 4️⃣ Load Today's Schedule ======
     function loadTodaysSchedule() {
@@ -1439,17 +1344,17 @@
         .then(res => {
           if (res.status === 'success') {
             const p = res.data;
+            // Update Profile Modal
             document.getElementById('profile-patient-name').textContent = p.patient_name;
             document.getElementById('profile-patient-relation').textContent = p.relation ? `Relation: ${p.relation}` : 'Patient';
             document.getElementById('profile-patient-dob').textContent = p.dob || '--';
             document.getElementById('profile-patient-gender').textContent = p.gender || '--';
             document.getElementById('profile-patient-blood').textContent = p.blood_group || '--';
-            document.getElementById('profile-patient-contact').textContent = '--'; // Contact not available in this endpoint yet
+            document.getElementById('profile-patient-contact').textContent = '--';
             document.getElementById('profile-patient-height').textContent = (p.height_cm || '--') + ' cm';
             document.getElementById('profile-patient-weight').textContent = (p.weight_kg || '--') + ' kg';
 
             const photoDiv = document.getElementById('profile-patient-photo');
-            // Ensure classes match new styling
             photoDiv.className = "bg-center bg-no-repeat bg-cover rounded-full size-24 border-4 border-white dark:border-slate-900 shadow-md";
 
             if (p.profile_photo) {
@@ -1457,6 +1362,31 @@
             } else {
               photoDiv.style.backgroundColor = '#137fec';
               photoDiv.style.backgroundImage = 'none';
+            }
+
+            // Update Dashboard Header
+            const headerName = document.getElementById('patient-name');
+            if (headerName) headerName.textContent = p.patient_name;
+
+            const headerStatus = document.getElementById('patient-care-status');
+            if (headerStatus) headerStatus.textContent = p.relation || 'Patient';
+
+            const headerPhoto = document.getElementById('patient-photo');
+            if (headerPhoto) {
+              if (p.profile_photo) {
+                headerPhoto.style.backgroundImage = `url('../${p.profile_photo}')`;
+              } else {
+                headerPhoto.style.backgroundColor = '#137fec';
+                headerPhoto.style.backgroundImage = 'none';
+              }
+            }
+
+            const headerAdherence = document.getElementById('patient-adherence');
+            if (headerAdherence) {
+              const score = p.adherence_score !== undefined ? p.adherence_score : 0;
+              headerAdherence.textContent = score + '%';
+              // Color coding
+              headerAdherence.className = "font-bold " + (score >= 80 ? "text-green-600" : (score >= 50 ? "text-yellow-600" : "text-red-600"));
             }
           }
         })
@@ -1714,20 +1644,43 @@
           list.innerHTML = '';
           if (res.status === 'success' && res.data.length) {
             res.data.forEach(dose => {
+              const dateObj = new Date(dose.intake_datetime);
+              const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+              const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
               list.innerHTML += `
-                    <div class="flex justify-between items-center p-4 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-950/10">
-                        <div class="flex flex-col">
-                            <h4 class="font-semibold text-[#0d141b] dark:text-white">${dose.name}</h4>
-                            <p class="text-sm text-[#4c739a] dark:text-slate-300">
-                                ${dose.dosage_value || '--'} ${dose.dosage_unit || ''} • ${dose.intake_datetime || 'No schedule'}
-                            </p>
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-950/10 shadow-sm transition-transform hover:scale-[1.01]">
+                        <div class="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-lg shrink-0">
+                             <span class="material-symbols-outlined">warning</span>
                         </div>
-                        <span class="px-3 py-1 bg-red-200 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-bold rounded-full">Missed</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-[#0d141b] dark:text-white truncate pr-2">${dose.name}</h4>
+                                <span class="px-2 py-0.5 bg-red-200 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-[10px] font-bold uppercase rounded-full tracking-wide">Missed</span>
+                            </div>
+                            <p class="text-xs font-semibold text-[#4c739a] dark:text-slate-400 mt-0.5">${dose.dosage_value || 'Dose'} ${dose.dosage_unit || ''}</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-red-600/80 font-medium">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                    ${dateStr}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    ${timeStr}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
           } else {
-            list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No missed doses recorded.</p>';
+            list.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-dashed border-[#cfdbe7] dark:border-slate-700">
+                    <span class="material-symbols-outlined text-green-500 text-3xl mb-2">check_circle</span>
+                    <p class="text-sm font-semibold text-[#0d141b] dark:text-white">All Clear</p>
+                    <p class="text-xs text-[#4c739a]">No missed doses recorded recently.</p>
+                </div>
+            `;
           }
         })
         .catch(err => console.error('Error loading missed doses:', err));
@@ -1740,23 +1693,57 @@
           list.innerHTML = '';
           if (res.status === 'success' && res.data.length) {
             res.data.forEach(med => {
+              // Determine Icon
+              let icon = 'pill';
+              const type = (med.medicine_type || '').toLowerCase();
+              let iconBg = 'bg-blue-100 text-blue-600';
+
+              if (type.includes('liquid')) { icon = 'water_drop'; iconBg = 'bg-cyan-100 text-cyan-600'; }
+              else if (type.includes('injection')) { icon = 'syringe'; iconBg = 'bg-purple-100 text-purple-600'; }
+
               list.innerHTML += `
-                    <div class="flex justify-between items-center p-4 rounded-lg border border-[#cfdbe7] dark:border-slate-800 bg-background-light dark:bg-slate-800">
-                        <div class="flex flex-col">
-                            <h4 class="font-semibold text-[#0d141b] dark:text-white">${med.name}</h4>
-                            <p class="text-sm text-[#4c739a] dark:text-slate-300">
-                                ${med.dosage_value || '--'} ${med.dosage_unit || ''} • ${med.frequency || 'As needed'}
-                            </p>
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-[#cfdbe7] dark:border-slate-700 shadow-sm hover:shadow-md hover:border-primary/40 transition-all group relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="size-10 rounded-lg ${iconBg} bg-opacity-20 flex items-center justify-center">
+                                <span class="material-symbols-outlined">${icon}</span>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <div class="size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                                <span class="text-[10px] text-green-600 font-bold mt-1">Active</span>
+                            </div>
                         </div>
-                        <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">Active</span>
+                        
+                        <h4 class="font-bold text-[#0d141b] dark:text-white text-lg mb-1 truncate" title="${med.name}">${med.name}</h4>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 uppercase tracking-wide border border-slate-200">
+                                ${med.dosage || (med.dosage_value ? med.dosage_value + ' ' + (med.dosage_unit || '') : '--')}
+                             </span>
+                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 uppercase tracking-wide border border-slate-200">
+                                ${med.frequency || 'Daily'}
+                             </span>
+                        </div>
+                        
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-end">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-[#4c739a] uppercase font-bold">Schedule</span>
+                                <span class="text-xs font-semibold text-[#0d141b] dark:text-white truncate max-w-[120px]">${med.schedule_type || 'Custom'}</span>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
           } else {
-            list.innerHTML = '<p class="text-sm text-[#4c739a] dark:text-slate-300">No medicines found.</p>';
+            list.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-dashed border-[#cfdbe7] dark:border-slate-700">
+                    <span class="material-symbols-outlined text-slate-400 text-3xl mb-2">medication</span>
+                    <p class="text-sm font-semibold text-[#0d141b] dark:text-white">No Medicines</p>
+                    <p class="text-xs text-[#4c739a]">Patient has no active medicines.</p>
+                </div>
+             `;
           }
         })
-        .catch(err => console.error('Error loading medicines:', err));
+        .catch(err => console.error('Error loading medicine report:', err));
     }
 
     // ====== Export Medicines CSV ======
@@ -1765,19 +1752,7 @@
     });
 
     // ====== Add Note Modal ======
-    // Find the Add Note button in the sidebar
-    const addNoteButtons = document.querySelectorAll('button');
-    let addNoteBtn = null;
-    for (let btn of addNoteButtons) {
-      if (btn.textContent.includes('Add Note')) {
-        addNoteBtn = btn;
-        break;
-      }
-    }
-
-    if (addNoteBtn) {
-      addNoteBtn.addEventListener('click', openAddNoteModal);
-    }
+    document.getElementById('add-note-btn-main')?.addEventListener('click', openAddNoteModal);
 
     function openAddNoteModal(e) {
       e.preventDefault();
@@ -1865,42 +1840,175 @@
         .catch(err => console.error('Error getting patient:', err));
     });
 
-    // ====== Load Notes ======
+    // ====== Notifications ======
+    function loadNotifications() {
+      const notificationsList = document.getElementById('notifications-list');
+      if (!notificationsList) return;
+
+      fetch('caretaker.php?action=getMessages', { credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            renderNotifications(res.data);
+          } else {
+            notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error loading messages</div>';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching notifications:', err);
+          // Don't overwrite if it was a transient error, but helpful for debugging
+          // notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a]">Error connecting</div>';
+        });
+    }
+
+    function renderNotifications(messages) {
+      const notificationsList = document.getElementById('notifications-list');
+      if (!notificationsList) return;
+
+      if (!messages || messages.length === 0) {
+        notificationsList.innerHTML = '<div class="p-4 text-sm text-[#4c739a] dark:text-slate-300 text-center">No messages</div>';
+        return;
+      }
+
+      notificationsList.innerHTML = messages.map(msg => {
+        const messageTime = new Date(msg.sent_at).toLocaleString();
+        const isUnread = msg.is_read !== 'read';
+        return `
+                  <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer" data-message-id="${msg.id}">
+                      <div class="flex items-start justify-between gap-3">
+                          <div class="flex-1">
+                              <p class="font-semibold text-[#0d141b] dark:text-white">${msg.patient_name || 'Patient'}</p>
+                              <p class="text-sm text-[#4c739a] dark:text-slate-300 mt-1">${msg.message}</p>
+                              <p class="text-xs text-[#4c739a] dark:text-slate-400 mt-2">${messageTime}</p>
+                          </div>
+                          ${isUnread ? '<span class="size-2 bg-primary rounded-full flex-shrink-0 mt-1"></span>' : ''}
+                      </div>
+                  </div>
+              `;
+      }).join('');
+
+      // Add click handlers to mark messages as read
+      document.querySelectorAll('#notifications-list > div').forEach(item => {
+        item.addEventListener('click', () => {
+          const messageId = item.getAttribute('data-message-id');
+          markMessageAsRead(messageId);
+        });
+      });
+    }
+
+    function markMessageAsRead(messageId) {
+      fetch('caretaker.php?action=markMessageAsRead&id=' + messageId, { credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            loadNotifications();
+          }
+        })
+        .catch(err => console.error('Error marking message as read:', err));
+    }
+
+    // ====== Load Notes & Filtering ======
+    let allNotes = [];
+
+    // Initialize Filters
+    function loadNoteFilters() {
+      fetch('caretaker.php?action=getPatientMedicines', { credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(res => {
+          const filterSelect = document.getElementById('notes-filter-medicine');
+          if (filterSelect && res.status === 'success') {
+            // Keep first option "All Medicines"
+            filterSelect.innerHTML = '<option value="">All Medicines</option>';
+            filterSelect.innerHTML += '<option value="general">General (No Medicine)</option>';
+            res.data.forEach(med => {
+              filterSelect.innerHTML += `<option value="${med.id}">${med.name}</option>`;
+            });
+          }
+        })
+        .catch(err => console.error('Error loading filters:', err));
+    }
+
+    // Input Listeners
+    document.getElementById('notes-search')?.addEventListener('input', renderNotes);
+    document.getElementById('notes-filter-medicine')?.addEventListener('change', renderNotes);
+
     function loadNotes() {
+      // Load filters if empty (check > 2 because we now have All + General)
+      const filterSelect = document.getElementById('notes-filter-medicine');
+      if (filterSelect && filterSelect.options.length <= 2) loadNoteFilters();
+
       fetch('caretaker.php?action=getNotes', { credentials: 'same-origin' })
         .then(res => res.json())
         .then(res => {
-          const list = document.getElementById('notes-list');
-          list.innerHTML = '';
+          if (res.status === 'success') {
+            allNotes = res.data; // Store globally
+            renderNotes();
+          } else {
+            allNotes = [];
+            renderNotes();
+          }
+        })
+        .catch(err => console.error('Error loading notes:', err));
+    }
 
-          if (res.status === 'success' && res.data.length) {
-            res.data.forEach(note => {
-              const date = new Date(note.created_at);
-              const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-              const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    function renderNotes() {
+      const list = document.getElementById('notes-list');
+      const query = document.getElementById('notes-search')?.value.toLowerCase().trim() || '';
+      const filterMedId = document.getElementById('notes-filter-medicine')?.value || '';
 
-              const noteLabel = note.note_type === 'medicine' ? `<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full">${note.medicine_name || 'Medicine'}</span>` : '<span class="px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded-full">General</span>';
+      list.innerHTML = '';
 
-              list.innerHTML += `
+      const filtered = allNotes.filter(note => {
+        const matchesSearch = note.message.toLowerCase().includes(query) || (note.medicine_name || '').toLowerCase().includes(query);
+
+        let matchesFilter = true;
+        if (filterMedId === 'general') {
+          // Show notes that are NOT medicine type OR have no medicine ID
+          matchesFilter = note.note_type !== 'medicine' && !note.medicine_id;
+        } else if (filterMedId) {
+          // Specific medicine selected
+          matchesFilter = note.medicine_id == filterMedId;
+        }
+
+        return matchesSearch && matchesFilter;
+      });
+
+      if (filtered.length > 0) {
+        filtered.forEach(note => {
+          const date = new Date(note.created_at);
+          const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+          // Robust check: It's a medicine note if type is 'medicine' OR it has a valid medicine_id
+          const isMedicineNote = note.note_type === 'medicine' || (note.medicine_id && note.medicine_id != 0);
+
+          const noteLabel = isMedicineNote
+            ? `<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20">${note.medicine_name || 'Medicine'}</span>`
+            : '<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold rounded-full border border-slate-200 dark:border-slate-700">General</span>';
+
+          list.innerHTML += `
                     <div class="flex gap-4 p-4 rounded-lg border border-[#cfdbe7] dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-primary/30 transition-all">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
                                 ${noteLabel}
-                                <span class="text-[10px] text-[#4c739a] dark:text-slate-400">${dateStr} ${timeStr}</span>
+                                <span class="text-[10px] text-[#4c739a] dark:text-slate-400 font-medium">${dateStr} • ${timeStr}</span>
                             </div>
-                            <p class="text-[#0d141b] dark:text-white text-sm">${note.message}</p>
+                            <p class="text-[#0d141b] dark:text-white text-sm leading-relaxed">${note.message}</p>
                         </div>
-                        <button onclick="deleteNote(${note.id})" class="text-[#4c739a] hover:text-red-600 transition-colors">
+                        <button onclick="deleteNote(${note.id})" class="text-[#4c739a] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-colors" title="Delete Note">
                             <span class="material-symbols-outlined text-base">delete</span>
                         </button>
                     </div>
                 `;
-            });
-          } else {
-            list.innerHTML = '<div class="text-center p-4 text-[#4c739a] dark:text-slate-400">No notes yet. Add one to get started!</div>';
-          }
-        })
-        .catch(err => console.error('Error loading notes:', err));
+        });
+      } else {
+        list.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-8 text-[#4c739a] dark:text-slate-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">note_stack_add</span>
+                    <p class="text-sm">No notes found matching your criteria.</p>
+                </div>
+            `;
+      }
     }
 
     function deleteNote(noteId) {
@@ -1925,6 +2033,297 @@
 
     // Load notes on page load
     loadNotes();
+    loadPatientProfile();
+    loadTodaysSchedule();
+    loadEmergencyContacts();
+    loadReports();
+    loadNotifications();
+
+    // ====== Change Password Functionality ======
+    const passwordModal = document.getElementById('password-modal');
+    const passwordModalContent = document.getElementById('password-modal-content');
+    const closePasswordModalBtn = document.getElementById('close-password-modal');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+
+    if (changePasswordBtn) {
+      changePasswordBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Hide profile dropdown
+        document.getElementById('profile-dropdown-menu').classList.add('hidden');
+
+        passwordModal.classList.remove('hidden');
+        renderPasswordStep(1);
+      });
+    }
+
+    if (closePasswordModalBtn) {
+      closePasswordModalBtn.addEventListener('click', () => {
+        passwordModal.classList.add('hidden');
+      });
+    }
+
+    function renderPasswordStep(step, data = {}) {
+      let html = '';
+
+      if (step === 1) {
+        html = `
+                <div class="text-center space-y-4">
+                    <div class="size-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#0d141b] dark:text-white">Verify Identity</h3>
+                        <p class="text-sm text-[#4c739a] mt-1">We will send a One-Time Password (OTP) to your registered email address.</p>
+                    </div>
+                    <button onclick="requestOTP()" class="w-full py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                        <span>Send OTP</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+            `;
+      } else if (step === 2) {
+        html = `
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <h3 class="font-bold text-[#0d141b] dark:text-white">Enter OTP</h3>
+                        <p class="text-sm text-[#4c739a] mt-1">Enter the 6-digit code sent to your email.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" id="otp-input" placeholder="000000" maxlength="6" class="w-full text-center tracking-[0.5em] text-2xl font-bold px-4 py-3 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <button onclick="verifyOTP()" class="w-full py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                        Verify Code
+                    </button>
+                    
+                    <button onclick="renderPasswordStep(1)" class="w-full text-sm text-[#4c739a] hover:text-primary">
+                        Resend OTP
+                    </button>
+                </div>
+            `;
+      } else if (step === 3) {
+        html = `
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <h3 class="font-bold text-[#0d141b] dark:text-white">New Password</h3>
+                        <p class="text-sm text-[#4c739a] mt-1">Create a strong password for your account.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-[#4c739a] uppercase mb-1 block">New Password</label>
+                            <input type="password" id="new-password" placeholder="Min 8 characters" class="w-full px-4 py-2 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-[#4c739a] uppercase mb-1 block">Confirm Password</label>
+                            <input type="password" id="confirm-password" placeholder="Confirm new password" class="w-full px-4 py-2 border border-[#cfdbe7] dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                    <button onclick="updatePassword('${data.otp}')" class="w-full py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                        Update Password
+                    </button>
+                </div>
+            `;
+      } else if (step === 4) {
+        html = `
+                <div class="text-center space-y-4 py-4">
+                    <div class="size-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                        <span class="material-symbols-outlined text-3xl">check_circle</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-[#0d141b] dark:text-white">Success!</h3>
+                        <p class="text-[#4c739a] mt-1">Your password has been updated successfully.</p>
+                    </div>
+                    <button onclick="document.getElementById('password-modal').classList.add('hidden')" class="w-full py-2.5 bg-slate-100 text-[#0d141b] rounded-lg font-semibold hover:bg-slate-200 transition-colors">
+                        Close
+                    </button>
+                </div>
+            `;
+      }
+
+      passwordModalContent.innerHTML = html;
+    }
+
+    // Expose functions to window for inline onclicks
+    window.requestOTP = function () {
+      const btn = document.querySelector('#password-modal-content button');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Sending...';
+      btn.disabled = true;
+
+      fetch('caretaker.php?action=requestPasswordChangeOTP', {
+        credentials: 'same-origin'
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            renderPasswordStep(2);
+          } else {
+            showToast(res.message, true);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast('Failed to send OTP', true);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        });
+    };
+
+    window.verifyOTP = function () {
+      const otp = document.getElementById('otp-input').value.trim();
+      if (!otp) return showToast('Please enter OTP', true);
+
+      const btn = document.querySelector('#password-modal-content button');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Verifying...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('otp', otp);
+
+      fetch('caretaker.php?action=verifyPasswordChangeOTP', {
+        method: 'POST',
+        credentials: 'same-origin',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            renderPasswordStep(3, { otp: otp });
+          } else {
+            showToast(res.message, true);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast('Failed to verify OTP', true);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        });
+    };
+
+    window.updatePassword = function (otp) {
+      const newPass = document.getElementById('new-password').value;
+      const confirmPass = document.getElementById('confirm-password').value;
+
+      if (!newPass || !confirmPass) return showToast('Please fill all fields', true);
+      if (newPass !== confirmPass) return showToast('Passwords do not match', true);
+      if (newPass.length < 8) return showToast('Password must be at least 8 characters', true);
+
+      const btn = document.querySelector('#password-modal-content button');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Updating...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('otp', otp);
+      formData.append('new_password', newPass);
+
+      fetch('caretaker.php?action=changePassword', {
+        method: 'POST',
+        credentials: 'same-origin',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            renderPasswordStep(4);
+          } else {
+            showToast(res.message, true);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast('Failed to update password', true);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        });
+    };
+
+    // ====== Search Functionality ======
+    const searchInput = document.getElementById('search-input');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+
+        // 1. Filter Medicines (Dashboard Summary)
+        const medicineList = document.getElementById('medicine-report-list');
+        if (medicineList) {
+          Array.from(medicineList.children).forEach(child => {
+            if (child.tagName === 'P') return;
+
+            const text = child.textContent.toLowerCase();
+            if (text.includes(query)) {
+              child.classList.remove('hidden');
+            } else {
+              child.classList.add('hidden');
+            }
+          });
+        }
+
+        // 2. Filter Notes (Dashboard)
+        const notesList = document.getElementById('notes-list');
+        if (notesList) {
+          Array.from(notesList.children).forEach(note => {
+            if (note.tagName === 'DIV' && note.textContent.includes('Loading notes')) return;
+
+            const text = note.textContent.toLowerCase();
+            if (text.includes(query)) {
+              note.classList.remove('hidden');
+            } else {
+              note.classList.add('hidden');
+            }
+          });
+        }
+
+        // 3. Filter Medicine History (Table)
+        const historyBody = document.getElementById('medicine-history-table-body');
+        if (historyBody) {
+          const rows = historyBody.querySelectorAll('tr');
+          rows.forEach(row => {
+            if (row.cells.length === 1) return;
+
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+              row.classList.remove('hidden');
+            } else {
+              row.classList.add('hidden');
+            }
+          });
+        }
+      });
+    }
+
+    // ====== Toast Notification ======
+    function showToast(message, isError = false) {
+      let toast = document.getElementById("globalToast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "globalToast";
+        toast.className = "fixed top-4 right-4 z-[9999] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white transition transform translate-y-[-10px] opacity-0";
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = message;
+      toast.classList.remove("bg-green-500", "bg-red-500");
+      toast.classList.add(isError ? "bg-red-500" : "bg-green-500");
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-[-10px]", "opacity-0");
+        toast.classList.add("translate-y-0", "opacity-100");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-[-10px]", "opacity-0");
+      }, 3000);
+    }
   </script>
 
 

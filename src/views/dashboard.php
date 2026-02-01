@@ -1480,7 +1480,16 @@ async function loadCaretakers() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ caretaker_id: cg.id, message })
       });
-      const data = await res.json();
+      
+      const text = await res.text();
+      let data;
+      try {
+          data = JSON.parse(text);
+      } catch (e) {
+          console.error("Server invalid response:", text);
+          showToast("Server error: " + text.substring(0, 50), true);
+          return;
+      }
       if (data.status === "success") {
         showToast("Message sent to caretaker");
         messageInput.value = "";
