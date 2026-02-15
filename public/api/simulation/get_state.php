@@ -5,17 +5,22 @@ require '../../../src/config/db.php';
 
 // 1. Get Simulation Config
 session_start();
-$userId = $_SESSION['user_id'] ?? null;
 
-// Return empty/error if not logged in (or for testing allow override if needed, but per user request, we enforce session)
-if (!$userId && !isset($_GET['debug_user_id'])) {
+// Allow ESP32 via user_id OR browser via session
+if (isset($_GET['user_id'])) {
+    // ESP32 request
+    $user_id = intval($_GET['user_id']);
+} elseif (isset($_SESSION['user_id'])) {
+    // Browser request
+    $user_id = $_SESSION['user_id'];
+} else {
     echo json_encode([
-        'error' => 'Not logged in', 
-        'current_time' => date('H:i'), 
-        'schedules' => []
+        "error" => "Not logged in",
+        "schedules" => []
     ]);
     exit;
 }
+
 
 if (isset($_GET['debug_user_id'])) $userId = $_GET['debug_user_id'];
 
@@ -56,60 +61,75 @@ $sql = "
         m.end_date,
         d.status AS log_status,
         d.log_time
-    FROM medicine_schedule ms
-    JOIN medicines m ON ms.medicine_id = m.id
+    FROM medicines m
+    LEFT JOIN medicine_schedule ms ON m.id = ms.medicine_id
     LEFT JOIN dose_logs d ON ms.id = d.schedule_id AND DATE(d.log_time) = CURDATE()
     WHERE m.patient_id = ?
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId);
+$stmt->bind_param("i", $user_id);
+
 $stmt->execute();
 $result = $stmt->get_result();
 $schedules = [];
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Filter by Day
-        $schedType = $row['schedule_type'];
-        $daysJson = $row['days'];
-        $shouldInclude = true;
+        $shouldIncludeToday = true;
+        
+        // Schedule Check
+        if ($row['schedule_id']) {
+            $schedType = $row['schedule_type'];
+            $daysJson = $row['days'];
+            $todayDate = date('Y-m-d');
+            $startDate = $row['start_date'];
+            $endDate = $row['end_date'];
 
-        if ($schedType === 'as_needed') {
-            $shouldInclude = false; // Ignore for daily reminder simulation for now
-        } elseif ($schedType === 'custom' || $schedType === 'days') {
-            $allowedDays = json_decode($daysJson, true);
-            if (!is_array($allowedDays) || !in_array($todayAbbr, $allowedDays)) {
-                $shouldInclude = false;
+            if ($schedType === 'as_needed') {
+                $shouldIncludeToday = false;
+            } elseif ($schedType === 'custom' || $schedType === 'days') {
+                $allowedDays = json_decode($daysJson, true);
+                if (!is_array($allowedDays) || !in_array($todayAbbr, $allowedDays)) {
+                    $shouldIncludeToday = false;
+                }
             }
+            
+            if ($startDate && $todayDate < $startDate) $shouldIncludeToday = false;
+            if ($endDate && $todayDate > $endDate) $shouldIncludeToday = false;
+        } else {
+            $shouldIncludeToday = false;
         }
         
-        // Date Check Logic
-        $todayDate = date('Y-m-d');
-        $startDate = $row['start_date'];
-        $endDate = $row['end_date'];
+        // Always include the medicine record so the slot isn't "Empty"
+       $compNum = intval($row['compartment_number']);
+$row['slot_id'] = ($compNum > 0) ? ($compNum - 1) : 0;
 
-        // Check Start Date
-        if ($startDate && $todayDate < $startDate) {
-            $shouldInclude = false;
-        }
+$row['intake_time_formatted'] = $row['intake_time'] 
+    ? date('H:i', strtotime($row['intake_time'])) 
+    : null;
 
-        // Check End Date (if exists)
-        if ($endDate && $todayDate > $endDate) {
-            $shouldInclude = false;
-        }
-        
-        if ($shouldInclude) {
-            // Normalize time to HH:MM
-            $row['intake_time_formatted'] = date('H:i', strtotime($row['intake_time']));
-            
-            // Assign a Slot ID based on real compartment (1-4 -> 0-3)
-            // If unknown, fallback to 0
-            $compNum = intval($row['compartment_number']);
-            $row['slot_id'] = ($compNum > 0) ? ($compNum - 1) : 0;
-            
-            $schedules[] = $row;
-        }
+// 🔥 NEW TIME-BASED DUE LOGIC
+$isDueNow = false;
+
+if ($shouldIncludeToday && $row['intake_time']) {
+
+    $intakeTimestamp = strtotime(date('Y-m-d') . ' ' . $row['intake_time']);
+    $currentTimestamp = strtotime(date('Y-m-d') . ' ' . $currentTime);
+    $graceTimestamp = $intakeTimestamp + ($gracePeriodInfo * 60);
+
+    if (
+        $currentTimestamp >= $intakeTimestamp &&
+        $currentTimestamp <= $graceTimestamp &&
+        $row['log_status'] === null
+    ) {
+        $isDueNow = true;
+    }
+}
+
+$row['is_due_today'] = $isDueNow;
+
+        $schedules[] = $row;
     }
 }
 

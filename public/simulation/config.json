@@ -1,0 +1,5 @@
+{
+  "wifi_ssid": "Mackal",
+  "wifi_pass": "6567759416",
+  "api_url": "http://YOUR_SERVER_IP/SUSHRUSHA/public/api/simulation/get_state.php?user_id=1"
+}

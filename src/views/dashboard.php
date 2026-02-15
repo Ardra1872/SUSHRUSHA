@@ -264,7 +264,7 @@ tailwind.config = {
         textMain: "#1E293B",
         textSub: "#64748B",
         success: "#10B981",
-        warning: "#F59E0B",
+        warning: "#6366F1", // Changed from Orange to Indigo
         danger: "#EF4444",
       },
       fontFamily: {
@@ -663,12 +663,12 @@ tailwind.config = {
  <section id="alerts" class="section hidden p-6 md:p-10 bg-white rounded-3xl shadow-soft border border-slate-100">
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
     <div>
-      <h2 class="text-4xl font-extrabold mb-2 text-textMain bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Admin Alerts</h2>
+      <h2 class="text-4xl font-extrabold mb-2 text-textMain bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">System Announcements</h2>
       <p class="text-textSub text-sm md:text-base">Stay updated with important notifications from your administrator</p>
     </div>
-    <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-700 text-xs md:text-sm font-medium">
-      <span class="material-symbols-outlined text-lg">notifications_active</span>
-      <span>Real-time Updates</span>
+    <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 text-indigo-700 text-xs md:text-sm font-medium">
+      <span class="material-symbols-outlined text-lg">campaign</span>
+      <span>Official Updates</span>
     </div>
   </div>
 
@@ -1162,9 +1162,9 @@ async function loadSchedule() {
         statusBg = "bg-gray-100";
         statusText = "text-gray-600";
       } else if (diffDays <= 7) {
-        statusLabel = "Expiring";
-        statusBg = "bg-amber-50";
-        statusText = "text-amber-600";
+        statusLabel = "Refill Soon";
+        statusBg = "bg-indigo-50";
+        statusText = "text-indigo-600";
       }
     }
 
@@ -1646,7 +1646,13 @@ document.querySelector('[data-section="alerts"]').addEventListener('click', () =
 
 async function loadAlerts() {
   const container = document.getElementById('alertsContainer');
-  container.innerHTML = '<div class="py-12 text-center"><span class="material-symbols-outlined text-5xl text-slate-300 block mb-4 animate-spin">settings</span><p class="text-slate-600 font-medium">Loading alerts...</p></div>';
+  container.innerHTML = `
+    <div class="py-12 text-center">
+      <div class="inline-flex items-center justify-center size-16 rounded-full bg-indigo-50 text-indigo-600 mb-4 animate-pulse">
+        <span class="material-symbols-outlined text-3xl">sync</span>
+      </div>
+      <p class="text-slate-600 font-medium tracking-tight">Syncing announcements...</p>
+    </div>`;
 
   try {
     const res = await fetch('get_alerts.php');
@@ -1656,47 +1662,69 @@ async function loadAlerts() {
 
     if (data.status !== 'success' || data.alerts.length === 0) {
       container.innerHTML = `
-        <div class="py-16 text-center">
-          <span class="material-symbols-outlined text-6xl text-slate-300 block mb-4">notifications_none</span>
-          <p class="text-slate-500 text-lg font-medium">
-            No alerts from admin
+        <div class="py-16 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+          <span class="material-symbols-outlined text-6xl text-slate-300 block mb-4">notifications_off</span>
+          <p class="text-slate-500 text-lg font-bold">
+            All caught up!
           </p>
-          <p class="text-slate-400 text-sm mt-2">Check back later for updates</p>
+          <p class="text-slate-400 text-sm mt-2">No new announcements from administration.</p>
         </div>`;
       return;
     }
 
     data.alerts.forEach((alert, index) => {
       const alertTime = new Date(alert.created_at);
-      const isRecent = (Date.now() - alertTime.getTime()) < 3600000;
+      const isRecent = (Date.now() - alertTime.getTime()) < 86400000; // 24 hours
       
       container.innerHTML += `
-        <div class="group relative bg-white p-6 rounded-2xl shadow-soft border border-slate-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-          <!-- Decorative accent -->
-          <div class="absolute left-0 top-6 bottom-6 w-1.5 bg-gradient-to-b from-primary to-blue-400 rounded-r-full"></div>
+        <div class="group relative bg-white p-6 md:p-8 rounded-3xl shadow-soft border border-slate-100 hover:shadow-xl hover:border-indigo-100 transition-all duration-500 transform hover:-translate-y-1 overflow-hidden">
+          <!-- Glass effect accent -->
+          <div class="absolute -right-4 -top-4 size-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
           
-          <div class="pl-5 relative z-10">
-            <div class="flex items-start justify-between gap-4 mb-3">
-              <div class="flex items-center gap-3">
-                 <div class="p-2 bg-blue-50 text-primary rounded-xl">
-                    <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+          <div class="relative z-10">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex items-center gap-4">
+                 <div class="size-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
+                    <span class="material-symbols-outlined text-2xl font-bold">campaign</span>
                  </div>
-                 <h4 class="font-bold text-textMain text-sm uppercase tracking-wider">Admin Announcement</h4>
+                 <div>
+                    <h4 class="font-bold text-slate-800 text-lg leading-tight">Admin Update</h4>
+                    <div class="flex items-center gap-2 text-[10px] font-bold text-indigo-500 uppercase tracking-widest mt-0.5">
+                      <span class="size-1.5 rounded-full bg-indigo-400"></span>
+                      Broadcast System
+                    </div>
+                 </div>
               </div>
+              
               ${isRecent ? `
-              <span class="relative inline-flex h-6 items-center justify-center px-3 rounded-full bg-blue-600 text-[10px] font-bold text-white tracking-wide shadow-md shadow-blue-200">
-                NEW
-                <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20 animate-ping"></span>
+              <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-600 text-[10px] font-bold text-white tracking-wide shadow-lg shadow-indigo-200 transition-transform group-hover:scale-105">
+                <span class="size-1.5 rounded-full bg-white animate-pulse"></span>
+                RECENT
               </span>` : ''}
             </div>
 
-            <p class="text-slate-700 text-base font-medium leading-relaxed mb-4">
-              ${alert.message}
-            </p>
+            <div class="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 mb-5 group-hover:bg-indigo-50/30 transition-colors duration-500">
+              <p class="text-slate-700 text-base md:text-lg font-medium leading-relaxed">
+                ${alert.message}
+              </p>
+            </div>
 
-            <div class="flex items-center gap-2 text-xs text-textSub font-medium pt-3 border-t border-slate-100">
-              <span class="material-symbols-outlined text-base">schedule</span>
-              <span>${alertTime.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+              <div class="flex items-center gap-3 text-xs text-textSub font-bold tracking-tight">
+                <div class="flex items-center gap-1 bg-white border border-slate-100 px-2 py-1 rounded-lg">
+                  <span class="material-symbols-outlined text-sm text-indigo-400">event</span>
+                  <span>${alertTime.toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                </div>
+                <div class="flex items-center gap-1 bg-white border border-slate-100 px-2 py-1 rounded-lg">
+                  <span class="material-symbols-outlined text-sm text-indigo-400">schedule</span>
+                  <span>${alertTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+              
+              <button class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all">
+                Mark as read
+                <span class="material-symbols-outlined text-lg">done_all</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1706,12 +1734,17 @@ async function loadAlerts() {
   } catch (err) {
     console.error(err);
     container.innerHTML = `
-      <div class="py-12 text-center">
-        <span class="material-symbols-outlined text-6xl text-red-300 block mb-4">error_outline</span>
-        <p class="text-red-600 text-lg font-medium">
-          Failed to load alerts
+      <div class="py-12 text-center bg-rose-50/50 rounded-3xl border-2 border-dashed border-rose-100">
+        <div class="size-16 rounded-full bg-rose-100 text-rose-600 inline-flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-3xl">cloud_off</span>
+        </div>
+        <p class="text-rose-700 text-lg font-bold">
+          Refresh required
         </p>
-        <p class="text-red-500 text-sm mt-2">Please try again later</p>
+        <p class="text-rose-600 text-sm mt-1">Unable to connect to the broadcast server.</p>
+        <button onclick="loadAlerts()" class="mt-4 px-6 py-2 bg-rose-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-200 hover:scale-105 transition-transform">
+          Try Again
+        </button>
       </div>`;
   }
 }

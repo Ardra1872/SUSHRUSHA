@@ -22,7 +22,15 @@ $gender    = !empty($_POST['gender']) ? $_POST['gender'] : null;
 $blood     = !empty($_POST['blood_group']) ? $_POST['blood_group'] : null;
 $height    = !empty($_POST['height_cm']) ? (int) $_POST['height_cm'] : null;
 $weight    = !empty($_POST['weight_kg']) ? (float) $_POST['weight_kg'] : null;
-$emergency = !empty($_POST['emergency_contact']) ? trim($_POST['emergency_contact']) : null;
+
+// Handle split emergency contact
+$e_name = !empty($_POST['emergency_name']) ? trim($_POST['emergency_name']) : '';
+$e_phone = !empty($_POST['emergency_phone']) ? trim($_POST['emergency_phone']) : '';
+
+$emergency = null;
+if (!empty($e_name) || !empty($e_phone)) {
+    $emergency = $e_name . ' - ' . $e_phone;
+}
 
 // Only validate dob and emergency_contact if they're being updated
 // (If they're not provided, we'll keep existing values in the database)
@@ -190,8 +198,6 @@ try {
             $stmt->execute();
         }
     }
-
-    $stmt->execute();
 
     $conn->commit();
 

@@ -116,60 +116,24 @@
             </div>
         </div>
 
-        <!-- RIGHT PANEL: System Internals -->
-        <div class="glass-panel w-64 rounded-3xl p-5 pointer-events-auto flex flex-col gap-4">
-            <h2 class="text-sm font-bold uppercase tracking-wide text-slate-600 flex items-center gap-2">
-                <span class="material-symbols-outlined text-lg">memory</span>
-                System Internals
-            </h2>
-
-            <!-- ESP32 Status -->
             <div class="bg-white/50 rounded-xl p-3 border border-slate-100">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs font-semibold text-slate-500">ESP32 Controller</span>
-                    <span class="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">ONLINE</span>
+                    <span class="text-xs font-semibold text-slate-500">Sync Status</span>
+                    <span id="sync-status" class="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Never</span>
                 </div>
-                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
-                    <div class="bg-green-500 h-1.5 rounded-full w-[90%]"></div>
-                </div>
-                <div class="flex justify-between mt-1">
-                    <span class="text-[10px] text-slate-400">Signal Strength</span>
-                    <span class="text-[10px] font-mono text-slate-600">-42dBm</span>
+                <div class="flex justify-between mt-2">
+                    <span class="text-[10px] text-slate-400">Firmware Mode</span>
+                    <span class="text-[10px] font-bold text-slate-600">Standalone</span>
                 </div>
             </div>
 
-            <!-- Servo Motors -->
-            <div class="space-y-2">
-                 <div class="flex justify-between items-end">
-                    <span class="text-xs font-semibold text-slate-500">Servo Motors</span>
-                    <span class="text-[10px] text-slate-400">4 Axes Active</span>
-                </div>
-                <div class="grid grid-cols-4 gap-1 h-8">
-                     <div class="bg-blue-500/20 rounded-b-md relative group">
-                         <div class="absolute bottom-0 w-full bg-blue-500 h-[20%] rounded-b-md transition-all duration-300"></div>
-                     </div>
-                     <div class="bg-blue-500/20 rounded-b-md relative">
-                         <div class="absolute bottom-0 w-full bg-blue-500 h-[60%] rounded-b-md transition-all duration-300"></div>
-                     </div>
-                     <div class="bg-blue-500/20 rounded-b-md relative">
-                         <div class="absolute bottom-0 w-full bg-blue-500 h-[10%] rounded-b-md transition-all duration-300"></div>
-                     </div>
-                     <div class="bg-blue-500/20 rounded-b-md relative">
-                         <div class="absolute bottom-0 w-full bg-blue-500 h-[0%] rounded-b-md transition-all duration-300"></div>
-                     </div>
-                </div>
-            </div>
-
-            <!-- Buzzer Status -->
-            <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <div class="flex items-center justify-between bg-white/50 p-3 rounded-xl border border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-slate-400 text-lg">volume_up</span>
                     <span class="text-xs font-bold text-slate-600">Buzzer</span>
                 </div>
-                <span id="buzzer-badge" class="size-2 rounded-full bg-slate-300"></span>
+                <span id="buzzer-badge" class="size-2 rounded-full bg-slate-300 transition-colors duration-200"></span>
             </div>
-
-        </div>
     </div>
 
 

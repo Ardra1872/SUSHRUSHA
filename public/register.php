@@ -95,9 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="register-page">
 
 <div class="auth-wrapper">
-    <!-- Language Selector -->
-    <div id="langSelectorPlaceholder" style="position: absolute; top: 20px; right: 20px; z-index: 100;"></div>
 
+  
     <div class="auth-card">
 
         <h2 data-i18n="create_account_title">Create Account</h2>

@@ -295,7 +295,7 @@ class TranslationSystem {
 
   async translateText(text, targetLang) {
     if (targetLang === "en") return text;
-    
+
     const cacheKey = text + "|" + targetLang;
     if (this.translationCache[cacheKey]) {
       return this.translationCache[cacheKey];
@@ -305,7 +305,7 @@ class TranslationSystem {
     const directKey = Object.keys(this.translations.en).find(
       key => this.translations.en[key] === text.trim()
     );
-    
+
     if (directKey && this.translations[targetLang] && this.translations[targetLang][directKey]) {
       this.translationCache[cacheKey] = this.translations[targetLang][directKey];
       return this.translations[targetLang][directKey];

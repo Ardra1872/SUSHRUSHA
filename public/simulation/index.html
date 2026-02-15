@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP32 MedBox Hardware</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #f4f4f9;
+        }
+
+        .slot {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .Alerting {
+            background: #ffe6e6;
+            border-color: #ff4d4d;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MedBox Hardware Status</h1>
+    <p>Time: <span id="time">--:--</span> | Connected: <span id="synced">...</span></p>
+    <div id="slots"></div>
+
+    <script>
+        async function update() {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                document.getElementById('time').innerText = data.time;
+                document.getElementById('synced').innerText = data.synced ? "YES" : "NO";
+
+                const container = document.getElementById('slots');
+                container.innerHTML = '';
+                data.slots.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = 'slot ' + s.status;
+                    div.innerHTML = `
+                        <h3>Slot ${s.id}</h3>
+                        <p>${s.medicine || 'Empty'}</p>
+                        <p class="status">${s.status}</p>
+                        <p>Time: ${s.schedule || '--:--'}</p>
+                        <button onclick="openSlot(${s.id})">Open Lid</button>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (e) { }
+        }
+
+        async function openSlot(id) {
+            await fetch('/open?slot=' + id);
+            update();
+        }
+
+        setInterval(update, 2000);
+        update();
+    </script>
+</body>
+
+</html>

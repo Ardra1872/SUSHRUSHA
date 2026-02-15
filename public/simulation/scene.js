@@ -173,15 +173,15 @@ const SceneManager = {
         });
 
         // Animate LEDs (Blink if active)
-        const time = Date.now() * 0.005; // Speed
+        const time = Date.now();
         this.leds.forEach(led => {
             if (led.active) {
-                // Blink Red
-                const intensity = (Math.sin(time * 2) + 1) / 2; // 0 to 1
-                if (intensity > 0.5) {
-                    led.mesh.material.color.setHex(0xFF0000);
+                // 500ms interval -> 1000ms period
+                const isLit = (time % 1000) < 500;
+                if (isLit) {
+                    led.mesh.material.color.setHex(0xFF0000); // Bright Red
                 } else {
-                    led.mesh.material.color.setHex(0x550000);
+                    led.mesh.material.color.setHex(0x330000); // Dim Red
                 }
             }
         });

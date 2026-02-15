@@ -27,6 +27,13 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $data = $stmt->get_result()->fetch_assoc();
 
+// Split emergency contact into Name and Number
+$emergency_contact_str = $data['emergency_contact'] ?? '';
+$ec_parts = explode(' - ', $emergency_contact_str);
+$ec_name = $ec_parts[0] ?? '';
+$ec_number = $ec_parts[1] ?? '';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -284,15 +291,27 @@ $userInitials = !empty($name) ? strtoupper(substr($name, 0, 1)) : 'U';
     Emergency Contact
   </h4>
 
-  <label class="flex flex-col gap-2">
-    <span class="text-sm font-medium" data-i18n="contact_name_phone">Contact Name & Phone</span>
-    <input type="text"
-           name="emergency_contact"
-           value="<?= htmlspecialchars($data['emergency_contact'] ?? '') ?>"
-           placeholder="Eg: Michael Jenkins - 9876543210"
-           required
-           class="w-full rounded-lg px-4 py-2.5">
-  </label>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <label class="flex flex-col gap-2">
+        <span class="text-sm font-medium" data-i18n="contact_name">Contact Name</span>
+        <input type="text"
+               name="emergency_name"
+               value="<?= htmlspecialchars($ec_name) ?>"
+               placeholder="Eg: Michael Jenkins"
+               required
+               class="w-full rounded-lg px-4 py-2.5">
+      </label>
+
+      <label class="flex flex-col gap-2">
+        <span class="text-sm font-medium" data-i18n="contact_number">Contact Number</span>
+        <input type="tel"
+               name="emergency_phone"
+               value="<?= htmlspecialchars($ec_number) ?>"
+               placeholder="Eg: 9876543210"
+               required
+               class="w-full rounded-lg px-4 py-2.5">
+      </label>
+    </div>
 
 </div>
 </div>
