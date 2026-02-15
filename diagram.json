@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "author": "Medicine Box Project",
+  "title": "Smart Medicine Box - 4 Slots with Web UI",
+  "description": "ESP32 medicine box with 4 independent slots, web UI control, LEDs, and buttons",
+  "files": {
+    "sketch.ino": {
+      "name": "sketch.ino"
+    }
+  },
+  "connections": [
+    ["ESP32:15", "LED1:A"],
+    ["GND:GND", "LED1:K"],
+    ["ESP32:4", "LED2:A"],
+    ["GND:GND", "LED2:K"],
+    ["ESP32:16", "LED3:A"],
+    ["GND:GND", "LED3:K"],
+    ["ESP32:17", "LED4:A"],
+    ["GND:GND", "LED4:K"],
+    ["ESP32:32", "BTN1:1"],
+    ["GND:GND", "BTN1:2"],
+    ["ESP32:33", "BTN2:1"],
+    ["GND:GND", "BTN2:2"],
+    ["ESP32:25", "BTN3:1"],
+    ["GND:GND", "BTN3:2"],
+    ["ESP32:26", "BTN4:1"],
+    ["GND:GND", "BTN4:2"]
+  ],
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "ESP32",
+      "top": 0,
+      "left": 0,
+      "attrs": {
+        "env": "web"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "LED1",
+      "top": 50,
+      "left": 350,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "LED2",
+      "top": 120,
+      "left": 350,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "LED3",
+      "top": 190,
+      "left": 350,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "LED4",
+      "top": 260,
+      "left": 350,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "BTN1",
+      "top": 50,
+      "left": 480,
+      "attrs": {
+        "key": "1"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "BTN2",
+      "top": 120,
+      "left": 480,
+      "attrs": {
+        "key": "2"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "BTN3",
+      "top": 190,
+      "left": 480,
+      "attrs": {
+        "key": "3"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "BTN4",
+      "top": 260,
+      "left": 480,
+      "attrs": {
+        "key": "4"
+      }
+    }
+  ]
+}

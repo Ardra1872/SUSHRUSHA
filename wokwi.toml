@@ -1,0 +1,10 @@
+[wokwi]
+version = 1
+pio-env = "esp32doit-devkit-v1"
+
+[env]
+WOKWI_HOSTNAME = "192.168.4.1"
+
+[[net.hosts]]
+host = "host.wokwi.internal"
+address = "192.168.4.1"
