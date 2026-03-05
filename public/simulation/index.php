@@ -13,6 +13,14 @@
         body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; }
         #canvas-container { width: 100vw; height: 100vh; background: #f0f4f8; position: fixed; top: 0; left: 0; z-index: 0; }
         
+        <?php
+        $buzzerFile = __DIR__ . '/../api/simulation/buzzer_state.json';
+        $buzzerOn = false;
+        if (file_exists($buzzerFile)) {
+            $stateData = json_decode(file_get_contents($buzzerFile), true);
+            $buzzerOn = ($stateData['buzzer'] === 'on');
+        }
+        ?>
         /* Glassmorphism Panel Base */
         .glass-panel {
             background: rgba(255, 255, 255, 0.92);
@@ -116,7 +124,9 @@
             </div>
         </div>
 
-            <div class="bg-white/50 rounded-xl p-3 border border-slate-100">
+        <!-- RIGHT PANEL: Status & Settings -->
+        <div class="flex flex-col gap-4 pointer-events-auto">
+            <div class="glass-panel w-64 rounded-2xl p-4">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-xs font-semibold text-slate-500">Sync Status</span>
                     <span id="sync-status" class="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Never</span>
@@ -125,15 +135,19 @@
                     <span class="text-[10px] text-slate-400">Firmware Mode</span>
                     <span class="text-[10px] font-bold text-slate-600">Standalone</span>
                 </div>
-            </div>
+                
+                <div class="h-px bg-slate-100 my-4"></div>
 
-            <div class="flex items-center justify-between bg-white/50 p-3 rounded-xl border border-slate-100">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-slate-400 text-lg">volume_up</span>
-                    <span class="text-xs font-bold text-slate-600">Buzzer</span>
+                <div class="flex items-center justify-between bg-slate-50/50 p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors" onclick="toggleBuzzer()">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-400 text-lg">volume_up</span>
+                        <span class="text-xs font-bold text-slate-600">Buzzer</span>
+                    </div>
+                    <span id="buzzer-badge" class="size-2 rounded-full <?php echo $buzzerOn ? 'bg-green-500' : 'bg-slate-300'; ?> transition-colors duration-200"></span>
                 </div>
-                <span id="buzzer-badge" class="size-2 rounded-full bg-slate-300 transition-colors duration-200"></span>
             </div>
+        </div>
+
     </div>
 
 

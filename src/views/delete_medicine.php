@@ -20,6 +20,12 @@ if ($action === 'remove_compartment') {
     $stmt->close();
 } else {
     // Completely delete the medicine
+    // First delete associated doses
+    $doseCleanup = $conn->prepare("DELETE FROM doses WHERE manual_medicine_id=? AND patient_id=?");
+    $doseCleanup->bind_param("ii", $id, $_SESSION['user_id']);
+    $doseCleanup->execute();
+    $doseCleanup->close();
+
     $stmt = $conn->prepare("DELETE FROM medicines WHERE id=? AND patient_id=?");
     $stmt->bind_param("ii", $id, $_SESSION['user_id']);
     if ($stmt->execute()) echo json_encode(['status'=>'success']);

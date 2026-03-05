@@ -133,9 +133,18 @@ $row['is_due_today'] = $isDueNow;
     }
 }
 
+// 4. Get Buzzer State
+$buzzerFile = __DIR__ . '/buzzer_state.json';
+$buzzerState = 'off';
+if (file_exists($buzzerFile)) {
+    $stateData = json_decode(file_get_contents($buzzerFile), true);
+    $buzzerState = $stateData['buzzer'] ?? 'off';
+}
+
 echo json_encode([
     'current_time' => $currentTime,
     'grace_period_minutes' => $gracePeriodInfo,
+    'buzzer_state' => $buzzerState,
     'schedules' => $schedules
 ]);
 ?>

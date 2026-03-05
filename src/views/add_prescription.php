@@ -30,26 +30,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prescriptionId = $stmt->insert_id;
         $stmt->close();
 
-        // Insert medicines
+        // Insert medicines and generate doses
         if (isset($_POST['medicines']) && is_array($_POST['medicines'])) {
             $medicineStmt = $conn->prepare("
-                INSERT INTO prescription_medicines (prescription_id, medicine_name, dosage, frequency, duration, instructions)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO prescription_medicines (
+                    prescription_id, medicine_name, dosage, frequency_type, 
+                    time_slots, start_date, end_date, before_after_food, notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+
+            $doseStmt = $conn->prepare("
+                INSERT INTO doses (patient_id, prescription_medicine_id, scheduled_datetime, status)
+                VALUES (?, ?, ?, 'upcoming')
             ");
 
             foreach ($_POST['medicines'] as $medicine) {
                 $medicineName = $medicine['name'] ?? '';
                 $dosage = $medicine['dosage'] ?? '';
-                $frequency = $medicine['frequency'] ?? '';
-                $duration = $medicine['duration'] ?? '';
-                $instructions = $medicine['instructions'] ?? '';
+                $freqType = $medicine['frequency_type'] ?? 'once';
+                $timeSlots = isset($medicine['time_slots']) ? json_encode($medicine['time_slots']) : '[]';
+                $startDate = $medicine['start_date'] ?? date('Y-m-d');
+                $endDate = $medicine['end_date'] ?? $startDate;
+                $foodInstruction = $medicine['before_after_food'] ?? 'After Food';
+                $medNotes = $medicine['notes'] ?? '';
 
                 if (!empty($medicineName)) {
-                    $medicineStmt->bind_param("isssss", $prescriptionId, $medicineName, $dosage, $frequency, $duration, $instructions);
+                    $medicineStmt->bind_param(
+                        "issssssss", 
+                        $prescriptionId, $medicineName, $dosage, $freqType, 
+                        $timeSlots, $startDate, $endDate, $foodInstruction, $medNotes
+                    );
                     $medicineStmt->execute();
+                    $pmId = $medicineStmt->insert_id;
+
+                    // Generate Doses
+                    $start = new DateTime($startDate);
+                    $end = new DateTime($endDate);
+                    $end->modify('+1 day'); // inclusive
+
+                    $interval = new DateInterval('P1D');
+                    $dateRange = new DatePeriod($start, $interval, $end);
+
+                    $slots = json_decode($timeSlots, true);
+                    if (is_array($slots)) {
+                        foreach ($dateRange as $date) {
+                            $dateStr = $date->format('Y-m-d');
+                            foreach ($slots as $time) {
+                                $scheduledDT = "$dateStr $time:00";
+                                $doseStmt->bind_param("iis", $patientId, $pmId, $scheduledDT);
+                                $doseStmt->execute();
+                            }
+                        }
+                    }
                 }
             }
             $medicineStmt->close();
+            $doseStmt->close();
         }
 
         // Insert tests

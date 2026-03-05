@@ -9,7 +9,8 @@ const STATE = {
     gracePeriodMinutes: 5,
     activeAlerts: {}, // Map schedule_id -> { startTime: Date, slotId: int }
     overrideTime: null,
-    lastSync: "Never"
+    lastSync: "Never",
+    buzzerOn: false
 };
 
 // Firmware constants
@@ -50,7 +51,21 @@ async function fetchState() {
         STATE.schedules = data.schedules;
         STATE.lastSync = new Date().toLocaleTimeString();
 
+        // 🔥 Sync Buzzer State from main API
+        if (data.buzzer_state) {
+            const isBuzzerOn = data.buzzer_state === 'on';
+            if (STATE.buzzerOn !== isBuzzerOn) {
+                STATE.buzzerOn = isBuzzerOn;
+                const badge = document.getElementById("buzzer-badge");
+                if (badge) {
+                    badge.classList.toggle("bg-green-500", STATE.buzzerOn);
+                    badge.classList.toggle("bg-slate-300", !STATE.buzzerOn);
+                }
+            }
+        }
+
         log(`✅ [System] Sync Complete. Current Time: ${STATE.currentTime}`);
+
         updateUI();
         checkAlerts();
 
@@ -229,8 +244,14 @@ async function reportAction(scheduleId, status) {
 
 // Utils
 function playSound() {
+    if (!STATE.buzzerOn) {
+        log("🔇 [Buzzer] Muted (Software Toggle)");
+        return;
+    }
+
     const badge = document.getElementById('buzzer-badge');
-    if (badge) badge.classList.replace('bg-slate-300', 'bg-red-500');
+    const originalColor = STATE.buzzerOn ? 'bg-green-500' : 'bg-slate-300';
+    if (badge) badge.classList.replace(originalColor, 'bg-red-500');
 
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -240,10 +261,10 @@ function playSound() {
         osc.start();
         setTimeout(() => {
             osc.stop();
-            if (badge) badge.classList.replace('bg-red-500', 'bg-slate-300');
+            if (badge) badge.classList.replace('bg-red-500', originalColor);
         }, 200);
     } catch (e) {
-        if (badge) badge.classList.replace('bg-red-500', 'bg-slate-300');
+        if (badge) badge.classList.replace('bg-red-500', originalColor);
     }
 }
 
@@ -253,6 +274,28 @@ window.overrideTime = function (t) {
         fetchState();
     }
 };
+async function toggleBuzzer() {
+    const newState = !STATE.buzzerOn;
+    const action = newState ? 'on' : 'off';
+
+    try {
+        const res = await fetch(`../api/simulation/set_buzzer.php?action=${action}`);
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            STATE.buzzerOn = newState;
+            const badge = document.getElementById("buzzer-badge");
+            if (badge) {
+                badge.classList.toggle("bg-green-500", STATE.buzzerOn);
+                badge.classList.toggle("bg-slate-300", !STATE.buzzerOn);
+            }
+            log(`🔔 [Buzzer] Toggled ${action.toUpperCase()}`);
+        }
+    } catch (err) {
+        console.error("Buzzer Toggle Error:", err);
+        log("❌ [Error] Failed to toggle buzzer");
+    }
+}
 
 // Init
 setInterval(fetchState, TICK_RATE);

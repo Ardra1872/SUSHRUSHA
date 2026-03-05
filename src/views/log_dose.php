@@ -55,6 +55,8 @@ if ($logCheck->get_result()->num_rows > 0) {
     $updateStmt->bind_param("sis", $status, $schedule_id, $today);
     
     if ($updateStmt->execute()) {
+        // Sync with doses table
+        syncWithDosesTable($conn, $schedule_id, $status, $patient_id);
         echo json_encode(['status' => 'success', 'message' => 'Dose updated']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Database error']);
@@ -67,9 +69,46 @@ if ($logCheck->get_result()->num_rows > 0) {
     $insertStmt->bind_param("is", $schedule_id, $status);
 
     if ($insertStmt->execute()) {
+        // Sync with doses table
+        syncWithDosesTable($conn, $schedule_id, $status, $patient_id);
         echo json_encode(['status' => 'success', 'message' => 'Dose logged']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $conn->error]);
     }
+}
+
+function syncWithDosesTable($conn, $schedule_id, $status, $patient_id) {
+    // 1. Get manual_medicine_id and scheduled time from the old system
+    $infoSql = "
+        SELECT ms.medicine_id, ms.intake_time 
+        FROM medicine_schedule ms
+        WHERE ms.id = ?
+    ";
+    $infoStmt = $conn->prepare($infoSql);
+    $infoStmt->bind_param("i", $schedule_id);
+    $infoStmt->execute();
+    $info = $infoStmt->get_result()->fetch_assoc();
+    if (!$info) return;
+
+    $manualMedId = $info['medicine_id'];
+    $intakeTime = $info['intake_time'];
+    $today = date('Y-m-d');
+    $scheduledDT = "$today $intakeTime";
+
+    // 2. Map status to the system's enum (lowercase)
+    $newStatus = strtolower($status); // 'taken' or 'missed'
+
+    // 3. Find and update the corresponding dose in the unified doses table
+    $syncSql = "
+        UPDATE doses 
+        SET status = ?, taken_at = CASE WHEN ? = 'taken' THEN CURRENT_TIMESTAMP ELSE taken_at END
+        WHERE patient_id = ? 
+          AND manual_medicine_id = ? 
+          AND scheduled_datetime = ?
+    ";
+    $syncStmt = $conn->prepare($syncSql);
+    $syncStmt->bind_param("ssiis", $newStatus, $newStatus, $patient_id, $manualMedId, $scheduledDT);
+    $syncStmt->execute();
+    $syncStmt->close();
 }
 ?>

@@ -165,12 +165,54 @@ if ($schedule_type === 'As Needed') {
         INSERT INTO medicine_schedule (medicine_id, intake_time)
         VALUES (?, ?)
     ");
+    
+    $doseStmt = $conn->prepare("
+        INSERT INTO doses (patient_id, manual_medicine_id, scheduled_datetime, status)
+        VALUES (?, ?, ?, 'upcoming')
+    ");
 
     foreach ($times as $time) {
         if (!$time) continue;
         $timeStmt->bind_param("is", $medicine_id, $time);
         $timeStmt->execute();
+
+        // Generate Doses for the next 30 days (as a start)
+        // Or until end_date if specified
+        $start = new DateTime($start_date);
+        $end = (!empty($end_date) && $end_date !== '0000-00-00') ? new DateTime($end_date) : (clone $start)->modify('+30 days');
+        $end->modify('+1 day'); // inclusive
+
+        $interval = new DateInterval('P1D');
+        $dateRange = new DatePeriod($start, $interval, $end);
+
+        foreach ($dateRange as $date) {
+            $dateStr = $date->format('Y-m-d');
+            $scheduledDT = "$dateStr $time:00";
+
+            // Only if it's correct day of week (if weekly/specific days)
+            $isScheduled = false;
+            if ($schedule_type_db === 'daily') {
+                $isScheduled = true;
+            } elseif ($schedule_type_db === 'weekly') {
+                if ($date->format('N') === (new DateTime($start_date))->format('N')) {
+                    $isScheduled = true;
+                }
+            } elseif ($schedule_type_db === 'custom') {
+                $daysArr = json_decode($days_json ?? '[]', true);
+                $dayName = $date->format('D'); // Mon, Tue...
+                if (in_array($dayName, $daysArr) || in_array($date->format('l'), $daysArr)) {
+                    $isScheduled = true;
+                }
+            }
+
+            if ($isScheduled) {
+                $doseStmt->bind_param("iis", $patient_id, $medicine_id, $scheduledDT);
+                $doseStmt->execute();
+            }
+        }
     }
+    $timeStmt->close();
+    $doseStmt->close();
 } elseif ($reminder_type === 'interval') {
     // Generate times server-side
     // inputs: intervalStart, intervalHours
@@ -196,11 +238,53 @@ if ($schedule_type === 'As Needed') {
         INSERT INTO medicine_schedule (medicine_id, intake_time)
         VALUES (?, ?)
     ");
+    
+    $doseStmt = $conn->prepare("
+        INSERT INTO doses (patient_id, manual_medicine_id, scheduled_datetime, status)
+        VALUES (?, ?, ?, 'upcoming')
+    ");
 
     foreach ($generated_times as $time) {
         $timeStmt->bind_param("is", $medicine_id, $time);
         $timeStmt->execute();
+        
+        // Generate Doses for the next 30 days (as a start)
+        // Or until end_date if specified
+        $start = new DateTime($start_date);
+        $end = (!empty($end_date) && $end_date !== '0000-00-00') ? new DateTime($end_date) : (clone $start)->modify('+30 days');
+        $end->modify('+1 day'); // inclusive
+
+        $interval = new DateInterval('P1D');
+        $dateRange = new DatePeriod($start, $interval, $end);
+
+        foreach ($dateRange as $date) {
+            $dateStr = $date->format('Y-m-d');
+            $scheduledDT = "$dateStr $time:00";
+            
+            // Only if it's correct day of week (if weekly/specific days)
+            $isScheduled = false;
+            if ($schedule_type_db === 'daily') {
+                $isScheduled = true;
+            } elseif ($schedule_type_db === 'weekly') {
+                if ($date->format('N') === (new DateTime($start_date))->format('N')) {
+                    $isScheduled = true;
+                }
+            } elseif ($schedule_type_db === 'custom') {
+                $daysArr = json_decode($days_json ?? '[]', true);
+                $dayName = $date->format('D'); // Mon, Tue...
+                if (in_array($dayName, $daysArr) || in_array($date->format('l'), $daysArr)) {
+                    $isScheduled = true;
+                }
+            }
+
+            if ($isScheduled) {
+                $doseStmt->bind_param("iis", $patient_id, $medicine_id, $scheduledDT);
+                $doseStmt->execute();
+            }
+        }
     }
+    $timeStmt->close();
+    $doseStmt->close();
 }
 
 /* -------------------------------------------------

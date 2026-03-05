@@ -1,277 +1,466 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Prescription</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <style>
-        .medicine-item, .test-item {
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Sushrusha - Add Prescription</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+            "card-light": "#ffffff",
+            "card-dark": "#182635",
+            "input-border-light": "#cfdbe7",
+            "input-border-dark": "#2d3b4e",
+            "text-main-light": "#0d141b",
+            "text-main-dark": "#e0e6ed",
+            "text-sub-light": "#4c739a",
+            "text-sub-dark": "#94a3b8",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"],
+            "body": ["Inter", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .medicine-item {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-    <div class="min-h-screen p-4 md:p-8">
-        <div class="max-w-4xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-4xl text-blue-600">receipt_long</span>
-                    Add New Prescription
-                </h1>
-                <p class="text-slate-600 mt-2">Record medical prescriptions with medicines and tests</p>
-            </div>
 
-            <form id="prescriptionForm" class="space-y-6">
-                <!-- Disease & Doctor Information Section -->
-                <div class="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined">medical_information</span>
-                        Disease & Doctor Information
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Prescription Date -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
-                                <span class="text-red-500">*</span> Prescription Date
-                            </label>
-                            <input type="date" name="prescription_date" id="prescription_date" required
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                value="<?php echo date('Y-m-d'); ?>">
-                        </div>
-
-                        <!-- Disease Name -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
-                                <span class="text-red-500">*</span> Disease/Condition Name
-                            </label>
-                            <input type="text" name="disease_name" id="disease_name" required placeholder="e.g., Diabetes, Hypertension"
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-
-                        <!-- Doctor Name -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
-                                <span class="text-red-500">*</span> Doctor Name
-                            </label>
-                            <input type="text" name="doctor_name" id="doctor_name" required placeholder="e.g., Dr. Rajesh Kumar"
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-
-                        <!-- Hospital Name -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Hospital/Clinic Name</label>
-                            <input type="text" name="hospital_name" id="hospital_name" placeholder="e.g., City Hospital"
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-
-                        <!-- Disease Description -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Disease Description</label>
-                            <textarea name="disease_description" id="disease_description" placeholder="Describe symptoms, severity, and any relevant details..."
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
-                        </div>
-
-                        <!-- Additional Notes -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Additional Notes</label>
-                            <textarea name="notes" id="notes" placeholder="Any additional information or follow-up instructions..."
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Medicines Section -->
-                <div class="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-slate-900 flex items-center gap-2">
-                            <span class="material-symbols-outlined">medication</span>
-                            Prescribed Medicines
-                        </h2>
-                        <button type="button" onclick="addMedicine()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center gap-1">
-                            <span class="material-symbols-outlined text-base">add</span>
-                            Add Medicine
-                        </button>
-                    </div>
-
-                    <div id="medicinesContainer" class="space-y-4">
-                        <div class="medicine-item bg-slate-50 p-4 rounded-lg border border-slate-200">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <input type="text" name="medicines[0][name]" placeholder="Medicine Name" required
-                                    class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <input type="text" name="medicines[0][dosage]" placeholder="Dosage (e.g., 500mg)"
-                                    class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <input type="text" name="medicines[0][frequency]" placeholder="Frequency (e.g., 3 times daily)"
-                                    class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <input type="text" name="medicines[0][duration]" placeholder="Duration (e.g., 7 days)"
-                                    class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <textarea name="medicines[0][instructions]" placeholder="Instructions (e.g., Take with food)" rows="2"
-                                    class="md:col-span-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                            </div>
-                            <button type="button" onclick="removeMedicine(this)" class="mt-2 text-red-600 hover:text-red-800 text-sm flex items-center gap-1">
-                                <span class="material-symbols-outlined text-base">delete</span>
-                                Remove
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tests Section -->
-                <div class="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-slate-900 flex items-center gap-2">
-                            <span class="material-symbols-outlined">science</span>
-                            Prescribed Tests
-                        </h2>
-                        <button type="button" onclick="addTest()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm flex items-center gap-1">
-                            <span class="material-symbols-outlined text-base">add</span>
-                            Add Test
-                        </button>
-                    </div>
-
-                    <div id="testsContainer" class="space-y-4">
-                        <!-- Test items will be added here -->
-                    </div>
-                    <p class="text-slate-500 text-sm italic mt-2">No tests added yet</p>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-3 justify-end">
-                    <button type="button" onclick="goBack()" class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2">
-                        <span class="material-symbols-outlined">save</span>
-                        Save Prescription
-                    </button>
-                </div>
-            </form>
+<body
+  class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-display min-h-screen flex flex-col transition-colors duration-200">
+  
+  <!-- Top Navigation -->
+  <header
+    class="sticky top-0 z-50 w-full bg-card-light dark:bg-card-dark border-b border-input-border-light dark:border-input-border-dark shadow-sm">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-2xl">local_hospital</span>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Sushrusha</span>
         </div>
+        <nav class="hidden md:flex items-center gap-8">
+          <a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary transition-colors" href="dashboard.php">Dashboard</a>
+          <a class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:text-primary transition-colors" href="prescription_history.php">History</a>
+        </nav>
+        <div class="flex items-center gap-4">
+           <div class="size-9 rounded-full bg-slate-200 border border-input-border-light dark:border-input-border-dark flex items-center justify-center">
+             <span class="material-symbols-outlined text-slate-500">person</span>
+           </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-[1000px] mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <!-- Page Heading -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-black text-text-main-light dark:text-text-main-dark tracking-tight mb-3">Add New Prescription</h1>
+      <p class="text-base text-text-sub-light dark:text-text-sub-dark">Record detailed medication schedules and medical tests.</p>
     </div>
 
-    <script>
-        let medicineCount = 1;
-        let testCount = 0;
+    <form id="prescriptionForm" class="flex flex-col gap-8">
+      
+      <!-- Section 1: Disease & Doctor Info -->
+      <div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center gap-3 bg-background-light/50 dark:bg-background-dark/50">
+          <div class="bg-primary/10 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined">medical_information</span>
+          </div>
+          <h2 class="text-lg font-bold">General Information</h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold">Prescription Date *</label>
+            <input name="prescription_date" type="date" required value="<?php echo date('Y-m-d'); ?>"
+              class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold">Disease/Condition Name *</label>
+            <input name="disease_name" type="text" required placeholder="e.g. Hypertension"
+              class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold">Doctor Name *</label>
+            <input name="doctor_name" type="text" required placeholder="Dr. Smith"
+              class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold">Hospital/Clinic Name</label>
+            <input name="hospital_name" type="text" placeholder="City General Hospital"
+              class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+          <div class="space-y-2 md:col-span-2">
+            <label class="block text-sm font-semibold">Disease Description</label>
+            <textarea name="disease_description" rows="2" placeholder="Describe symptoms or diagnosis..."
+              class="w-full p-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"></textarea>
+          </div>
+        </div>
+      </div>
 
-        function addMedicine() {
-            const container = document.getElementById('medicinesContainer');
-            const medicineItem = document.createElement('div');
-            medicineItem.className = 'medicine-item bg-slate-50 p-4 rounded-lg border border-slate-200';
-            medicineItem.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" name="medicines[${medicineCount}][name]" placeholder="Medicine Name" required
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <input type="text" name="medicines[${medicineCount}][dosage]" placeholder="Dosage (e.g., 500mg)"
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <input type="text" name="medicines[${medicineCount}][frequency]" placeholder="Frequency (e.g., 3 times daily)"
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <input type="text" name="medicines[${medicineCount}][duration]" placeholder="Duration (e.g., 7 days)"
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <textarea name="medicines[${medicineCount}][instructions]" placeholder="Instructions (e.g., Take with food)" rows="2"
-                        class="md:col-span-2 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <button type="button" onclick="removeMedicine(this)" class="mt-2 text-red-600 hover:text-red-800 text-sm flex items-center gap-1">
-                    <span class="material-symbols-outlined text-base">delete</span>
-                    Remove
-                </button>
-            `;
-            container.appendChild(medicineItem);
-            medicineCount++;
+      <!-- Section 2: Medicines -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between px-2">
+          <div class="flex items-center gap-3">
+            <div class="bg-primary/10 p-2 rounded-lg text-primary">
+              <span class="material-symbols-outlined">medication</span>
+            </div>
+            <h2 class="text-xl font-bold">Medicines</h2>
+          </div>
+          <button type="button" onclick="addMedicineRow()"
+            class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20">
+            <span class="material-symbols-outlined text-lg">add</span> Add Medicine
+          </button>
+        </div>
+
+        <div id="medicinesContainer" class="space-y-6">
+          <!-- Medicine items will be injected here -->
+        </div>
+      </div>
+
+      <!-- Section 3: Tests -->
+      <div class="bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-input-border-light dark:border-input-border-dark flex items-center justify-between bg-background-light/50 dark:bg-background-dark/50">
+          <div class="flex items-center gap-3">
+            <div class="bg-primary/10 p-2 rounded-lg text-primary">
+              <span class="material-symbols-outlined">science</span>
+            </div>
+            <h2 class="text-lg font-bold">Prescribed Tests</h2>
+          </div>
+          <button type="button" onclick="addTestRow()" class="text-primary font-bold hover:text-blue-600 flex items-center gap-1">
+            <span class="material-symbols-outlined">add_circle</span> Add Test
+          </button>
+        </div>
+        <div id="testsContainer" class="p-6 space-y-4">
+          <!-- Test items will be injected here -->
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-4 py-6">
+        <button type="button" onclick="window.history.back()"
+          class="px-6 py-3 rounded-lg text-sm font-semibold text-text-sub-light hover:text-text-main-light transition-colors">Cancel</button>
+        <button type="submit"
+          class="px-10 py-3 rounded-lg text-sm font-bold text-white bg-primary hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">save</span> Save Prescription
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Templates -->
+  <template id="medicineTemplate">
+    <div class="medicine-item bg-card-light dark:bg-card-dark rounded-xl border border-input-border-light dark:border-input-border-dark shadow-sm overflow-hidden group">
+      <div class="px-6 py-3 border-b border-input-border-light dark:border-input-border-dark flex items-center justify-between bg-background-light/30 dark:bg-background-dark/30">
+        <span class="text-sm font-bold text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">pill</span> Medicine #<span class="med-index">1</span>
+        </span>
+        <button type="button" onclick="removeMedicineRow(this)" class="text-red-500 hover:text-red-700 transition-colors">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
+      
+      <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Name -->
+        <div class="md:col-span-2 relative">
+          <label class="block text-sm font-semibold mb-2">Medicine Name *</label>
+          <input type="text" name="medicines[{index}][name]" required placeholder="Type medicine name..."
+            class="med-name-input w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          <ul class="med-suggestions absolute z-50 w-full bg-card-light dark:bg-card-dark border border-input-border-light dark:border-input-border-dark rounded-lg mt-1 max-h-48 overflow-auto hidden shadow-xl"></ul>
+        </div>
+
+        <!-- Dosage -->
+        <div class="">
+          <label class="block text-sm font-semibold mb-2">Dosage *</label>
+          <select name="medicines[{index}][dosage]" required
+            class="dosage-select w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+            <option value="">Select dosage</option>
+          </select>
+        </div>
+
+        <!-- Frequency -->
+        <div class="md:col-span-1">
+          <label class="block text-sm font-semibold mb-2">Frequency *</label>
+          <select name="medicines[{index}][frequency_type]" class="freq-select w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+            <option value="once">Once Choice (Daily)</option>
+            <option value="twice">Twice Choice (Daily)</option>
+            <option value="thrice">Thrice Choice (Daily)</option>
+            <option value="custom">Custom Times</option>
+            <option value="as_needed">As Needed</option>
+          </select>
+        </div>
+
+        <!-- Time Slots -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold mb-2">Time Slots</label>
+          <div class="time-slots-container flex flex-wrap gap-3 p-3 rounded-lg border border-dashed border-input-border-light dark:border-input-border-dark bg-background-light/30 dark:bg-background-dark/30">
+            <!-- Dynamic time inputs -->
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="md:col-span-1">
+          <label class="block text-sm font-semibold mb-2">Start Date *</label>
+          <input type="date" name="medicines[{index}][start_date]" required value="<?php echo date('Y-m-d'); ?>"
+            class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+        </div>
+        <div class="md:col-span-1">
+          <label class="block text-sm font-semibold mb-2">End Date *</label>
+          <input type="date" name="medicines[{index}][end_date]" required
+            class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+        </div>
+
+        <!-- Food & Notes -->
+        <div class="md:col-span-1">
+          <label class="block text-sm font-semibold mb-2">Food Instruction</label>
+          <div class="flex gap-2">
+            <label class="flex-1 cursor-pointer">
+              <input type="radio" name="medicines[{index}][before_after_food]" value="Before Food" class="peer sr-only">
+              <div class="h-12 flex items-center justify-center rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary transition-all text-xs font-bold">Before Food</div>
+            </label>
+            <label class="flex-1 cursor-pointer">
+              <input type="radio" name="medicines[{index}][before_after_food]" value="After Food" checked class="peer sr-only">
+              <div class="h-12 flex items-center justify-center rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary transition-all text-xs font-bold">After Food</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="md:col-span-3">
+          <label class="block text-sm font-semibold mb-2">Medicine Notes/Instructions</label>
+          <textarea name="medicines[{index}][notes]" rows="2" placeholder="e.g. Swallow whole, do not crush..."
+            class="w-full p-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"></textarea>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="testTemplate">
+    <div class="test-item p-4 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light/20 dark:bg-background-dark/20 flex flex-col md:flex-row gap-4 items-end group">
+      <div class="flex-1 w-full space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-text-sub-light">Test Name *</label>
+        <input type="text" name="tests[{index}][name]" required placeholder="e.g. CBC Blood Test"
+          class="w-full h-11 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+      </div>
+      <div class="w-full md:w-48 space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-text-sub-light">Type</label>
+        <select name="tests[{index}][type]"
+          class="w-full h-11 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+          <option value="Blood">Blood</option>
+          <option value="X-Ray">X-Ray</option>
+          <option value="Ultrasound">Ultrasound</option>
+          <option value="CT Scan">CT Scan</option>
+          <option value="MRI">MRI</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="w-full md:w-48 space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-text-sub-light">Recommended Date</label>
+        <input type="date" name="tests[{index}][recommended_date]"
+          class="w-full h-11 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-input-border-light dark:border-input-border-dark outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+      </div>
+      <button type="button" onclick="this.closest('.test-item').remove()" class="h-11 px-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+    </div>
+  </template>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-6 right-6 z-[9999] hidden max-w-sm rounded-xl shadow-2xl border p-4 flex items-start gap-3 transition-all">
+    <span id="toastIcon" class="material-symbols-outlined"></span>
+    <p id="toastMessage" class="text-sm font-medium"></p>
+  </div>
+
+  <script>
+    let medicineCount = 0;
+    let testCount = 0;
+
+    function addMedicineRow() {
+      const container = document.getElementById('medicinesContainer');
+      const template = document.getElementById('medicineTemplate').innerHTML;
+      const html = template.replace(/{index}/g, medicineCount);
+      
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const row = div.firstElementChild;
+      
+      row.querySelector('.med-index').textContent = medicineCount + 1;
+      container.appendChild(row);
+      
+      setupMedicineLogic(row, medicineCount);
+      medicineCount++;
+    }
+
+    function removeMedicineRow(btn) {
+      if (document.querySelectorAll('.medicine-item').length > 1) {
+        btn.closest('.medicine-item').remove();
+      } else {
+        showToast("At least one medicine is required", "error");
+      }
+    }
+
+    function addTestRow() {
+      const container = document.getElementById('testsContainer');
+      const template = document.getElementById('testTemplate').innerHTML;
+      const html = template.replace(/{index}/g, testCount);
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      container.appendChild(div.firstElementChild);
+      testCount++;
+    }
+
+    function setupMedicineLogic(row, index) {
+      const nameInput = row.querySelector('.med-name-input');
+      const suggestions = row.querySelector('.med-suggestions');
+      const dosageSelect = row.querySelector('.dosage-select');
+      const freqSelect = row.querySelector('.freq-select');
+      const timeSlotsContainer = row.querySelector('.time-slots-container');
+
+      // Autocomplete
+      nameInput.addEventListener('input', async () => {
+        const query = nameInput.value.trim();
+        suggestions.innerHTML = "";
+        if (query.length < 2) { suggestions.classList.add('hidden'); return; }
+
+        const res = await fetch(`medicines_autocomplete.php?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        
+        if (data.length > 0) {
+          data.forEach(med => {
+            const li = document.createElement('li');
+            li.textContent = med.name;
+            li.className = "px-4 py-2 hover:bg-primary/10 cursor-pointer text-sm";
+            li.onclick = () => {
+              nameInput.value = med.name;
+              suggestions.classList.add('hidden');
+              loadDosages(med.name, dosageSelect);
+            };
+            suggestions.appendChild(li);
+          });
+          suggestions.classList.remove('hidden');
+        } else {
+          suggestions.classList.add('hidden');
         }
+      });
 
-        function removeMedicine(btn) {
-            const medicineCount = document.querySelectorAll('.medicine-item').length;
-            if (medicineCount > 1) {
-                btn.closest('.medicine-item').remove();
-            } else {
-                alert('At least one medicine is required');
-            }
+      // Frequency logic
+      freqSelect.addEventListener('change', () => updateTimeSlots(freqSelect.value, timeSlotsContainer, index));
+      updateTimeSlots('once', timeSlotsContainer, index); // init
+    }
+
+    async function loadDosages(medicine, select) {
+      const res = await fetch(`medicines_autocomplete.php?medicine=${encodeURIComponent(medicine)}`);
+      const data = await res.json();
+      select.innerHTML = '<option value="">Select dosage</option>';
+      data.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.dosage;
+        opt.textContent = d.dosage;
+        select.appendChild(opt);
+      });
+    }
+
+    function updateTimeSlots(type, container, index) {
+      container.innerHTML = "";
+      let times = [];
+      if (type === 'once') times = ['08:00'];
+      else if (type === 'twice') times = ['08:00', '20:00'];
+      else if (type === 'thrice') times = ['08:00', '14:00', '20:00'];
+      else if (type === 'custom') {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = "px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-bold flex items-center gap-1";
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">add</span> Add Time';
+        btn.onclick = () => addCustomTime(container, index);
+        container.appendChild(btn);
+        return;
+      } else {
+        container.innerHTML = '<span class="text-xs text-text-sub-light italic">No scheduled times for "As Needed"</span>';
+        return;
+      }
+
+      times.forEach(t => {
+        const input = document.createElement('input');
+        input.type = 'time';
+        input.name = `medicines[${index}][time_slots][]`;
+        input.value = t;
+        input.className = "h-9 px-2 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark text-xs";
+        container.appendChild(input);
+      });
+    }
+
+    function addCustomTime(container, index) {
+      const wrap = document.createElement('div');
+      wrap.className = "flex items-center gap-1";
+      wrap.innerHTML = `
+        <input type="time" name="medicines[${index}][time_slots][]" value="08:00" class="h-9 px-2 rounded-lg border border-input-border-light dark:border-input-border-dark bg-background-light dark:bg-background-dark text-xs">
+        <button type="button" onclick="this.parentElement.remove()" class="text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>
+      `;
+      container.insertBefore(wrap, container.lastElementChild);
+    }
+
+    document.getElementById('prescriptionForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      
+      try {
+        const response = await fetch('add_prescription.php', { method: 'POST', body: formData });
+        const data = await response.json();
+        if (data.success) {
+          showToast("Prescription saved successfully!", "success");
+          setTimeout(() => window.location.href = 'prescription_history.php', 1500);
+        } else {
+          showToast(data.message || "Failed to save", "error");
         }
+      } catch (err) {
+        showToast("Connection error", "error");
+      }
+    });
 
-        function addTest() {
-            const container = document.getElementById('testsContainer');
-            const testItem = document.createElement('div');
-            testItem.className = 'test-item bg-slate-50 p-4 rounded-lg border border-slate-200';
-            testItem.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" name="tests[${testCount}][name]" placeholder="Test Name (e.g., Blood Test)" required
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <select name="tests[${testCount}][type]" class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option value="Blood">Blood Test</option>
-                        <option value="X-Ray">X-Ray</option>
-                        <option value="Ultrasound">Ultrasound</option>
-                        <option value="CT Scan">CT Scan</option>
-                        <option value="MRI">MRI</option>
-                        <option value="ECG">ECG</option>
-                        <option value="EEG">EEG</option>
-                        <option value="Pathology">Pathology</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input type="date" name="tests[${testCount}][recommended_date]" class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <textarea name="tests[${testCount}][description]" placeholder="Test description/notes" rows="2"
-                        class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <button type="button" onclick="removeTest(this)" class="mt-2 text-red-600 hover:text-red-800 text-sm flex items-center gap-1">
-                    <span class="material-symbols-outlined text-base">delete</span>
-                    Remove
-                </button>
-            `;
-            container.appendChild(testItem);
-            if (testCount === 0) {
-                document.querySelectorAll('#testsContainer ~ p')[0]?.remove();
-            }
-            testCount++;
-        }
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      const text = document.getElementById('toastMessage');
+      
+      toast.className = "fixed top-6 right-6 z-[9999] max-w-sm rounded-xl shadow-2xl border p-4 flex items-start gap-3 transition-all " + 
+        (type === 'success' ? "bg-green-50 border-green-200 text-green-800" : "bg-red-50 border-red-200 text-red-800");
+      
+      icon.textContent = type === 'success' ? 'check_circle' : 'error';
+      text.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
 
-        function removeTest(btn) {
-            btn.closest('.test-item').remove();
-            if (document.querySelectorAll('.test-item').length === 0) {
-                document.getElementById('testsContainer').insertAdjacentHTML('afterend', '<p class="text-slate-500 text-sm italic mt-2">No tests added yet</p>');
-            }
-        }
-
-        function goBack() {
-            window.history.back();
-        }
-
-        document.getElementById('prescriptionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-
-            try {
-                const response = await fetch('add_prescription.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('Prescription added successfully!');
-                    window.location.href = 'prescription_history.php';
-                } else {
-                    alert('Error: ' + (data.message || 'Failed to add prescription'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while saving the prescription');
-            }
-        });
-    </script>
+    // Init
+    window.onload = () => {
+      addMedicineRow();
+    };
+  </script>
 </body>
 </html>

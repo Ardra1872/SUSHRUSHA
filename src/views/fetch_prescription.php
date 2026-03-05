@@ -48,7 +48,7 @@ elseif ($action === 'detail') {
 
     // Fetch medicines
     $stmt = $conn->prepare("
-        SELECT id, medicine_name, dosage, frequency, duration, instructions
+        SELECT id, medicine_name, dosage, frequency_type, time_slots, start_date, end_date, before_after_food, notes
         FROM prescription_medicines
         WHERE prescription_id = ?
     ");
@@ -91,7 +91,17 @@ elseif ($action === 'delete') {
     }
     $stmt->close();
 
-    // Delete related records first (cascade)
+    // 1. Delete associated doses
+    $stmt = $conn->prepare("
+        DELETE d FROM doses d
+        JOIN prescription_medicines pm ON d.prescription_medicine_id = pm.id
+        WHERE pm.prescription_id = ?
+    ");
+    $stmt->bind_param("i", $prescriptionId);
+    $stmt->execute();
+    $stmt->close();
+
+    // 2. Delete related records
     $stmt = $conn->prepare("DELETE FROM prescription_medicines WHERE prescription_id = ?");
     $stmt->bind_param("i", $prescriptionId);
     $stmt->execute();
@@ -102,7 +112,7 @@ elseif ($action === 'delete') {
     $stmt->execute();
     $stmt->close();
 
-    // Delete prescription
+    // 3. Delete prescription
     $stmt = $conn->prepare("DELETE FROM prescriptions WHERE id = ? AND patient_id = ?");
     $stmt->bind_param("ii", $prescriptionId, $patientId);
     $stmt->execute();

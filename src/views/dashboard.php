@@ -67,48 +67,54 @@ $stmt->close();
 
 
 // ---------------------------------------------------------
-// ADHERENCE UPDATE QUERY
+// ADHERENCE UPDATE QUERY (Enhanced for Prescriptions)
 // ---------------------------------------------------------
-// 1. Count Total Medicines
-$countMedStmt = $conn->prepare("SELECT COUNT(*) as total_meds FROM medicines WHERE patient_id = ?");
-$countMedStmt->bind_param("i", $userId);
-$countMedStmt->execute();
-$medCountResult = $countMedStmt->get_result();
-$totalMeds = $medCountResult->fetch_assoc()['total_meds'];
-$countMedStmt->close();
-
-// 2. Calculate Adherence (Based on dose_logs)
-// We join with medicines table to ensure we only count logs for this patient's medicines
-// logs: status = 'TAKEN' or 'MISSED' (or 'SKIPPED' if you use that)
 $adherencePct = 0;
-$totalLogs = 0;
-$hasLogs = false;
+$totalPrescribed = 0;
+$totalTaken = 0;
+$hasDoseLogs = false;
 
-if ($totalMeds > 0) {
-    $logQuery = "
-        SELECT 
-            COUNT(*) as total_attempts,
-            SUM(CASE WHEN dl.status = 'TAKEN' THEN 1 ELSE 0 END) as taken_count
-        FROM dose_logs dl
-        JOIN medicine_schedule ms ON dl.schedule_id = ms.id
-        JOIN medicines m ON ms.medicine_id = m.id
-        WHERE m.patient_id = ?
-    ";
-    $logStmt = $conn->prepare($logQuery);
-    $logStmt->bind_param("i", $userId);
-    $logStmt->execute();
-    $logResult = $logStmt->get_result();
-    $logData = $logResult->fetch_assoc();
-    $logStmt->close();
+$adherenceSql = "
+    SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'taken' THEN 1 ELSE 0 END) as taken
+    FROM doses
+    WHERE patient_id = ? AND DATE(scheduled_datetime) <= CURDATE()
+";
+$stmt = $conn->prepare($adherenceSql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$adResult = $stmt->get_result()->fetch_assoc();
+$totalPrescribed = $adResult['total'] ?: 0;
+$totalTaken = $adResult['taken'] ?: 0;
+$stmt->close();
 
-    $totalLogs = intval($logData['total_attempts']);
-    $takenCount = intval($logData['taken_count']);
+if ($totalPrescribed > 0) {
+    $adherencePct = round(($totalTaken / $totalPrescribed) * 100);
+    $hasDoseLogs = true;
+}
 
-    if ($totalLogs > 0) {
-        $adherencePct = round(($takenCount / $totalLogs) * 100);
-        $hasLogs = true;
+// Check for 2+ consecutive missed doses
+$consecutiveMissed = false;
+$consecutiveSql = "
+    SELECT status FROM doses d
+    JOIN prescription_medicines pm ON d.prescription_medicine_id = pm.id
+    JOIN prescriptions p ON pm.prescription_id = p.id
+    WHERE p.patient_id = ? AND d.scheduled_datetime <= NOW()
+    ORDER BY d.scheduled_datetime DESC LIMIT 2
+";
+$stmt = $conn->prepare($consecutiveSql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$cResult = $stmt->get_result();
+if ($cResult->num_rows >= 2) {
+    $m1 = $cResult->fetch_assoc()['status'];
+    $m2 = $cResult->fetch_assoc()['status'];
+    if ($m1 === 'missed' && $m2 === 'missed') {
+        $consecutiveMissed = true;
     }
 }
+$stmt->close();
 
 // ---------------------------------------------------------
 // FETCH BOX SLOTS DATA (1-4)
@@ -459,22 +465,36 @@ tailwind.config = {
       <h2 class="text-2xl font-bold mb-4"data-i18n="dashboard_overview">Dashboard Overview</h2>
       <p data-i18n="dashboard_overview_text">Here’s your health overview for today.</p>
 
+      <!-- CONSECUTIVE MISSED ALERT -->
+      <?php if (isset($consecutiveMissed) && $consecutiveMissed): ?>
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-4 text-red-800 animate-pulse">
+        <span class="material-symbols-outlined text-3xl">warning</span>
+        <div>
+          <p class="font-bold">Urgent: Missed Doses Alert</p>
+          <p class="text-sm">You have missed 2 consecutive doses. Your caretaker has been notified (if 3 missed). Please take your medicine if possible.</p>
+        </div>
+      </div>
+      <?php endif; ?>
+
       <!-- STATS + DISEASE -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
-        <div class="bg-white p-6 rounded-2xl shadow-soft">
-          <p class="text-sm text-textSub" data-i18n="adherence">Adherence</p>
+        <a href="report.php" class="bg-white p-6 rounded-2xl shadow-soft hover:ring-2 hover:ring-primary transition-all group">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-sm text-textSub" data-i18n="adherence">Adherence</p>
+            <span class="material-symbols-outlined text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+          </div>
           
-          <?php if ($totalMeds == 0): ?>
+          <?php if (!isset($totalPrescribed) || $totalPrescribed == 0): ?>
             <!-- No Medicines Added -->
             <h3 class="text-xl font-display font-bold mt-2 text-primary">Start Tracking</h3>
             <p class="text-xs text-textSub mt-1">Add medicine to know your adherence</p>
             <div class="mt-3">
-               <a href="add_medicine.html" class="text-xs font-semibold text-primary bg-primary/10 px-3 py-2 rounded-lg hover:bg-primary/20 transition">
+               <span class="text-xs font-semibold text-primary bg-primary/10 px-3 py-2 rounded-lg group-hover:bg-primary/20 transition">
                  + Add Medicine
-               </a>
+               </span>
             </div>
 
-          <?php elseif (!$hasLogs): ?>
+          <?php elseif (!isset($hasDoseLogs) || !$hasDoseLogs): ?>
             <!-- Medicines exist, but no logs yet -->
             <h3 class="text-4xl font-display font-bold mt-2 text-slate-300">--%</h3>
             <p class="text-xs text-textSub mt-1">No logs recorded yet</p>
@@ -489,7 +509,7 @@ tailwind.config = {
               <div class="h-2 bg-primary rounded-full" style="width: <?= $adherencePct ?>%"></div>
             </div>
           <?php endif; ?>
-        </div>
+        </a>
 
         <div class="bg-white p-6 rounded-2xl shadow-soft">
           <p class="text-sm text-textSub" data-i18n="missed_doses">Missed Doses</p>
