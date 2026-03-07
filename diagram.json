@@ -9,24 +9,87 @@
     }
   },
   "connections": [
-    ["ESP32:15", "LED1:A"],
-    ["GND:GND", "LED1:K"],
-    ["ESP32:4", "LED2:A"],
-    ["GND:GND", "LED2:K"],
-    ["ESP32:16", "LED3:A"],
-    ["GND:GND", "LED3:K"],
-    ["ESP32:17", "LED4:A"],
-    ["GND:GND", "LED4:K"],
-    ["ESP32:32", "BTN1:1"],
-    ["GND:GND", "BTN1:2"],
-    ["ESP32:33", "BTN2:1"],
-    ["GND:GND", "BTN2:2"],
-    ["ESP32:25", "BTN3:1"],
-    ["GND:GND", "BTN3:2"],
-    ["ESP32:26", "BTN4:1"],
-    ["GND:GND", "BTN4:2"]
+    [
+      "ESP32:15",
+      "LED1:A"
+    ],
+    [
+      "GND:GND",
+      "LED1:K"
+    ],
+    [
+      "ESP32:18",
+      "LED2:A"
+    ],
+    [
+      "GND:GND",
+      "LED2:K"
+    ],
+    [
+      "ESP32:4",
+      "LED3:A"
+    ],
+    [
+      "GND:GND",
+      "LED3:K"
+    ],
+    [
+      "ESP32:16",
+      "LED4:A"
+    ],
+    [
+      "GND:GND",
+      "LED4:K"
+    ],
+    [
+      "ESP32:32",
+      "BTN1:1"
+    ],
+    [
+      "GND:GND",
+      "BTN1:2"
+    ],
+    [
+      "ESP32:33",
+      "BTN2:1"
+    ],
+    [
+      "GND:GND",
+      "BTN2:2"
+    ],
+    [
+      "ESP32:25",
+      "BTN3:1"
+    ],
+    [
+      "GND:GND",
+      "BTN3:2"
+    ],
+    [
+      "ESP32:26",
+      "BTN4:1"
+    ],
+    [
+      "GND:GND",
+      "BTN4:2"
+    ],
+    [
+      "GND:GND",
+      "BZ1:1"
+    ],
+    [
+      "ESP32:27",
+      "BZ1:2"
+    ]
   ],
   "parts": [
+    {
+      "type": "wokwi-buzzer",
+      "id": "BZ1",
+      "top": -100,
+      "left": 150,
+      "attrs": {}
+    },
     {
       "type": "wokwi-esp32-devkit-v1",
       "id": "ESP32",
