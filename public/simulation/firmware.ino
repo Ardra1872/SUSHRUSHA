@@ -21,6 +21,7 @@ const char* ntpServer = "pool.ntp.org";
 WebServer server(80);
 
 const int SLOT_LED_PINS[NUM_SLOTS] = {15, 4, 16, 17};
+const int REED_SWITCH_PINS[NUM_SLOTS] = {32, 33, 34, 35}; // Pins for Slots 1, 2, 3, 4
 const int BUZZER_PIN = 27;
 
 enum SlotStatus { Waiting, Alerting, Taken, Missed };
@@ -28,6 +29,7 @@ enum SlotStatus { Waiting, Alerting, Taken, Missed };
 struct Slot {
   int id;
   int ledPin;
+  int reedPin;
   int scheduleMinutes; // Minutes since midnight
   SlotStatus status;
   bool alerting;
@@ -35,6 +37,7 @@ struct Slot {
   unsigned long lastBlinkMillis;
   bool ledState;
   int lastTriggeredDay;
+  int lastReedState;
   String medicineName;
 };
 
@@ -69,6 +72,27 @@ bool loadConfig() {
   return true;
 }
 
+void reportIntake(int slotId) {
+    if (WiFi.status() != WL_CONNECTED) return;
+
+    Serial.printf("Reporting intake for Slot %d...\n", slotId);
+    HTTPClient http;
+    // Base URL assumed to be in same directory as get_state (api_url)
+    // api_url typically: http://.../get_state.php?user_id=10
+    // We need to extract the base path
+    String baseUrl = api_url.substring(0, api_url.lastIndexOf('/') + 1);
+    String url = baseUrl + "report_intake.php?user_id=10&slot_id=" + String(slotId);
+    
+    http.begin(url);
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK) {
+        Serial.println("Intake reported successfully.");
+    } else {
+        Serial.printf("Failed to report intake, code: %d\n", httpCode);
+    }
+    http.end();
+}
+
 void syncSchedules() {
   if (WiFi.status() != WL_CONNECTED) return;
 
@@ -91,7 +115,10 @@ void syncSchedules() {
     }
 
     for (JsonObject s : schedules) {
-      int slotIdx = s["slot_id"].as<int>();
+        // Now using 1-based matching from API
+      int slotNum = s["slot_id"].as<int>();
+      int slotIdx = slotNum - 1; 
+
       if (slotIdx >= 0 && slotIdx < NUM_SLOTS) {
         String timeStr = s["intake_time_formatted"].as<String>(); // "HH:MM"
         int hh = timeStr.substring(0, 2).toInt();
@@ -99,10 +126,17 @@ void syncSchedules() {
         
         slots[slotIdx].scheduleMinutes = hh * 60 + mm;
         slots[slotIdx].medicineName = s["medicine_name"].as<String>();
-        slots[slotIdx].status = Waiting;
-        slots[slotIdx].alerting = false;
         
-        Serial.printf("Slot %d: %s at %02d:%02d\n", slotIdx + 1, slots[slotIdx].medicineName.c_str(), hh, mm);
+        String statusStr = s["log_status"].as<String>();
+        if (statusStr == "Taken") {
+            slots[slotIdx].status = Taken;
+            slots[slotIdx].alerting = false;
+        } else {
+            slots[slotIdx].status = Waiting;
+            slots[slotIdx].alerting = false;
+        }
+        
+        Serial.printf("Slot %d: %s at %02d:%02d (%s)\n", slotNum, slots[slotIdx].medicineName.c_str(), hh, mm, statusStr.c_str());
       }
     }
     lastSyncMillis = millis();
@@ -122,14 +156,17 @@ void setup() {
   for (int i = 0; i < NUM_SLOTS; i++) {
     slots[i].id = i + 1;
     slots[i].ledPin = SLOT_LED_PINS[i];
+    slots[i].reedPin = REED_SWITCH_PINS[i];
     slots[i].scheduleMinutes = -1;
     slots[i].status = Waiting;
     slots[i].alerting = false;
     slots[i].lastTriggeredDay = -1;
+    slots[i].lastReedState = LOW;
     slots[i].medicineName = "Empty";
 
     pinMode(slots[i].ledPin, OUTPUT);
     digitalWrite(slots[i].ledPin, LOW);
+    pinMode(slots[i].reedPin, INPUT_PULLUP);
   }
 
   pinMode(BUZZER_PIN, OUTPUT);
@@ -214,6 +251,8 @@ void setup() {
       slots[s].status = Taken;
       digitalWrite(slots[s].ledPin, LOW);
       digitalWrite(BUZZER_PIN, LOW);
+      // Manually trigger reporting to simulate Reed Switch for web-based testing
+      reportIntake(s + 1);
       server.send(200, "text/plain", "OK");
     } else {
       server.send(400, "text/plain", "Invalid Slot");
@@ -244,9 +283,27 @@ void loop() {
   for (int i = 0; i < NUM_SLOTS; i++) {
     Slot &s = slots[i];
 
+    // --- REED SWITCH MONITORING ---
+    int currentReedState = digitalRead(s.reedPin);
+    if (currentReedState == HIGH && s.lastReedState == LOW) {
+        // Rising edge: Magnet removed (Slot opened)
+        Serial.printf("Reed Switch Slot %d triggered!\n", s.id);
+        
+        // Report intake to backend
+        reportIntake(s.id);
+
+        // Update local state and stop alerts
+        s.alerting = false;
+        s.status = Taken;
+        digitalWrite(s.ledPin, LOW);
+        digitalWrite(BUZZER_PIN, LOW);
+    }
+    s.lastReedState = currentReedState;
+
+    // --- ALERT LOGIC ---
     // Trigger Alert
     if (s.scheduleMinutes >= 0 && s.status == Waiting) {
-      if (nowMin >= s.scheduleMinutes && nowMin < s.scheduleMinutes + 5 && s.lastTriggeredDay != day) {
+      if (nowMin >= s.scheduleMinutes && nowMin < s.scheduleMinutes + 30 && s.lastTriggeredDay != day) {
         s.alerting = true;
         s.status = Alerting;
         s.alertStartMillis = nowMs;
@@ -265,8 +322,8 @@ void loop() {
         digitalWrite(BUZZER_PIN, s.ledState);
       }
 
-      // Timeout
-      if (nowMs - s.alertStartMillis > ALERT_DURATION) {
+      // Timeout (e.g., 30 mins)
+      if (nowMs - s.alertStartMillis > (30 * 60 * 1000)) {
         s.alerting = false;
         s.status = Missed;
         digitalWrite(s.ledPin, LOW);

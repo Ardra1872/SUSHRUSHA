@@ -959,16 +959,18 @@
     // Auto-select compartment from URL parameter
     function initializeCompartmentFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
-      const compartmentId = urlParams.get('compartment');
+      const compartmentId = urlParams.get('compartment') || urlParams.get('slot');
 
       if (compartmentId) {
         const compartmentSelect = document.getElementById('compartment_number');
         // Wait for compartment dropdown to be loaded
         setTimeout(() => {
-          compartmentSelect.value = compartmentId;
-          // Scroll to compartment field
-          compartmentSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+          if (compartmentSelect) {
+            compartmentSelect.value = compartmentId;
+            // Scroll to compartment field
+            compartmentSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 800);
       }
     }
 

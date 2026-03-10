@@ -11,8 +11,8 @@ if (isset($_GET['user_id'])) {
     // ESP32 request
     $user_id = intval($_GET['user_id']);
 } elseif (isset($_SESSION['user_id'])) {
-    // Browser request
-    $user_id = $_SESSION['user_id'];
+    // Browser request - use active patient context for caretakers
+    $user_id = $_SESSION['active_patient_id'] ?? $_SESSION['user_id'];
 } else {
     echo json_encode([
         "error" => "Not logged in",
@@ -102,8 +102,7 @@ if ($result) {
         }
         
         // Always include the medicine record so the slot isn't "Empty"
-       $compNum = intval($row['compartment_number']);
-$row['slot_id'] = ($compNum > 0) ? ($compNum - 1) : 0;
+        $row['slot_id'] = intval($row['compartment_number']);
 
 $row['intake_time_formatted'] = $row['intake_time'] 
     ? date('H:i', strtotime($row['intake_time'])) 

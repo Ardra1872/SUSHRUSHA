@@ -89,8 +89,8 @@ function updateUI() {
     const slots = [0, 1, 2, 3];
 
     slots.forEach(slotId => {
-        // Find ALL medicines assigned to this slot
-        const meds = STATE.schedules.filter(s => s.slot_id === slotId);
+        // Find ALL medicines assigned to this slot (slot_id is now 1-based from API)
+        const meds = STATE.schedules.filter(s => parseInt(s.slot_id) === (slotId + 1));
 
         let content = `<div class="font-bold text-gray-700">Slot ${slotId + 1}</div>`;
 
@@ -122,6 +122,12 @@ function updateUI() {
                         <div class="text-[10px] text-slate-500 font-mono">
                            ${m.intake_time_formatted || 'As Needed'}
                         </div>
+                        ${(alertInfo && alertInfo.status === 'Alerting') ? `
+                        <button onclick="triggerReedSwitch(${slotId})" class="mt-2 w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg flex items-center justify-center gap-1 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                            <span class="material-symbols-outlined text-xs">sensors</span>
+                            Trigger Reed Switch
+                        </button>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -137,51 +143,55 @@ function updateUI() {
 // 3. Check Alerts Logic (Mirrors Firmware)
 function checkAlerts() {
     const nowStr = STATE.currentTime;
+    let alertsChanged = false;
 
+    // A. Sync from DB: START or STOP alerts based on schedule status
     STATE.schedules.forEach(sched => {
-        const scheduleId = sched.schedule_id;
-
-        // Skip if already taken/missed in DB, OR if not due today
-        if (sched.log_status || !sched.is_due_today) return;
-
+        const scheduleId = String(sched.schedule_id);
         const alertInfo = STATE.activeAlerts[scheduleId];
 
-        // START ALERT if time matches and not already alerting
-        if (sched.intake_time_formatted === nowStr) {
-            if (!alertInfo) {
-                log(`🔔 [Hardware] Alert started for Slot ${sched.slot_id + 1}: ${sched.medicine_name}`);
-                startAlert(sched);
+        const isTakenOrExpired = sched.log_status || !sched.is_due_today;
+
+        if (isTakenOrExpired) {
+            if (alertInfo) {
+                log(`✅ [Hardware] Alert cleared for #${scheduleId} (Slot ${sched.slot_id}) - Status: ${sched.log_status || 'Expired'}`);
+                delete STATE.activeAlerts[scheduleId];
+                alertsChanged = true;
             }
+            return;
         }
 
-        // If alerting, check timeout
-        if (alertInfo && alertInfo.status === 'Alerting') {
-            const elapsedMs = Date.now() - alertInfo.startedAt;
+        // START ALERT if time matches and not already alerting/taken
+        if (sched.intake_time_formatted === nowStr) {
+            if (!alertInfo) {
+                log(`🔔 [Hardware] Alert started for Slot ${sched.slot_id}: ${sched.medicine_name}`);
+                startAlert(sched);
+                alertsChanged = true;
+            }
+        }
+    });
 
+    // B. Internal Timeouts: Check if alerting items have timed out
+    Object.entries(STATE.activeAlerts).forEach(([id, info]) => {
+        if (info.status === 'Alerting') {
+            const elapsedMs = Date.now() - info.startedAt;
             if (elapsedMs > ALERT_DURATION) {
-                // TIMEOUT -> MISSED (Mirror firmware logic)
-                log(`Slot ${sched.slot_id + 1} Timeout! Dosing Missed.`);
-                alertInfo.status = 'Missed';
-                reportAction(scheduleId, 'MISSED');
-                // We keep it in activeAlerts as 'Missed' for UI but stop LED
+                log(`Slot ${info.slotId + 1} Timeout! Dosing Missed.`);
+                info.status = 'Missed';
+                reportAction(id, 'MISSED');
+                alertsChanged = true;
             }
         }
     });
 
     // Update 3D scene: only slots with status 'Alerting' should blink
-    const alertingSlots = Object.values(STATE.activeAlerts)
-        .filter(a => a.status === 'Alerting')
-        .map(a => a.slotId);
-
-    if (window.SceneManager) {
-        window.SceneManager.updateAlerts(alertingSlots);
-    }
+    updateSimulation3D();
 }
 
 function startAlert(sched) {
-    log(`⏰ ALERT: Time for ${sched.medicine_name} (Slot ${sched.slot_id + 1})`);
+    log(`⏰ ALERT: Time for ${sched.medicine_name} (Slot ${sched.slot_id})`);
     STATE.activeAlerts[sched.schedule_id] = {
-        slotId: sched.slot_id,
+        slotId: sched.slot_id - 1, // Convert 1-based to 0-based for internal state
         startedAt: Date.now(),
         status: 'Alerting'
     };
@@ -190,10 +200,10 @@ function startAlert(sched) {
 
 function stopAlert(scheduleId) {
     delete STATE.activeAlerts[scheduleId];
-    sync3D();
+    updateSimulation3D();
 }
 
-function sync3D() {
+function updateSimulation3D() {
     const alertingSlots = Object.values(STATE.activeAlerts)
         .filter(a => a.status === 'Alerting')
         .map(a => a.slotId);
@@ -207,25 +217,30 @@ function isSlotActive(slotId) {
     return Object.values(STATE.activeAlerts).some(a => a.slotId === slotId && a.status === 'Alerting');
 }
 
-// 4. Handle User Actions (Lid Open)
-window.onLidClick = function (slotIndex) {
-    log(`User opened Slot ${slotIndex + 1}...`);
+// 4. Handle User Actions (Reed Switch / Lid Open)
+window.triggerReedSwitch = function (slotIndex) {
+    log(`🧲 [Reed Switch] Triggered for Slot ${slotIndex + 1}...`);
 
-    const alertEntry = Object.entries(STATE.activeAlerts).find(([id, info]) => info.slotId === slotIndex && info.status === 'Alerting');
+    // Find ALL alerting medicines for this slot
+    const alertingDoses = Object.entries(STATE.activeAlerts).filter(([id, info]) => info.slotId === slotIndex && info.status === 'Alerting');
 
-    if (alertEntry) {
-        const [schedId, info] = alertEntry;
-        log(`✅ Valid Dose Taken for Schedule #${schedId}`);
-        info.status = 'Taken';
-        reportAction(schedId, 'TAKEN');
-        sync3D();
+    if (alertingDoses.length > 0) {
+        alertingDoses.forEach(([schedId, info]) => {
+            log(`✅ Valid Dose Taken for Schedule #${schedId}`);
+            info.status = 'Taken';
+            reportAction(schedId, 'TAKEN');
+        });
 
+        updateSimulation3D();
         window.SceneManager.animateLid(slotIndex);
     } else {
         log(`(Opened empty/inactive slot)`);
         window.SceneManager.animateLid(slotIndex);
     }
 };
+
+// Compatibility for 3D clicks
+window.onLidClick = window.triggerReedSwitch;
 
 // 5. Send Action to API
 async function reportAction(scheduleId, status) {
