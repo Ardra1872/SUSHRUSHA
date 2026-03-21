@@ -37,7 +37,7 @@ void reportIntake() {
     HTTPClient http;
   
     // Assuming slot_id=1 for the Reed switch on GPIO 32
-    String url = "http://10.251.114.231/Sushrusha/public/api/simulation/report_intake.php?user_id=10&slot_id=1";
+    String url = "http://10.160.152.231/Sushrusha/public/api/simulation/report_intake.php?user_id=10&slot_id=1";
     http.begin(url);
     int httpCode = http.GET();
     if (httpCode > 0) {
@@ -133,7 +133,7 @@ void loop() {
     if(WiFi.status() == WL_CONNECTED){
       // --- Slot API ---
       HTTPClient httpSlots;
-      httpSlots.begin("http://10.251.114.231/Sushrusha/public/api/simulation/get_state.php?user_id=10");
+      httpSlots.begin("http://10.160.152.231/Sushrusha/public/api/simulation/get_state.php?user_id=10");
       int httpCodeSlots = httpSlots.GET();
       if(httpCodeSlots > 0){
         String payload = httpSlots.getString();
