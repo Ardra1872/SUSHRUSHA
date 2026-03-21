@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../src/config/db.php';
+require dirname(__DIR__) . '/src/config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -61,6 +61,7 @@ $_SESSION['first_login'] = $first_login;
     <title>SUSHRUSHA – Login</title>
 
     <link rel="stylesheet" href="assets/login.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="assets/translations.js"></script>
     <script src="assets/language-selector.js"></script>
@@ -101,7 +102,7 @@ $_SESSION['first_login'] = $first_login;
 
             <p class="switch">
                 <span data-i18n="dont_have_account">Don't have an account?</span>
-                <a href="/Sushrusha/public/register.php" data-i18n="create_account">Create Account</a>
+                <a href="register.php" data-i18n="create_account">Create Account</a>
             </p>
         </div>
     </div>

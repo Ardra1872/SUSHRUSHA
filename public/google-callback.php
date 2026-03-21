@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once '../src/config/db.php';
-require_once '../src/config/env.php'; // load env
+require_once dirname(__DIR__) . '/src/config/db.php';
+require_once dirname(__DIR__) . '/src/config/env.php'; // load env
 
 $client_id     = $_ENV['GOOGLE_CLIENT_ID'];
 $client_secret = $_ENV['GOOGLE_CLIENT_SECRET'];
@@ -158,17 +158,17 @@ if ($role === 'patient') {
 }
 
 if($role === 'patient'){
-    header("Location: /Sushrusha/src/views/dashboard.php");
+    header("Location: ../src/views/dashboard.php");
     exit();
 } elseif($role === 'caretaker'){
-    header("Location: /Sushrusha/src/views/caretaker_dashboard.html");
+    header("Location: ../src/views/caretaker_dashboard.html");
     exit();
 } elseif($role === 'admin'){
-    header("Location: /Sushrusha/src/views/admin_dashboard.html");
+    header("Location: ../src/views/admin_dashboard.html");
     exit();
 } else {
     
-    header("Location: /Sushrusha/public/login.php");
+    header("Location: login.php");
     exit();
 }
 

@@ -1,7 +1,10 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require '../src/config/db.php';   
-require '../src/helpers/sendWelcomeEmail.php';
+require dirname(__DIR__) . '/src/config/db.php';
+// require dirname(__DIR__) . '/src/helpers/sendWelcomeEmail.php';
 
 // ---------- FORM SUBMISSION ----------
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -64,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($stmt->execute()) {
         // Send Welcome Email
-        sendWelcomeEmail($email, $name);
+        // sendWelcomeEmail($email, $name);
 
         $_SESSION['success'] = "Registration successful! Please login.";
         header("Location: login.php");
@@ -85,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>SUSHRUSHA – Register</title>
 
     <link rel="stylesheet" href="assets/register.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="assets/translations.js"></script>
     <script src="assets/language-selector.js"></script>

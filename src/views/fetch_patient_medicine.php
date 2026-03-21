@@ -3,7 +3,7 @@ session_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
-include '../config/db.php';
+include __DIR__ . '/../config/db.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'caretaker') {

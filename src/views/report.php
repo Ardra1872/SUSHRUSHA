@@ -81,7 +81,7 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <title>Sushrusha - Adherence Report</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../../public/assets/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">

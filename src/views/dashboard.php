@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include '../config/db.php';
+include __DIR__ . '/../config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -76,10 +76,14 @@ $hasDoseLogs = false;
 
 $adherenceSql = "
     SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN status = 'taken' THEN 1 ELSE 0 END) as taken
-    FROM doses
-    WHERE patient_id = ? AND DATE(scheduled_datetime) <= CURDATE()
+        COUNT(ms.id) as total,
+        SUM(CASE WHEN dl.status = 'TAKEN' THEN 1 ELSE 0 END) as taken
+    FROM medicine_schedule ms
+    JOIN medicines m ON ms.medicine_id = m.id
+    LEFT JOIN dose_logs dl ON ms.id = dl.schedule_id AND DATE(dl.log_time) = CURDATE()
+    WHERE m.patient_id = ? 
+      AND m.start_date <= CURDATE()
+      AND (m.end_date IS NULL OR m.end_date = '0000-00-00' OR m.end_date >= CURDATE())
 ";
 $stmt = $conn->prepare($adherenceSql);
 $stmt->bind_param("i", $userId);
@@ -254,36 +258,9 @@ while (strtotime($currentDate) <= strtotime($todayDate)) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="../../public/assets/style.css" rel="stylesheet">
 <script src="../../public/assets/translations.js"></script>
 <script src="../../public/assets/language-selector.js"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: "#2563EB",
-        primaryDark: "#1D4ED8",
-        surface: "#FFFFFF",
-        bg: "#F3F6FA",
-        textMain: "#1E293B",
-        textSub: "#64748B",
-        success: "#10B981",
-        warning: "#6366F1", // Changed from Orange to Indigo
-        danger: "#EF4444",
-      },
-      fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Inter", "sans-serif"]
-      },
-      boxShadow: {
-        soft: "0 8px 30px rgba(0,0,0,0.05)"
-      }
-    }
-  }
-}
-</script>
 </head>
 <body class="bg-bg text-textMain font-body h-screen flex">
 
@@ -341,11 +318,8 @@ tailwind.config = {
 
   <!-- Medicine Logs -->
   <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="logs">
-    <span class="material-symbols-outlined">history</span> <span>Medicine Logs</span>
+    <span class="material-symbols-outlined">history</span> <span class="nav-text">Medicine Logs</span>
   </a>
-  <!-- <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-textSub hover:bg-slate-100" data-section="users">
-    <span class="material-symbols-outlined">manage_accounts</span> Manage Users
-  </a> -->
 </nav>
 
 <div class="p-6 space-y-3">
@@ -373,9 +347,9 @@ tailwind.config = {
 <header class="h-20 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between">
 
   <!-- LEFT: Hamburger + Greeting -->
-  <div class="flex items-center gap-4">
-    <button id="menuBtn" class="text-textSub md:hidden">
-      <span class="material-symbols-outlined text-3xl">menu</span>
+  <div class="flex items-center gap-3 md:gap-4 overflow-hidden">
+    <button id="menuBtn" class="p-2 -ml-2 text-textSub md:hidden flex items-center justify-center rounded-lg hover:bg-slate-100 transition">
+      <span class="material-symbols-outlined text-2xl">menu</span>
     </button>
 
     <div class="flex flex-col md:flex-row md:items-baseline md:gap-3">
@@ -390,30 +364,30 @@ tailwind.config = {
   </div>
 
   <!-- RIGHT: Search + Icons -->
-  <div class="flex items-center gap-4 min-w-[220px] md:min-w-[300px] justify-end">
+  <div class="flex items-center gap-2 md:gap-4 justify-end flex-1 md:flex-none">
 
     <!-- Search -->
-   <div class="relative">
-  <svg
-    class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-      d="M21 21l-4.35-4.35M16.65 10.5a6.15 6.15 0 11-12.3 0 6.15 6.15 0 0112.3 0z" />
-  </svg>
+    <div class="relative hidden sm:block">
+      <svg
+        class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-4.35-4.35M16.65 10.5a6.15 6.15 0 11-12.3 0 6.15 6.15 0 0112.3 0z" />
+      </svg>
 
-  <input
-    id="searchInput"
-    type="text"
-    placeholder="Search medicines..."
-    class="w-72 h-10 rounded-full border border-slate-300 bg-slate-50 pl-9 pr-4 text-sm
-           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
-           transition"data-i18n-placeholder="search_medicines"
-  />
-</div>
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search medicines..."
+        class="w-40 lg:w-72 h-10 rounded-full border border-slate-300 bg-slate-50 pl-9 pr-4 text-sm
+               focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+               transition" data-i18n-placeholder="search_medicines"
+      />
+    </div>
 
     <!-- Notifications -->
     <button class="relative hidden md:inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100">
@@ -457,8 +431,8 @@ tailwind.config = {
 
 
 <!-- CONTENT -->
-<div class="flex-1 overflow-y-auto p-8">
-  <div class="max-w-[1500px] mx-auto space-y-8">
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+  <div class="max-w-[1500px] mx-auto space-y-6 md:space-y-8">
 
     <!-- Dashboard Section -->
     <div id="dashboard" class="section">
@@ -477,7 +451,7 @@ tailwind.config = {
       <?php endif; ?>
 
       <!-- STATS + DISEASE -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-4">
         <a href="report.php" class="bg-white p-6 rounded-2xl shadow-soft hover:ring-2 hover:ring-primary transition-all group">
           <div class="flex items-center justify-between mb-2">
             <p class="text-sm text-textSub" data-i18n="adherence">Adherence</p>
@@ -524,7 +498,7 @@ tailwind.config = {
           <p class="text-xs text-textSub mt-2 dynamic-text"><?= isset($caretakerRelation) ? 'Relation: ' . htmlspecialchars($caretakerRelation) : 'No caretaker linked' ?></p>
         </div>
         <!-- Disease / Conditions card -->
-        <div class="bg-white p-6 rounded-2xl shadow-soft md:col-span-1">
+        <div class="bg-white p-6 rounded-2xl shadow-soft sm:col-span-2 lg:col-span-1">
           <p class="text-sm text-textSub">Disease / Conditions</p>
           <?php if (!empty($prescriptionDiseases)): ?>
             <?php $diseaseCount = count($prescriptionDiseases); ?>
@@ -613,7 +587,7 @@ tailwind.config = {
   </div>
 
   <!-- Two-column layout: form + list -->
-  <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)] gap-8 items-start">
+  <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)] gap-6 md:gap-8 items-start">
     <!-- Form -->
     <form id="assignCaretakerForm" class="space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 p-7 md:p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div class="flex items-center gap-3 mb-2">
@@ -724,7 +698,7 @@ tailwind.config = {
   <h2 class="text-2xl font-bold text-textMain mb-6">Smart Medicine Box</h2>
 
   <!-- STRICT MINIMALIST BOX SETTINGS [Refined] -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
     
     <!-- LEFT COLUMN (Launch & Status & Settings) - Spans 4 cols -->
     <div class="lg:col-span-4 space-y-6">
@@ -791,7 +765,7 @@ tailwind.config = {
          </div>
          
          <!-- SLOTS GRID -->
-         <div class="grid grid-cols-2 gap-6 h-full">
+         <div id="compartmentsList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 h-full">
            <?php for ($i = 1; $i <= 4; $i++): 
               $slotData = $boxSlots[$i] ?? null;
               $isEmpty = empty($slotData);
@@ -1137,6 +1111,7 @@ function closeSidebar() {
 async function loadSchedule() {
  
   const container = document.getElementById("scheduleList");
+  if (!container) return;
   container.innerHTML = "<p>Loading...</p>";
 
   try {
@@ -1294,6 +1269,7 @@ function openEditModal(id) { console.log("Open edit modal for", id); }
 
 async function loadTodaySchedule() {
   const container = document.getElementById("todaySchedule");
+  if (!container) return;
   container.innerHTML = "<p class='text-sm text-textSub'>Loading...</p>";
 
   try {
@@ -1313,34 +1289,34 @@ async function loadTodaySchedule() {
       if (item.status === "Taken" || item.status === "Missed") {
         const isMissed = item.status === "Missed";
         block = `
-          <div class="flex items-start gap-6 opacity-75">
-            <div class="w-12 h-12 rounded-full ${isMissed ? 'bg-red-50 text-red-500' : 'bg-success/10 text-success'} flex items-center justify-center">
-              <span class="material-symbols-outlined">${isMissed ? 'close' : 'check'}</span>
+          <div class="flex items-start gap-4 md:gap-6 opacity-75">
+            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full ${isMissed ? 'bg-red-50 text-red-500' : 'bg-success/10 text-success'} flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-xl md:text-2xl">${isMissed ? 'close' : 'check'}</span>
             </div>
             <div>
-              <p class="text-sm text-textSub">${formatTime(item.intake_time)} • <span class="font-bold ${isMissed ? 'text-red-500' : 'text-green-600'}">${item.status}</span></p>
-              <h4 class="font-bold line-through text-slate-500">${item.name} ${item.dosage}</h4>
+              <p class="text-xs md:text-sm text-textSub">${formatTime(item.intake_time)} • <span class="font-bold ${isMissed ? 'text-red-500' : 'text-green-600'}">${item.status}</span></p>
+              <h4 class="font-bold line-through text-slate-500 break-words">${item.name} ${item.dosage}</h4>
             </div>
           </div>
         `;
       } else {
         block = `
-          <div class="flex items-start gap-6">
-            <div class="size-12 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
-              <span class="material-symbols-outlined">pill</span>
+          <div class="flex items-start gap-4 md:gap-6">
+            <div class="size-10 md:size-12 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-xl md:text-2xl">pill</span>
             </div>
-            <div class="flex-1 bg-primary/10 p-6 rounded-2xl">
-              <p class="text-sm text-primary font-semibold">
+            <div class="flex-1 bg-primary/10 p-4 md:p-6 rounded-2xl">
+              <p class="text-xs md:text-sm text-primary font-semibold">
                 ${item.status === "Pending" ? "Upcoming" : item.status} • ${formatTime(item.intake_time)}
               </p>
-              <h4 class="text-xl font-display font-bold">
+              <h4 class="text-lg md:text-xl font-display font-bold break-words">
                 ${item.name} ${item.dosage}
               </h4>
-              <div class="flex gap-3 mt-4">
-                <button onclick="markDose(${item.schedule_id}, 'TAKEN')" class="flex-1 bg-primary hover:bg-primaryDark transition text-white py-2 rounded-xl font-bold shadow-sm">
+              <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                <button onclick="markDose(${item.schedule_id}, 'TAKEN')" class="flex-1 bg-primary hover:bg-primaryDark transition text-white py-2.5 rounded-xl font-bold shadow-sm text-sm">
                   Mark Taken
                 </button>
-                <button onclick="markDose(${item.schedule_id}, 'MISSED')" class="flex-1 border border-slate-300 hover:bg-slate-50 transition py-2 rounded-xl font-semibold text-slate-600">
+                <button onclick="markDose(${item.schedule_id}, 'MISSED')" class="flex-1 border border-slate-300 hover:bg-slate-50 transition py-2.5 rounded-xl font-semibold text-slate-600 text-sm">
                   Skip
                 </button>
               </div>
@@ -1646,6 +1622,11 @@ navItems.forEach(item => {
     const section = item.dataset.section;
     switchSection(section);
 
+    // Auto-close sidebar on mobile after selection
+    if (window.innerWidth < 768) {
+      closeSidebar();
+    }
+
     if (section === "schedule") {
       loadSchedule(); 
     }
@@ -1666,6 +1647,7 @@ document.querySelector('[data-section="alerts"]').addEventListener('click', () =
 
 async function loadAlerts() {
   const container = document.getElementById('alertsContainer');
+  if (!container) return;
   container.innerHTML = `
     <div class="py-12 text-center">
       <div class="inline-flex items-center justify-center size-16 rounded-full bg-indigo-50 text-indigo-600 mb-4 animate-pulse">
@@ -1860,6 +1842,7 @@ requestMedicineForm.addEventListener("submit", async (e) => {
 async function loadMedicineRequests() {
   const container = document.getElementById("requestsContainer");
   const countBadge = document.getElementById("requestCount");
+  if (!container) return;
   container.innerHTML = '<div class="col-span-full py-16 text-center"><span class="material-symbols-outlined text-5xl text-slate-300 block mb-4 animate-spin">settings</span><p class="text-slate-600 font-medium">Loading requests...</p></div>';
 
   try {
@@ -2017,6 +2000,7 @@ document.querySelector('[data-section="boxSettings"]')?.addEventListener("click"
 // Load compartments function
 function loadCompartments() {
   const container = document.getElementById("compartmentsList");
+  if (!container) return;
   
   fetch("fetch_compartments.php")
     .then(res => res.json())
@@ -2539,7 +2523,7 @@ async function viewPrescriptionDetails(prescriptionId) {
           <!-- Content -->
           <div class="p-6 space-y-6">
             <!-- Disease & Doctor Info -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="bg-blue-50 p-4 rounded-xl">
                 <p class="text-xs text-textSub font-semibold mb-1">DOCTOR</p>
                 <p class="text-lg font-bold text-textMain">${escapeHtml(prescription.doctor_name)}</p>

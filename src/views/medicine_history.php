@@ -61,33 +61,8 @@ $profilePhoto = !empty($patient['profile_photo'])
   <title>Medicine History - <?= htmlspecialchars($patient['name']) ?></title>
 
   <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-  <!-- Fonts -->
+  <link href="../../public/assets/style.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-
-  <!-- Tailwind Config (same as dashboard) -->
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#137fec",
-            "background-light": "#f6f7f8"
-          },
-          fontFamily: {
-            display: ["Inter"]
-          },
-          borderRadius: {
-            lg: "0.5rem",
-            xl: "0.75rem",
-            full: "9999px"
-          }
-        }
-      }
-    }
-  </script>
 
   <style>
     body { font-family: 'Inter', sans-serif; }

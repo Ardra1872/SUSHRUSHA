@@ -1,6 +1,6 @@
 <?php
 // /tmp/debug_doses.php
-require 'c:/xampp/htdocs/SUSHRUSHA/src/config/db.php';
+require '../src/config/db.php';
 
 session_start();
 $userId = $_SESSION['user_id'] ?? 4; // Use a default for CLI if needed, or assume browser execution

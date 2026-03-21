@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../config/db.php';
+include __DIR__ . '/../config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../public/login.php");

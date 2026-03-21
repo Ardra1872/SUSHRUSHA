@@ -123,8 +123,8 @@ function updateUI() {
                            ${m.intake_time_formatted || 'As Needed'}
                         </div>
                         ${(alertInfo && alertInfo.status === 'Alerting') ? `
-                        <button onclick="triggerReedSwitch(${slotId})" class="mt-2 w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg flex items-center justify-center gap-1 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
-                            <span class="material-symbols-outlined text-xs">sensors</span>
+                        <button onclick="triggerReedSwitch(${slotId})" class="mt-2 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                            <span class="material-symbols-outlined text-sm">sensors</span>
                             Trigger Reed Switch
                         </button>
                         ` : ''}

@@ -46,7 +46,7 @@ if ($user['profile_photo']) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>View User - <?php echo htmlspecialchars($user['name']); ?></title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link href="../../public/assets/style.css" rel="stylesheet">
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 font-sans">
 <div class="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">

@@ -6,30 +6,7 @@
     <title>Prescription History</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#2563EB",
-                        primaryDark: "#1D4ED8",
-                        surface: "#FFFFFF",
-                        bg: "#F3F6FA",
-                        textMain: "#1E293B",
-                        textSub: "#64748B",
-                        success: "#10B981",
-                        warning: "#F59E0B",
-                        danger: "#EF4444",
-                    },
-                    fontFamily: {
-                        display: ["Plus Jakarta Sans", "sans-serif"],
-                        body: ["Inter", "sans-serif"]
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="../../public/assets/style.css" rel="stylesheet">
 </head>
 <body class="bg-bg text-textMain font-body">
     <div class="min-h-screen">

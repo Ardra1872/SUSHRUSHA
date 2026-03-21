@@ -12,46 +12,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#2563EB", // Slightly more vibrant blue (Tailwind Blue 600)
-            "primary-light": "#3B82F6",
-            "primary-dark": "#1D4ED8",
-            "background-light": "#F8FAFC", // Slate 50
-            "background-dark": "#0F172A", // Slate 900
-            "surface-light": "#FFFFFF",
-          },
-          fontFamily: {
-            "display": ["Plus Jakarta Sans", "sans-serif"],
-            "body": ["Plus Jakarta Sans", "sans-serif"]
-          },
-          boxShadow: {
-            'soft': '0 20px 40px -15px rgba(37, 99, 235, 0.1)',
-            'glow': '0 0 20px rgba(37, 99, 235, 0.3)'
-          }
-        },
-      },
-    }
-  </script>
-  <style type="text/tailwindcss">
-    @layer utilities {
-        .text-balance {
-            text-wrap: balance;
-        }
-        .bg-grid-pattern {
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-        .dark .bg-grid-pattern {
-            background-image: radial-gradient(#334155 1px, transparent 1px);
-        }
-    }
-</style>
+  <link href="assets/style.css" rel="stylesheet" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+
 </head>
 
 <body
@@ -77,18 +40,65 @@
         </nav>
 
         <!-- Actions -->
-        <div class="hidden md:flex gap-3">
-          <a href="login.php"
-            class="px-5 py-2 rounded-full border border-slate-300 font-semibold text-sm hover:bg-slate-100 transition">
-            Login
-          </a>
-          <a href="register.php"
-            class="px-6 py-2 rounded-full bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition shadow-md">
-            Register
-          </a>
+        <div class="flex items-center gap-3">
+          <div class="hidden md:flex gap-3">
+            <a href="login.php"
+              class="px-5 py-2 rounded-full border border-slate-300 font-semibold text-sm hover:bg-slate-100 transition text-slate-900">
+              Login
+            </a>
+            <a href="register.php"
+              class="px-6 py-2 rounded-full bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition shadow-md">
+              Register
+            </a>
+          </div>
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-button" class="md:hidden flex items-center justify-center size-12 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 hover:text-primary hover:bg-white transition-all shadow-sm">
+            <span class="material-symbols-outlined text-3xl">menu</span>
+          </button>
         </div>
       </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[100] bg-white dark:bg-slate-900 translate-x-full transition-transform duration-300 ease-in-out md:hidden flex flex-col p-8 shadow-2xl">
+      <div class="flex items-center justify-between mb-16">
+        <a href="#" class="flex items-center gap-2 font-extrabold text-xl text-slate-900 dark:text-white">
+          <span class="material-symbols-outlined text-primary text-3xl">local_pharmacy</span>
+          SUSHRUSHA
+        </a>
+        <button id="close-menu-button" class="size-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-all">
+          <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+      </div>
+      
+      <nav class="flex flex-col gap-10">
+        <a href="#" class="mobile-nav-link text-2xl font-bold text-slate-800 dark:text-slate-100 hover:text-primary transition-colors flex items-center justify-between group">
+          Home
+          <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+        </a>
+        <a href="#features" class="mobile-nav-link text-2xl font-bold text-slate-800 dark:text-slate-100 hover:text-primary transition-colors flex items-center justify-between group">
+          Features
+          <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+        </a>
+        <a href="#how-it-works" class="mobile-nav-link text-2xl font-bold text-slate-800 dark:text-slate-100 hover:text-primary transition-colors flex items-center justify-between group">
+          How it Works
+          <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+        </a>
+        <a href="#contact" class="mobile-nav-link text-2xl font-bold text-slate-800 dark:text-slate-100 hover:text-primary transition-colors flex items-center justify-between group">
+          Contact
+          <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+        </a>
+      </nav>
+
+      <div class="mt-auto flex flex-col gap-5">
+        <a href="login.php" class="w-full py-5 text-center rounded-2xl border border-slate-200 font-bold text-lg text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
+          Login
+        </a>
+        <a href="register.php" class="w-full py-5 text-center rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
+          Get Started
+        </a>
+      </div>
+    </div>
     <!-- ================= HERO ================= -->
     <section class="pt-32 pb-24 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
 
@@ -397,6 +407,50 @@
   </footer>
   </div>
 
+  <script>
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const closeMenuButton = document.getElementById('close-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    function toggleMenu() {
+      if (mobileMenu.classList.contains('translate-x-full')) {
+        mobileMenu.classList.remove('translate-x-full');
+        mobileMenu.classList.add('translate-x-0');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+      } else {
+        mobileMenu.classList.remove('translate-x-0');
+        mobileMenu.classList.add('translate-x-full');
+        document.body.style.overflow = ''; // Restore scrolling
+      }
+    }
+
+    mobileMenuButton.addEventListener('click', toggleMenu);
+    closeMenuButton.addEventListener('click', toggleMenu);
+
+    // Close menu when a link is clicked
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('translate-x-0');
+        mobileMenu.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('translate-x-0')) {
+        toggleMenu();
+      }
+    });
+
+    // Handle resize - close menu if window becomes desktop size
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && mobileMenu.classList.contains('translate-x-0')) {
+        toggleMenu();
+      }
+    });
+  </script>
 </body>
 
 </html>

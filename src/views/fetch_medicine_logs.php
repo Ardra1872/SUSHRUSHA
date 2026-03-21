@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 session_start();
-include '../config/db.php';
+include __DIR__ . '/../config/db.php';
 
 try {
     $patient_id = $_SESSION['user_id'] ?? null;

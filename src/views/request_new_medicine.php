@@ -9,8 +9,8 @@ header('Content-Type: application/json');
 try {
     session_start();
     
-    if (!file_exists('../config/db.php')) throw new Exception('Database config missing');
-    include '../config/db.php';
+    if (!file_exists(__DIR__ . '/../config/db.php')) throw new Exception('Database config missing');
+    include __DIR__ . '/../config/db.php';
 
     $patient_id = $_SESSION['user_id'] ?? null;
     if (!$patient_id) {

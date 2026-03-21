@@ -1,6 +1,6 @@
 <?php
 // debug_adherence.php
-require 'c:/xampp/htdocs/SUSHRUSHA/src/config/db.php';
+require '../src/config/db.php';
 
 // Check for a specific patient (Ardra S Nair from screenshot, let's find her ID)
 $userRes = $conn->query("SELECT id, name FROM users WHERE name LIKE '%Ardra%'");

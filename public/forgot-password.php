@@ -1,7 +1,7 @@
 <?php
 session_start();
-require '../src/config/db.php';
-require '../src/helpers/sendOtp.php';
+require dirname(__DIR__) . '/src/config/db.php';
+require dirname(__DIR__) . '/src/helpers/sendOtp.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../src/config/db.php';
+require dirname(__DIR__) . '/src/config/db.php';
 
 if(!isset($_SESSION['otp_verified'])){
     header("Location: login.php");
